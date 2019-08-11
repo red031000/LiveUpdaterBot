@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -24,6 +20,9 @@ namespace LiveUpdaterBot
 
 		[JsonProperty(PropertyName = "map_name")]
 		public string MapName;
+
+		[JsonProperty(PropertyName = "map_id")]
+		public int MapId;
 
 		[JsonProperty(PropertyName = "battle_kind", ItemConverterType = typeof(StringEnumConverter))]
 		public BattleKind? BattleKind;
@@ -60,6 +59,9 @@ namespace LiveUpdaterBot
 
 		[JsonProperty(PropertyName = "moves")]
 		public List<Move> Moves;
+
+		[JsonProperty(PropertyName = "health")]
+		public int[] Health;
 	}
 
 	public class Species
@@ -90,6 +92,12 @@ namespace LiveUpdaterBot
 
 		[JsonProperty(PropertyName = "name")]
 		public string Name;
+
+		[JsonProperty(PropertyName = "id")]
+		public int Id;
+
+		[JsonProperty(PropertyName = "class_id")]
+		public int ClassId;
 	}
 
 	public class GameStats
@@ -99,6 +107,12 @@ namespace LiveUpdaterBot
 
 		[JsonProperty(PropertyName = "Saves Made")]
 		public int Saves;
+
+		[JsonProperty(PropertyName = "Pok\u00e9mon Center Uses")]
+		public int PokemonCentersUsed;
+
+		[JsonProperty(PropertyName = "Battles Fought (Total)")]
+		public int BattlesFought;
 	}
 
 	public enum BattleKind

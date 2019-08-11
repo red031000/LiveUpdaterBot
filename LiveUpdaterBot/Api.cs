@@ -30,6 +30,7 @@ namespace LiveUpdaterBot
 					$"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
 				await Program.LogWriter.FlushAsync();
 				Console.ForegroundColor = ConsoleColor.White;
+				result.Dispose();
 				return;
 			}
 
@@ -44,6 +45,16 @@ namespace LiveUpdaterBot
 				Status.BadgesFlags.Add((Status.Badges & (int)Math.Pow(2, j)) != 0);
 				j++;
 			}
+
+			if (Status.EnemyTrainers != null)
+			{
+				foreach (Trainer t in Status.EnemyTrainers)
+				{
+					t.ClassName = t.ClassName.Replace("πµ", "PkMn");
+				}
+			}
+
+			result.Dispose();
 		}
 	}
 }

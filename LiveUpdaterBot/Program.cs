@@ -15,7 +15,8 @@ namespace LiveUpdaterBot
 		public static DiscordClient Client;
 		public static Settings Settings;
 		public static List<DiscordChannel> Channels = new List<DiscordChannel>();
-		public static FileStream LogStream = new FileStream("log.txt", FileMode.Append);
+		public static DateTime logdate = DateTime.UtcNow.Date;
+		public static FileStream LogStream = new FileStream("TriHardEmerald" + logdate.ToString("yyyy-MM-dd") + ".txt", FileMode.Append);
 		public static StreamWriter LogWriter = new StreamWriter(LogStream);
 		private static bool cancel, reset;
 
@@ -36,7 +37,7 @@ namespace LiveUpdaterBot
 			}
 			catch (Exception e)
 			{
-				using (FileStream stream = new FileStream("crash.log", FileMode.Append, FileAccess.ReadWrite))
+				using (FileStream stream = new FileStream("crash.log", FileMode.Append))
 				{
 					using (StreamWriter writer = new StreamWriter(stream))
 					{
@@ -115,16 +116,136 @@ namespace LiveUpdaterBot
 					Console.ForegroundColor = ConsoleColor.White;
 				}
 
-				//await Utils.SendMessage(Client, $"AreaName: {Api.Status.AreaName}, Blackouts: {Api.Status.GameStats.Blackouts}, Saves: {Api.Status.GameStats.Saves}, MapName: {Api.Status.MapName}");
+				if (logdate != DateTime.UtcNow.Date)
+				{
+					LogWriter.Dispose();
+					LogStream.Dispose();
+					logdate = DateTime.UtcNow.Date;
+					LogStream = new FileStream("TriHardEmerald" + logdate.ToString("yyyy-MM-dd") + ".txt", FileMode.Append);
+					LogWriter = new StreamWriter(LogStream);
+				}
+
 				await Task.Delay(RefreshInterval * 1000);
 			}
 		}
 
 		private static string CalculateDeltas(RunStatus status, RunStatus oldStatus)
 		{
+			bool reset2 = reset;
 			StringBuilder builder = new StringBuilder();
 			if (oldStatus == null)
 				return null; //calculate deltas between two statuses, not just one
+
+			if (status.BattleKind != null && status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
+			{
+				switch (status.BattleKind)
+				{
+					case BattleKind.Wild:
+						string[] rand1 =
+							{"come across", "run into", "step on", "stumble upon", "encounter", "bump into", "run across"};
+						string[] rand2 = { "Facing off against", "Battling", "Grappling", "Affronted by", "Wrestling" };
+						string[] rand3 =
+						{
+							"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
+							"collides with", "jumps", "ambushes", "attacks", "assaults"
+						};
+						string[] choice =
+						{
+							$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
+							$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
+							$"A wild {status.EnemyParty[0].Species.Name} {rand3[Random.Next(rand3.Length)]} us. "
+						};
+						string message = choice[Random.Next(choice.Length)];
+						builder.Append(message);
+						break;
+					case BattleKind.Trainer:
+						if (status.EnemyTrainers.Count == 1)
+						{
+							Trainer trainer = status.EnemyTrainers[0];
+							if (trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" || trainer.ClassName == "Champion" || trainer.Id == 527 /* brenden */)
+							{
+								builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
+								break;
+							}
+							string[] c1 = {"fight", "battle", "face off against"};
+							string[] c2 = {"cheeky", "rogue", "roving", "wandering"};
+							string[] c3 = {" wandering", "n eager"};
+							string[] choices =
+							{
+								$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. ",
+								$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. ",
+								$"{trainer.ClassName} {trainer.Name} picks a fight with us{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. "
+							};
+							builder.Append(choices[Random.Next(choices.Length)]);
+						}
+						else if (status.EnemyTrainers.Count == 2)
+						{
+							Trainer trainer0 = status.EnemyTrainers[0];
+							Trainer trainer1 = status.EnemyTrainers[1];
+
+							if (trainer1.ClassId != 0)
+							{
+								string[] choices =
+								{
+									$"Both {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name} challenge us to a battle at the same time!",
+								};
+								builder.Append(choices[Random.Next(choices.Length)]);
+							}
+							else
+							{
+								string[] choices =
+								{
+									$"{trainer0.ClassName} {trainer0.Name} challenge us to a battle at the same time!",
+								};
+								builder.Append(choices[Random.Next(choices.Length)]);
+							}
+						}
+
+						break;
+				}
+			}
+
+			foreach (Pokemon mon in status.Party)
+			{
+				if (mon == null) continue;
+				uint pv = mon.PersonalityValue;
+				if (mon.Species.Id == 292)
+					pv++;
+				Pokemon oldMon = oldStatus.Party.Where(x => x != null).FirstOrDefault(x =>
+					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+				if (oldMon == null) continue;
+				foreach (Move move in mon.Moves)
+				{
+					if (move == null) continue;
+					if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id))
+					{
+						if (oldMon.Moves.Count == 4)
+						{
+							Move oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
+							builder.Append(
+								$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
+						}
+						else
+						{
+							builder.Append($"**{mon.Name} ({mon.Species.Name}) learned {move.Name}!** ");
+						}
+					}
+				}
+
+				if (mon.Health[0] == 0 && oldMon.Health[0] != 0)
+				{
+					string[] choice = {$"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ", $"**{oldMon.Name} ({oldMon.Species.Name}) has died!** "};
+					builder.Append(choice[Random.Next(choice.Length)]);
+				}
+			}
+
+			if (status.GameStats.Blackouts != oldStatus.GameStats.Blackouts)
+			{
+				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
+				string message = options[Random.Next(options.Length)];
+				reset = true;
+				builder.Append(message);
+			}
 
 			if (status.Badges != oldStatus.Badges)
 			{
@@ -156,7 +277,7 @@ namespace LiveUpdaterBot
 					if (losses[i])
 					{
 						string[] choices = { $"**Lost the {Settings.BadgeNames[i]} Badge!** " };
-						builder.Append(choices[Random.Next(choices.Length - 1)]);
+						builder.Append(choices[Random.Next(choices.Length)]);
 					}
 				}
 
@@ -169,58 +290,8 @@ namespace LiveUpdaterBot
 							$"**Got the {Settings.BadgeNames[i]} Badge!** ",
 							$"**Received the {Settings.BadgeNames[i]} Badge!** "
 						};
-						builder.Append(choices[Random.Next(choices.Length - 1)]);
+						builder.Append(choices[Random.Next(choices.Length)]);
 					}
-				}
-			}
-
-			if (status.BattleKind != null && oldStatus.BattleKind == null)
-			{
-				switch (status.BattleKind) //TODO double trainer
-				{
-					case BattleKind.Wild:
-						string[] rand1 =
-							{"come across", "run into", "step on", "stumble upon", "encounter", "bump into", "run across"};
-						string[] rand2 = { "Facing off against", "Battling", "Grappling", "Affronted by", "Wrestling" };
-						string[] rand3 =
-						{
-							"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
-							"collides with", "jumps", "ambushes", "attacks", "assaults"
-						};
-						string[] choice =
-						{
-							$"We {rand1[Random.Next(rand1.Length - 1)]} a wild {status.EnemyParty[0].Species.Name}. ",
-							$"{rand2[Random.Next(rand2.Length - 1)]} a wild {status.EnemyParty[0].Species.Name}. ",
-							$"A wild {status.EnemyParty[0].Species.Name} {rand3[Random.Next(rand3.Length - 1)]} us. "
-						};
-						string message = choice[Random.Next(choice.Length - 1)];
-						builder.Append(message);
-						break;
-					case BattleKind.Trainer:
-						if (status.EnemyTrainers.Count == 1)
-						{
-							Trainer trainer = status.EnemyTrainers[0];
-							if (trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" || trainer.ClassName == "Champion")
-							{
-								builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
-								break;
-							}
-							string[] c1 = {"fight", "battle", "face off against"};
-							string[] c2 = {"cheeky", "rogue", "roving", "wandering"};
-							string[] c3 = {" wandering", " n eager"};
-							string[] choices =
-							{
-								$"We {c1[Random.Next(c1.Length - 1)]} a {c2[Random.Next(c2.Length - 1)]} {trainer.ClassName}, named {trainer.Name}{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. ",
-								$"We get spotted by a{c3[Random.Next(c3.Length - 1)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. ",
-								$"{trainer.ClassName} {trainer.Name} picks a fight with us{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. "
-							};
-							builder.Append(choices[Random.Next(choices.Length - 1)]);
-							break;
-						}
-						else
-						{
-							break;
-						}
 				}
 			}
 
@@ -231,14 +302,13 @@ namespace LiveUpdaterBot
 				uint pv = oldMon.PersonalityValue;
 				if (oldMon.Species.Id == 292)
 					pv++;
-				Pokemon mon = status.Party.FirstOrDefault(x =>
+				Pokemon mon = status.Party.Where(x => x != null).FirstOrDefault(x =>
 					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
 				if (mon == null)
 				{
-					builder.Append($"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ");
 					continue;
 				}
-				if (mon.Level != oldMon.Level)
+				if (mon.Level != oldMon.Level && !reset)
 				{
 					string[] choices =
 					{
@@ -246,7 +316,7 @@ namespace LiveUpdaterBot
 						$"**{oldMon.Name} ({oldMon.Species.Name}) is now level {mon.Level}!** ",
 						$"**{oldMon.Name} ({oldMon.Species.Name}) has leveled up to {mon.Level}!** "
 					};
-					string message = choices[Random.Next(choices.Length - 1)];
+					string message = choices[Random.Next(choices.Length)];
 					builder.Append(message);
 
 					if (mon.Species.Id != oldMon.Species.Id)
@@ -256,36 +326,8 @@ namespace LiveUpdaterBot
 							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}! **",
 							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}! **"
 						};
-						message = choices[Random.Next(choices.Length - 1)];
+						message = choices[Random.Next(choices.Length)];
 						builder.Append(message);
-					}
-				}
-			}
-
-			foreach (Pokemon mon in status.Party)
-			{
-				if (mon == null) continue;
-				uint pv = mon.PersonalityValue;
-				if (mon.Species.Id == 292)
-					pv++;
-				Pokemon oldMon = status.Party.FirstOrDefault(x =>
-					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
-				if (oldMon == null) continue;
-				foreach (Move move in mon.Moves)
-				{
-					if (move == null) continue;
-					if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id))
-					{
-						if (oldMon.Moves.Count == 4)
-						{
-							Move oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
-							builder.Append(
-								$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
-						}
-						else
-						{
-							builder.Append($"{mon.Name} ({mon.Species.Name}) learned {move.Name}!** ");
-						}
 					}
 				}
 			}
@@ -303,8 +345,12 @@ namespace LiveUpdaterBot
 				{
 					if (reset)
 					{
-						builder.Append($"**We re-gain {mon.Name} ({mon.Species.Name})!** ");
-						reset = false;
+						string[] choice =
+						{
+							$"**We re-gain {mon.Name} ({mon.Species.Name})!** ",
+							$"**{mon.Name} ({mon.Species.Name}) reappears!** "
+						};
+						builder.Append(choice[Random.Next(choice.Length)]);
 					}
 					else
 					{
@@ -314,22 +360,17 @@ namespace LiveUpdaterBot
 				}
 			}
 
-			if (status.GameStats.Blackouts != oldStatus.GameStats.Blackouts)
-			{
-				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
-				string message = options[Random.Next(options.Length - 1)];
-				reset = true;
-				builder.Append(message);
-			}
+			if (status.GameStats.Saves < oldStatus.GameStats.Saves) builder.Append("**We save!** ");
 
-			if (status.GameStats.Saves != oldStatus.GameStats.Saves) builder.Append("**We save!**");
+			if (status.GameStats.PokemonCentersUsed < oldStatus.GameStats.PokemonCentersUsed)
+				builder.Append("**We heal!** at the Poké Center! ");
 
 			if (status.MapName != oldStatus.MapName)
 			{
 				if (!string.IsNullOrWhiteSpace(status.MapName))
 				{
 					string[] move = {"head", "go", "step", "move", "travel", "walk", "stroll", "stride"};
-					string choice = move[Random.Next(move.Length - 1)];
+					string choice = move[Random.Next(move.Length)];
 					List<string> options = new List<string>
 					{
 						$"{status.MapName}. ", $"In {status.MapName}. ",
@@ -337,10 +378,17 @@ namespace LiveUpdaterBot
 						$"We {choice} into {status.MapName}. ",
 						$"Arrived at {status.MapName}. "
 					};
-					string message = options[Random.Next(options.Count - 1)];
+					string message = options[Random.Next(options.Count)];
 					builder.Append(message);
 				}
+				else if (status.MapId == 13)
+				{
+					builder.Append("Entered into a contest. ");
+				}
 			}
+
+			if (reset2)
+				reset = false;
 
 			return builder.ToString().Length == 0 ? null : builder.ToString();
 		}
