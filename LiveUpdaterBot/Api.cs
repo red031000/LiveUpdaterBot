@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -30,6 +26,9 @@ namespace LiveUpdaterBot
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine($"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
+				await Program.LogWriter.WriteLineAsync(
+					$"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
+				await Program.LogWriter.FlushAsync();
 				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}

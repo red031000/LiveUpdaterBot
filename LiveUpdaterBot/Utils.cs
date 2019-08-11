@@ -17,6 +17,8 @@ namespace LiveUpdaterBot
 				messages.Add(message);
 			}
 			Console.WriteLine($"Sent message: {content}");
+			await Program.LogWriter.WriteLineAsync($"Sent message: {content}");
+			await Program.LogWriter.FlushAsync();
 			return messages;
 		}
 	}

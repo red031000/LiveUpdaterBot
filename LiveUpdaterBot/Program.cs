@@ -15,6 +15,8 @@ namespace LiveUpdaterBot
 		public static DiscordClient Client;
 		public static Settings Settings;
 		public static List<DiscordChannel> Channels = new List<DiscordChannel>();
+		public static FileStream LogStream = new FileStream("log.txt", FileMode.Append);
+		public static StreamWriter LogWriter = new StreamWriter(LogStream);
 		private static bool cancel;
 
 		private static Api Api;
@@ -34,7 +36,7 @@ namespace LiveUpdaterBot
 			}
 			catch (Exception e)
 			{
-				using (FileStream stream = new FileStream("crash.log", FileMode.OpenOrCreate, FileAccess.ReadWrite))
+				using (FileStream stream = new FileStream("crash.log", FileMode.Append, FileAccess.ReadWrite))
 				{
 					using (StreamWriter writer = new StreamWriter(stream))
 					{
