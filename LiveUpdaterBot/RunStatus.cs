@@ -57,6 +57,9 @@ namespace LiveUpdaterBot
 
 		[JsonProperty(PropertyName = "species")]
 		public Species Species;
+
+		[JsonProperty(PropertyName = "moves")]
+		public List<Move> Moves;
 	}
 
 	public class Species
@@ -66,6 +69,15 @@ namespace LiveUpdaterBot
 
 		[JsonProperty(PropertyName = "id")]
 		public int Id;
+	}
+
+	public class Move
+	{
+		[JsonProperty(PropertyName = "id")]
+		public int Id;
+
+		[JsonProperty(PropertyName = "name")]
+		public string Name;
 	}
 
 	public class Trainer

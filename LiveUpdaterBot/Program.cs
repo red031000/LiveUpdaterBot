@@ -17,7 +17,7 @@ namespace LiveUpdaterBot
 		public static List<DiscordChannel> Channels = new List<DiscordChannel>();
 		public static FileStream LogStream = new FileStream("log.txt", FileMode.Append);
 		public static StreamWriter LogWriter = new StreamWriter(LogStream);
-		private static bool cancel;
+		private static bool cancel, reset;
 
 		private static Api Api;
 
@@ -50,11 +50,7 @@ namespace LiveUpdaterBot
 
 		private static async void Disconnect(object sender, ConsoleCancelEventArgs e)
 		{
-			if (Client != null)
-			{
-				Utils.SendMessage(Client, "**Disconnecting**").Wait();
-				await Client.DisconnectAsync();
-			}
+			if (Client != null) await Client.DisconnectAsync();
 
 			cancel = true;
 			Console.ReadLine();
@@ -85,7 +81,6 @@ namespace LiveUpdaterBot
 			foreach (ulong id in Settings.Channels)
 			{
 				DiscordChannel channel = await Client.GetChannelAsync(id);
-				await channel.SendMessageAsync("**Connected**");
 				Console.WriteLine($"Connecting to channel {id}.");
 				Channels.Add(channel);
 			}
@@ -100,7 +95,7 @@ namespace LiveUpdaterBot
 			while (!cancel)
 			{
 				await Api.UpdateStatus();
-				string message = await CalculateDeltas(Api.Status, Api.OldStatus);
+				string message = CalculateDeltas(Api.Status, Api.OldStatus);
 				if (message != null)
 				{
 					TimeSpan time = DateTime.UtcNow - RunStart;
@@ -112,7 +107,7 @@ namespace LiveUpdaterBot
 			}
 		}
 
-		private static async Task<string> CalculateDeltas(RunStatus status, RunStatus oldStatus)
+		private static string CalculateDeltas(RunStatus status, RunStatus oldStatus)
 		{
 			StringBuilder builder = new StringBuilder();
 			if (oldStatus == null)
@@ -192,7 +187,7 @@ namespace LiveUpdaterBot
 						if (status.EnemyTrainers.Count == 1)
 						{
 							Trainer trainer = status.EnemyTrainers[0];
-							if (trainer.ClassName == "Leader")
+							if (trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" || trainer.ClassName == "Champion")
 							{
 								builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
 								break;
@@ -254,10 +249,62 @@ namespace LiveUpdaterBot
 				}
 			}
 
+			foreach (Pokemon mon in status.Party)
+			{
+				if (mon == null) continue;
+				uint pv = mon.PersonalityValue;
+				if (mon.Species.Id == 292)
+					pv++;
+				Pokemon oldMon = status.Party.FirstOrDefault(x =>
+					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+				foreach (Move move in mon.Moves)
+				{
+					if (move == null) continue;
+					if (!oldMon.Moves.Select(x => x.Id).Contains(move.Id))
+					{
+						if (oldMon.Moves.Count == 4)
+						{
+							Move oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
+							builder.Append(
+								$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
+						}
+						else
+						{
+							builder.Append($"{mon.Name} ({mon.Species.Name}) learned {move.Name}!** ");
+						}
+					}
+				}
+			}
+
+			foreach (Pokemon mon in status.Party)
+			{
+				if (mon == null) continue;
+				uint pv = mon.PersonalityValue;
+				if (mon.Species.Id == 292)
+					pv++;
+				List<uint> values =
+					oldStatus.Party.Select(x => x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
+						.ToList();
+				if (!values.Contains(pv))
+				{
+					if (reset)
+					{
+						builder.Append($"**We re-gain {mon.Name} ({mon.Species.Name})!** ");
+						reset = false;
+					}
+					else
+					{
+						builder.Append(
+							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
+					}
+				}
+			}
+
 			if (status.GameStats.Blackouts != oldStatus.GameStats.Blackouts)
 			{
 				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
 				string message = options[Random.Next(options.Length - 1)];
+				reset = true;
 				builder.Append(message);
 			}
 
