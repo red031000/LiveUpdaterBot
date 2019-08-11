@@ -95,11 +95,24 @@ namespace LiveUpdaterBot
 			while (!cancel)
 			{
 				await Api.UpdateStatus();
-				string message = CalculateDeltas(Api.Status, Api.OldStatus);
-				if (message != null)
+				try
 				{
-					TimeSpan time = DateTime.UtcNow - RunStart;
-					await Utils.SendMessage(Client, $"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim());
+					string message = CalculateDeltas(Api.Status, Api.OldStatus);
+					if (message != null)
+					{
+						TimeSpan time = DateTime.UtcNow - RunStart;
+						await Utils.SendMessage(Client,
+							$"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim());
+					}
+				}
+				catch (Exception e)
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine($"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
+					await LogWriter.WriteLineAsync(
+						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
+					await LogWriter.FlushAsync();
+					Console.ForegroundColor = ConsoleColor.White;
 				}
 
 				//await Utils.SendMessage(Client, $"AreaName: {Api.Status.AreaName}, Blackouts: {Api.Status.GameStats.Blackouts}, Saves: {Api.Status.GameStats.Saves}, MapName: {Api.Status.MapName}");
@@ -257,10 +270,11 @@ namespace LiveUpdaterBot
 					pv++;
 				Pokemon oldMon = status.Party.FirstOrDefault(x =>
 					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+				if (oldMon == null) continue;
 				foreach (Move move in mon.Moves)
 				{
 					if (move == null) continue;
-					if (!oldMon.Moves.Select(x => x.Id).Contains(move.Id))
+					if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id))
 					{
 						if (oldMon.Moves.Count == 4)
 						{
@@ -283,7 +297,7 @@ namespace LiveUpdaterBot
 				if (mon.Species.Id == 292)
 					pv++;
 				List<uint> values =
-					oldStatus.Party.Select(x => x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
+					oldStatus.Party.Where(x => x != null).Select(x => x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
 						.ToList();
 				if (!values.Contains(pv))
 				{
@@ -312,17 +326,20 @@ namespace LiveUpdaterBot
 
 			if (status.MapName != oldStatus.MapName)
 			{
-				string[] move = { "head", "go", "step", "move", "travel", "walk", "stroll", "stride" };
-				string choice = move[Random.Next(move.Length - 1)];
-				List<string> options = new List<string>
+				if (!string.IsNullOrWhiteSpace(status.MapName))
 				{
-					$"{status.MapName ?? status.AreaName}. ", $"In {status.MapName ?? status.AreaName}. ",
-					$"Now in {status.MapName ?? status.AreaName}. ",
-					$"We {choice} into {status.MapName ?? status.AreaName}. ",
-					$"Arrived at {status.MapName ?? status.AreaName}. "
-				};
-				string message = options[Random.Next(options.Count - 1)];
-				builder.Append(message);
+					string[] move = {"head", "go", "step", "move", "travel", "walk", "stroll", "stride"};
+					string choice = move[Random.Next(move.Length - 1)];
+					List<string> options = new List<string>
+					{
+						$"{status.MapName}. ", $"In {status.MapName}. ",
+						$"Now in {status.MapName}. ",
+						$"We {choice} into {status.MapName}. ",
+						$"Arrived at {status.MapName}. "
+					};
+					string message = options[Random.Next(options.Count - 1)];
+					builder.Append(message);
+				}
 			}
 
 			return builder.ToString().Length == 0 ? null : builder.ToString();
