@@ -205,40 +205,6 @@ namespace LiveUpdaterBot
 				}
 			}
 
-			foreach (Pokemon mon in status.Party)
-			{
-				if (mon == null) continue;
-				uint pv = mon.PersonalityValue;
-				if (mon.Species.Id == 292)
-					pv++;
-				Pokemon oldMon = oldStatus.Party.Where(x => x != null).FirstOrDefault(x =>
-					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
-				if (oldMon == null) continue;
-				foreach (Move move in mon.Moves)
-				{
-					if (move == null) continue;
-					if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id))
-					{
-						if (oldMon.Moves.Count == 4)
-						{
-							Move oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
-							builder.Append(
-								$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
-						}
-						else
-						{
-							builder.Append($"**{mon.Name} ({mon.Species.Name}) learned {move.Name}!** ");
-						}
-					}
-				}
-
-				if (mon.Health[0] == 0 && oldMon.Health[0] != 0)
-				{
-					string[] choice = {$"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ", $"**{oldMon.Name} ({oldMon.Species.Name}) has died!** "};
-					builder.Append(choice[Random.Next(choice.Length)]);
-				}
-			}
-
 			if (status.GameStats.Blackouts != oldStatus.GameStats.Blackouts)
 			{
 				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
@@ -338,6 +304,40 @@ namespace LiveUpdaterBot
 				uint pv = mon.PersonalityValue;
 				if (mon.Species.Id == 292)
 					pv++;
+				Pokemon oldMon = oldStatus.Party.Where(x => x != null).FirstOrDefault(x =>
+					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+				if (oldMon == null) continue;
+				foreach (Move move in mon.Moves)
+				{
+					if (move == null) continue;
+					if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id))
+					{
+						if (oldMon.Moves.Count == 4)
+						{
+							Move oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
+							builder.Append(
+								$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
+						}
+						else
+						{
+							builder.Append($"**{mon.Name} ({mon.Species.Name}) learned {move.Name}!** ");
+						}
+					}
+				}
+
+				if (mon.Health[0] == 0 && oldMon.Health[0] != 0)
+				{
+					string[] choice = { $"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ", $"**{oldMon.Name} ({oldMon.Species.Name}) has died!** " };
+					builder.Append(choice[Random.Next(choice.Length)]);
+				}
+			}
+
+			foreach (Pokemon mon in status.Party)
+			{
+				if (mon == null) continue;
+				uint pv = mon.PersonalityValue;
+				if (mon.Species.Id == 292)
+					pv++;
 				List<uint> values =
 					oldStatus.Party.Where(x => x != null).Select(x => x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
 						.ToList();
@@ -360,9 +360,9 @@ namespace LiveUpdaterBot
 				}
 			}
 
-			if (status.GameStats.Saves < oldStatus.GameStats.Saves) builder.Append("**We save!** ");
+			if (status.GameStats.Saves > oldStatus.GameStats.Saves) builder.Append("**We save!** ");
 
-			if (status.GameStats.PokemonCentersUsed < oldStatus.GameStats.PokemonCentersUsed)
+			if (status.GameStats.PokemonCentersUsed > oldStatus.GameStats.PokemonCentersUsed)
 				builder.Append("**We heal!** at the Poké Center! ");
 
 			if (status.MapName != oldStatus.MapName)
