@@ -18,6 +18,9 @@ namespace LiveUpdaterBot
 		[JsonProperty(PropertyName = "game_stats")]
 		public GameStats GameStats;
 
+		[JsonProperty(PropertyName = "seen")]
+		public int Seen;
+
 		[JsonProperty(PropertyName = "map_name")]
 		public string MapName;
 

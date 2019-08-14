@@ -20,6 +20,8 @@ namespace LiveUpdaterBot
 		public static StreamWriter LogWriter = new StreamWriter(LogStream);
 		private static bool cancel, reset;
 
+		private static int expected;
+
 		private static Api Api;
 
 		public static readonly DateTime RunStart = new DateTime(2019, 08, 10, 21, 00, 00);
@@ -132,6 +134,7 @@ namespace LiveUpdaterBot
 		private static string CalculateDeltas(RunStatus status, RunStatus oldStatus)
 		{
 			bool reset2 = reset;
+
 			StringBuilder builder = new StringBuilder();
 			if (oldStatus == null)
 				return null; //calculate deltas between two statuses, not just one
@@ -162,7 +165,7 @@ namespace LiveUpdaterBot
 						if (status.EnemyTrainers.Count == 1)
 						{
 							Trainer trainer = status.EnemyTrainers[0];
-							if (trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" || trainer.ClassName == "Champion" || trainer.Id == 527 /* brenden */)
+							if (trainer.ClassName == "Magma Admin" || trainer.ClassName == "Magma Leader" || trainer.ClassName == "Aqua Leader" || trainer.ClassName == "Aqua Admin" || trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" || trainer.ClassName == "Champion" || trainer.ClassId == 50 /* brenden, may, steven, few others */)
 							{
 								builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
 								break;
@@ -284,17 +287,17 @@ namespace LiveUpdaterBot
 					};
 					string message = choices[Random.Next(choices.Length)];
 					builder.Append(message);
+				}
 
-					if (mon.Species.Id != oldMon.Species.Id)
+				if (mon.Species.Id != oldMon.Species.Id && !reset)
+				{
+					string[] choices =
 					{
-						choices = new[]
-						{
-							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}! **",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}! **"
-						};
-						message = choices[Random.Next(choices.Length)];
-						builder.Append(message);
-					}
+						$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}! **",
+						$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}! **"
+					};
+					string message = choices[Random.Next(choices.Length)];
+					builder.Append(message);
 				}
 			}
 
@@ -327,7 +330,16 @@ namespace LiveUpdaterBot
 
 				if (mon.Health[0] == 0 && oldMon.Health[0] != 0)
 				{
-					string[] choice = { $"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ", $"**{oldMon.Name} ({oldMon.Species.Name}) has died!** " };
+					string[] choice =
+					{
+						$"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ",
+						$"**{oldMon.Name} ({oldMon.Species.Name}) has died!** ",
+						$"**Press F48 to pay your respects to {oldMon.Name} ({oldMon.Species.Name}).** ",
+						$"**{oldMon.Name} ({oldMon.Species.Name}) has fallen!** ",
+						$"**{oldMon.Name} ({oldMon.Species.Name}) is no more!** ",
+						$"**{oldMon.Name} ({oldMon.Species.Name}) has kicked the bucket!** ",
+						$"**{oldMon.Name} ({oldMon.Species.Name}) has fainted. Bye bye {oldMon.Name}.** "
+					};
 					builder.Append(choice[Random.Next(choice.Length)]);
 				}
 			}
@@ -347,8 +359,13 @@ namespace LiveUpdaterBot
 					{
 						string[] choice =
 						{
-							$"**We re-gain {mon.Name} ({mon.Species.Name})!** ",
-							$"**{mon.Name} ({mon.Species.Name}) reappears!** "
+							$"**We regain {mon.Name} ({mon.Species.Name})!** ",
+							$"**{mon.Name} ({mon.Species.Name}) reappears!** ",
+							$"**{mon.Name} ({mon.Species.Name}) returns to us!** ",
+							$"**{mon.Name} ({mon.Species.Name}) returns from beyond the grave!** ",
+							$"**We find {mon.Name} ({mon.Species.Name}) again!** ",
+							$"**{mon.Name} ({mon.Species.Name}) came back!** ",
+							$"**We revert to a time before {mon.Name}'s ({mon.Species.Name}) demise.** "
 						};
 						builder.Append(choice[Random.Next(choice.Length)]);
 					}
@@ -360,10 +377,15 @@ namespace LiveUpdaterBot
 				}
 			}
 
-			if (status.GameStats.Saves > oldStatus.GameStats.Saves) builder.Append("**We save!** ");
+			expected = expected > oldStatus.GameStats.Saves ? expected : oldStatus.GameStats.Saves;
 
 			if (status.GameStats.PokemonCentersUsed > oldStatus.GameStats.PokemonCentersUsed)
-				builder.Append("**We heal!** at the Poké Center! ");
+			{
+				builder.Append("**We heal** at the Poké Center! Progress saved. ");
+				expected++;
+			}
+
+			if (status.GameStats.Saves > expected) builder.Append("**We save!** ");
 
 			if (status.MapName != oldStatus.MapName)
 			{

@@ -39,6 +39,13 @@ namespace LiveUpdaterBot
 
 			Status = JsonConvert.DeserializeObject<RunStatus>(content);
 
+			if (Status.Seen == 0) //TODO temp fix
+			{
+				Status = OldStatus;
+				result.Dispose();
+				return; //Game hasn't loaded yet
+			}
+
 			int j = 0;
 			foreach (string _ in Program.Settings.BadgeNames)
 			{
