@@ -47,8 +47,18 @@ namespace LiveUpdaterBot
 						writer.Flush();
 					}
 				}
+
+				ReportError(e).Wait();
 				Disconnect(null, null);
 			}
+		}
+
+		private static async Task ReportError(Exception e)
+		{
+			DiscordGuild RPS = await Client.GetGuildAsync(428919331628253184);
+			DiscordMember red = await RPS.GetMemberAsync(347914452181581827);
+			await red.SendMessageAsync(
+				$"Exception has occured: {e.Message}{(e.StackTrace.Length > 1500 ? $"{Environment.NewLine}StackTrace too large" : $"{Environment.NewLine}{e.StackTrace}")}");
 		}
 
 		private static async void Disconnect(object sender, ConsoleCancelEventArgs e)
