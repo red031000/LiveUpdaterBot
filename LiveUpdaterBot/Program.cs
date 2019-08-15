@@ -198,7 +198,16 @@ namespace LiveUpdaterBot
 							Trainer trainer0 = status.EnemyTrainers[0];
 							Trainer trainer1 = status.EnemyTrainers[1];
 
-							if (trainer1.ClassId != 0)
+							if (trainer0.ClassName == "Magma Admin" || trainer0.ClassName == "Magma Leader" ||
+							    trainer0.ClassName == "Aqua Leader" || trainer0.ClassName == "Aqua Admin" ||
+							    trainer0.ClassName == "Leader" || trainer0.ClassName == "Elite Four" ||
+							    trainer0.ClassName == "Champion" ||
+							    trainer0.ClassId == 50 /* brenden, may, steven, few others */)
+							{
+								builder.Append($"**VS {trainer0.ClassName}s {trainer0.Name}!** ");
+								break;
+							}
+							else if (trainer1.ClassId != 0)
 							{
 								string[] choices =
 								{
