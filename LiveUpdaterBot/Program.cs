@@ -44,7 +44,7 @@ namespace LiveUpdaterBot
 				{
 					using (StreamWriter writer = new StreamWriter(stream))
 					{
-						writer.WriteLine($"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
+						writer.WriteLine($"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}{e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}{Environment.NewLine}");
 						writer.Flush();
 					}
 				}
@@ -60,7 +60,7 @@ namespace LiveUpdaterBot
 			DiscordGuild RPS = await Client.GetGuildAsync(428919331628253184);
 			DiscordMember red = await RPS.GetMemberAsync(347914452181581827);
 			await red.SendMessageAsync(
-				$"Exception has occured: {e.Message}{(e.StackTrace.Length > 1500 ? $"{Environment.NewLine}StackTrace too large" : $"{Environment.NewLine}{e.StackTrace}")}");
+				$"Exception has occured: {e.Message}{((e.StackTrace.Length + e.InnerException?.StackTrace?.Length ?? 0) > 1500 ? $"{Environment.NewLine}StackTrace too large" : $"{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception: {e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}")}");
 		}
 
 		private static async void Disconnect(object sender, ConsoleCancelEventArgs e)

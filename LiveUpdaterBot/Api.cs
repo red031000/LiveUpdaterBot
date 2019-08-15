@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Timers;
 using Newtonsoft.Json;
 
 namespace LiveUpdaterBot
@@ -9,6 +11,9 @@ namespace LiveUpdaterBot
 	{
 		public RunStatus Status;
 		public RunStatus OldStatus;
+		private string message;
+
+		private Timer timer;
 
 		public HttpClient client = new HttpClient();
 
@@ -16,12 +21,27 @@ namespace LiveUpdaterBot
 		{
 			client.DefaultRequestHeaders.Add("Accept", "application/json");
 			client.DefaultRequestHeaders.Add("OAuth-Token", Program.Settings.OAuth);
+			timer = new Timer
+			{
+				AutoReset = true,
+				Interval = 3.6e+6
+			};
+			timer.Elapsed += TimerOnElapsed;
+			timer.Enabled = true;
+		}
+
+		private void TimerOnElapsed(object sender, ElapsedEventArgs e)
+		{
+			if (!Directory.Exists("Snapshots"))
+				Directory.CreateDirectory("Snapshots");
+			File.WriteAllText("Snapshots/ApiSnapshot" + DateTime.UtcNow.ToString("o") + ".txt", message);
 		}
 
 		public async Task UpdateStatus()
 		{
 			HttpResponseMessage result = await client.GetAsync("https://twitchplayspokemon.tv/api/run_status");
 			string content = await result.Content.ReadAsStringAsync();
+			message = content;
 			if (!result.IsSuccessStatusCode)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
