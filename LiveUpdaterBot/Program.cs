@@ -21,6 +21,7 @@ namespace LiveUpdaterBot
 		private static bool cancel, reset;
 
 		private static int expected;
+		private static List<Pokemon> lost = new List<Pokemon>();
 
 		private static Api Api;
 
@@ -48,7 +49,8 @@ namespace LiveUpdaterBot
 					}
 				}
 
-				ReportError(e).Wait();
+				if (Client != null)
+					ReportError(e).Wait();
 				Disconnect(null, null);
 			}
 		}
@@ -156,7 +158,7 @@ namespace LiveUpdaterBot
 					case BattleKind.Wild:
 						string[] rand1 =
 							{"come across", "run into", "step on", "stumble upon", "encounter", "bump into", "run across"};
-						string[] rand2 = { "Facing off against", "Battling", "Grappling", "Affronted by", "Wrestling" };
+						string[] rand2 = { "Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling" };
 						string[] rand3 =
 						{
 							"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
@@ -223,6 +225,7 @@ namespace LiveUpdaterBot
 				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
 				string message = options[Random.Next(options.Length)];
 				reset = true;
+				lost.Clear();
 				builder.Append(message);
 			}
 
@@ -351,6 +354,8 @@ namespace LiveUpdaterBot
 						$"**{oldMon.Name} ({oldMon.Species.Name}) has fainted. Bye bye {oldMon.Name}.** "
 					};
 					builder.Append(choice[Random.Next(choice.Length)]);
+					if (lost.All(x => x.PersonalityValue != mon.PersonalityValue))
+						lost.Add(mon);
 				}
 			}
 
@@ -389,13 +394,40 @@ namespace LiveUpdaterBot
 
 			expected = expected > oldStatus.GameStats.Saves ? expected : oldStatus.GameStats.Saves;
 
+			bool saved = false;
+
 			if (status.GameStats.PokemonCentersUsed > oldStatus.GameStats.PokemonCentersUsed)
 			{
 				builder.Append("**We heal** at the Poké Center! Progress saved. ");
 				expected++;
+				saved = true;
 			}
 
-			if (status.GameStats.Saves > expected) builder.Append("**We save!** ");
+			if (status.GameStats.Saves > expected)
+			{
+				builder.Append("**We save!** ");
+				saved = true;
+			}
+
+			if (saved)
+			{
+				foreach (Pokemon mon in lost)
+				{
+					string[] choice =
+					{
+						$"**{mon.Name} ({mon.Species.Name}) fades from existence.** ",
+						$"**{mon.Name} ({mon.Species.Name}) is enjoying the afterlife.** ",
+						$"**{mon.Name} ({mon.Species.Name}) has crossed the boundary of no return!** ",
+						$"**May {mon.Name} ({mon.Species.Name}) rest in eternal peace.** ",
+						$"**We seal the fate of {mon.Name} ({mon.Species.Name}).** ",
+						$"**{mon.Name} ({mon.Species.Name}) is gone** 🦀 ",
+						$"**{mon.Name} ({mon.Species.Name}) no longer exists in any timeline!** ",
+						$"**Requiescat in pace {mon.Name} ({mon.Species.Name}).** "
+					};
+					builder.Append(choice[Random.Next(choice.Length)]);
+				}
+				lost.Clear();
+			}
 
 			if (status.MapName != oldStatus.MapName)
 			{
