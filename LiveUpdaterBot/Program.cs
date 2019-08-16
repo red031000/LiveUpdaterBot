@@ -20,7 +20,7 @@ namespace LiveUpdaterBot
 		public static StreamWriter LogWriter = new StreamWriter(LogStream);
 		private static bool cancel, reset;
 
-		private static int expected;
+		private static uint expected;
 		private static List<Pokemon> lost = new List<Pokemon>();
 
 		private static Api Api;
@@ -377,7 +377,8 @@ namespace LiveUpdaterBot
 				List<uint> values =
 					oldStatus.Party.Where(x => x != null).Select(x => x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
 						.ToList();
-				if (!values.Contains(pv))
+				List<Pokemon> mons = oldStatus.Party.Where(x => x != null).ToList();
+				if (!values.Contains(pv) || mons.First(x => x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv).Health[0] == 0)
 				{
 					if (reset)
 					{

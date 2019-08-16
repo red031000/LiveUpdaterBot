@@ -10,7 +10,7 @@ namespace LiveUpdaterBot
 		public string AreaName;
 
 		[JsonProperty(PropertyName = "badges")]
-		public int Badges;
+		public uint Badges;
 
 		[JsonIgnore]
 		public List<bool> BadgesFlags = new List<bool>();
@@ -19,13 +19,13 @@ namespace LiveUpdaterBot
 		public GameStats GameStats;
 
 		[JsonProperty(PropertyName = "seen")]
-		public int Seen;
+		public uint Seen;
 
 		[JsonProperty(PropertyName = "map_name")]
 		public string MapName;
 
 		[JsonProperty(PropertyName = "map_id")]
-		public int MapId;
+		public uint MapId;
 
 		[JsonProperty(PropertyName = "battle_kind", ItemConverterType = typeof(StringEnumConverter))]
 		public BattleKind? BattleKind;
@@ -46,7 +46,7 @@ namespace LiveUpdaterBot
 		public bool? Active;
 
 		[JsonProperty(PropertyName = "level")]
-		public int? Level;
+		public uint? Level;
 
 		[JsonProperty(PropertyName = "name")]
 		public string Name;
@@ -106,16 +106,16 @@ namespace LiveUpdaterBot
 	public class GameStats
 	{
 		[JsonProperty(PropertyName = "blackouts")]
-		public int Blackouts;
+		public uint Blackouts;
 
 		[JsonProperty(PropertyName = "Saves Made")]
-		public int Saves;
+		public uint Saves;
 
 		[JsonProperty(PropertyName = "Pok\u00e9mon Center Uses")]
-		public int PokemonCentersUsed;
+		public uint PokemonCentersUsed;
 
 		[JsonProperty(PropertyName = "Battles Fought (Total)")]
-		public int BattlesFought;
+		public uint BattlesFought;
 	}
 
 	public enum BattleKind
