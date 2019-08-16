@@ -38,6 +38,39 @@ namespace LiveUpdaterBot
 
 		[JsonProperty(PropertyName = "party")]
 		public List<Pokemon> Party;
+
+		[JsonProperty(PropertyName = "items")]
+		public ItemGroup Items;
+	}
+
+	public class ItemGroup
+	{
+		[JsonProperty(PropertyName = "balls")]
+		public List<Item> Balls;
+
+		[JsonProperty(PropertyName = "berries")]
+		public List<Item> Berries;
+
+		[JsonProperty(PropertyName = "items")]
+		public List<Item> Items;
+
+		[JsonProperty(PropertyName = "key")]
+		public List<Item> Key;
+
+		[JsonProperty(PropertyName = "tms")]
+		public List<Item> TMs;
+	}
+
+	public class Item
+	{
+		[JsonProperty(PropertyName = "count")]
+		public uint? Count;
+
+		[JsonProperty(PropertyName = "id")]
+		public uint Id;
+
+		[JsonProperty(PropertyName = "name")]
+		public string Name;
 	}
 
 	public class Pokemon

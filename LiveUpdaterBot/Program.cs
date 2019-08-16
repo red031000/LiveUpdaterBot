@@ -286,6 +286,119 @@ namespace LiveUpdaterBot
 				}
 			}
 
+			List<uint> ids = new List<uint>();
+
+			foreach (Item item in status.Items.Balls)
+			{
+				if (ids.Contains(item.Id)) continue;
+				long count = status.Items.Balls.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				bool res = oldStatus.Items.Balls.FirstOrDefault(x => x.Id == item.Id) != null;
+				if (res)
+				{
+					long? oldCount = oldStatus.Items.Balls.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					count -= oldCount ?? 1;
+				}
+
+				if (count != 0)
+				{
+					if (status.BattleKind != null && count < 0)
+						builder.Append($"We throw {(count == -1 ? $"a {item.Name}" : $"some {item.Name}s")} at the wild {status.EnemyParty[0].Species.Name}. ");
+					else if (count < 0)
+						builder.Append($"We toss {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0)
+						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+				}
+				ids.Add(item.Id);
+			}
+
+			foreach (Item item in status.Items.Berries)
+			{
+				if (ids.Contains(item.Id)) continue;
+				long count = status.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				bool res = oldStatus.Items.Berries.FirstOrDefault(x => x.Id == item.Id) != null;
+				if (res)
+				{
+					long? oldCount = oldStatus.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					count -= oldCount ?? 1;
+				}
+
+				if (count != 0)
+				{
+					if (status.BattleKind != null && count < 0)
+						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count < 0)
+						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0)
+						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+				}
+				ids.Add(item.Id);
+			}
+
+			foreach (Item item in status.Items.Items)
+			{
+				if (ids.Contains(item.Id)) continue;
+				long count = status.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				bool res = oldStatus.Items.Items.FirstOrDefault(x => x.Id == item.Id) != null;
+				if (res)
+				{
+					long? oldCount = oldStatus.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					count -= oldCount ?? 1;
+				}
+
+				if (count != 0)
+				{
+					if (status.BattleKind != null && count < 0)
+						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count < 0)
+						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0)
+						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+				}
+				ids.Add(item.Id);
+			}
+
+			foreach (Item item in status.Items.Key)
+			{
+				if (ids.Contains(item.Id)) continue;
+				long count = status.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				bool res = oldStatus.Items.Key.FirstOrDefault(x => x.Id == item.Id) != null;
+				if (res)
+				{
+					long? oldCount = oldStatus.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					count -= oldCount ?? 1;
+				}
+
+				if (count != 0)
+				{
+					if (count < 0)
+						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0)
+						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+				}
+				ids.Add(item.Id);
+			}
+
+			foreach (Item item in status.Items.TMs)
+			{
+				if (ids.Contains(item.Id)) continue;
+				long count = status.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				bool res = oldStatus.Items.TMs.FirstOrDefault(x => x.Id == item.Id) != null;
+				if (res)
+				{
+					long? oldCount = oldStatus.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					count -= oldCount ?? 1;
+				}
+
+				if (count != 0)
+				{
+					if (count < 0)
+						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0)
+						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+				}
+				ids.Add(item.Id);
+			}
+
 			for (int i = 0; i < status.Party.Count; i++)
 			{
 				Pokemon oldMon = oldStatus.Party[i];
