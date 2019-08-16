@@ -40,14 +40,7 @@ namespace LiveUpdaterBot
 			}
 			catch (Exception e)
 			{
-				using (FileStream stream = new FileStream("crash.log", FileMode.Append))
-				{
-					using (StreamWriter writer = new StreamWriter(stream))
-					{
-						writer.WriteLine($"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}{e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}{Environment.NewLine}");
-						writer.Flush();
-					}
-				}
+				File.WriteAllText("crash.log", $"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}{e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}{Environment.NewLine}");
 
 				if (Client != null)
 					ReportError(e).Wait();
@@ -59,8 +52,15 @@ namespace LiveUpdaterBot
 		{
 			DiscordGuild RPS = await Client.GetGuildAsync(428919331628253184);
 			DiscordMember red = await RPS.GetMemberAsync(347914452181581827);
-			await red.SendMessageAsync(
-				$"Exception has occured: {e.Message}{((e.StackTrace.Length + e.InnerException?.StackTrace?.Length ?? 0) > 1500 ? $"{Environment.NewLine}StackTrace too large" : $"{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception: {e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}")}");
+			string message =
+				$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception: {e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}";
+			string message2 =
+				$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception too long.";
+			await red.SendMessageAsync(message.Length >= 2000 ? message2.Length >= 2000 ? $"Exception has occured: {e.Message}{Environment.NewLine}Stack Trace too long." : message2 : message);
+			using (FileStream stream = new FileStream("crash.log", FileMode.Open))
+			{
+				await red.SendFileAsync(stream);
+			}
 		}
 
 		private static async void Disconnect(object sender, ConsoleCancelEventArgs e)
