@@ -394,11 +394,11 @@ namespace LiveUpdaterBot
 						};
 						builder.Append(choice[Random.Next(choice.Length)]);
 					}
-					else
-					{
-						builder.Append(
-							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
-					}
+				}
+				else if (!values.Contains(pv))
+				{
+					builder.Append(
+						$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
 				}
 			}
 
