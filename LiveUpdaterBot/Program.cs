@@ -491,22 +491,19 @@ namespace LiveUpdaterBot
 					oldStatus.Party.Where(x => x != null).Select(x => x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
 						.ToList();
 				List<Pokemon> mons = oldStatus.Party.Where(x => x != null).ToList();
-				if (!values.Contains(pv) || mons.First(x => x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv).Health[0] == 0)
+				if ((!values.Contains(pv) || mons.First(x => x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv).Health[0] == 0) && reset)
 				{
-					if (reset)
+					string[] choice =
 					{
-						string[] choice =
-						{
-							$"**We regain {mon.Name} ({mon.Species.Name})!** ",
-							$"**{mon.Name} ({mon.Species.Name}) reappears!** ",
-							$"**{mon.Name} ({mon.Species.Name}) returns to us!** ",
-							$"**{mon.Name} ({mon.Species.Name}) returns from beyond the grave!** ",
-							$"**We find {mon.Name} ({mon.Species.Name}) again!** ",
-							$"**{mon.Name} ({mon.Species.Name}) came back!** ",
-							$"**We revert to a time before {mon.Name}'s ({mon.Species.Name}) demise.** "
-						};
-						builder.Append(choice[Random.Next(choice.Length)]);
-					}
+						$"**We regain {mon.Name} ({mon.Species.Name})!** ",
+						$"**{mon.Name} ({mon.Species.Name}) reappears!** ",
+						$"**{mon.Name} ({mon.Species.Name}) returns to us!** ",
+						$"**{mon.Name} ({mon.Species.Name}) returns from beyond the grave!** ",
+						$"**We find {mon.Name} ({mon.Species.Name}) again!** ",
+						$"**{mon.Name} ({mon.Species.Name}) came back!** ",
+						$"**We revert to a time before {mon.Name}'s ({mon.Species.Name}) demise.** "
+					};
+					builder.Append(choice[Random.Next(choice.Length)]);
 				}
 				else if (!values.Contains(pv))
 				{

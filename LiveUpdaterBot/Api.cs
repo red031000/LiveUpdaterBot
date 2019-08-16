@@ -66,6 +66,14 @@ namespace LiveUpdaterBot
 				return; //Game hasn't loaded yet
 			}
 
+			if (Status.BattleKind == BattleKind.Wild && Status.EnemyParty[0].Species.Name == "???")
+			{
+				Status = OldStatus;
+				result.Dispose();
+				await Task.Delay(1000);
+				await UpdateStatus();
+			}
+
 			int j = 0;
 			foreach (string _ in Program.Settings.BadgeNames)
 			{
