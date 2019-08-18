@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace LiveUpdaterBot
+namespace StreamFeedBot
 {
 	public class RunStatus
 	{

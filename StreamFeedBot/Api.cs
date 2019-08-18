@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using Newtonsoft.Json;
 
-namespace LiveUpdaterBot
+namespace StreamFeedBot
 {
 	public class Api
 	{

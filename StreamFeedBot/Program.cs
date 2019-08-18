@@ -8,9 +8,9 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using Newtonsoft.Json;
 
-namespace LiveUpdaterBot
+namespace StreamFeedBot
 {
-	class Program
+	class Program //TODO re-write to use events
 	{
 		public static DiscordClient Client;
 		public static Settings Settings;

@@ -1,4 +1,4 @@
-﻿namespace LiveUpdaterBot
+﻿namespace StreamFeedBot
 {
 	public class Settings
 	{
