@@ -23,13 +23,13 @@ namespace LiveUpdaterBot
 		private static Dictionary<int, int> attempts = new Dictionary<int, int>();
 
 		private static uint expected;
-		private static List<Pokemon> lost = new List<Pokemon>();
+		private static readonly List<Pokemon> lost = new List<Pokemon>();
 
 		private static Api Api;
 
 		public static readonly DateTime RunStart = new DateTime(2019, 08, 10, 21, 00, 00);
 
-		private static Random Random = new Random();
+		private static readonly Random Random = new Random();
 
 		public const int RefreshInterval = 15;
 
@@ -52,16 +52,24 @@ namespace LiveUpdaterBot
 
 		private static async Task ReportError(Exception e)
 		{
-			DiscordGuild RPS = await Client.GetGuildAsync(428919331628253184);
-			DiscordMember red = await RPS.GetMemberAsync(347914452181581827);
-			string message =
-				$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception: {e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}";
-			string message2 =
-				$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception too long.";
-			await red.SendMessageAsync(message.Length >= 2000 ? message2.Length >= 2000 ? $"Exception has occured: {e.Message}{Environment.NewLine}Stack Trace too long." : message2 : message);
-			using (FileStream stream = new FileStream("crash.log", FileMode.Open))
+			if (Settings != null)
 			{
-				await red.SendFileAsync(stream);
+				DiscordGuild RPS = await Client.GetGuildAsync(Settings.ReportServer);
+				DiscordMember red = await RPS.GetMemberAsync(Settings.ReportId);
+				string message =
+					$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception: {e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}";
+				string message2 =
+					$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception too long.";
+				await red.SendMessageAsync(message.Length >= 2000
+					? message2.Length >= 2000
+						?
+						$"Exception has occured: {e.Message}{Environment.NewLine}Stack Trace too long."
+						: message2
+					: message);
+				using (FileStream stream = new FileStream("crash.log", FileMode.Open))
+				{
+					await red.SendFileAsync(stream);
+				}
 			}
 		}
 
@@ -70,7 +78,8 @@ namespace LiveUpdaterBot
 			Client?.DisconnectAsync().Wait();
 
 			cancel = true;
-			e.Cancel = true;
+			if (e != null)
+				e.Cancel = true;
 			DumpMemory();
 			Console.WriteLine("Press Enter to continue...");
 			Console.ReadLine();
@@ -115,7 +124,10 @@ namespace LiveUpdaterBot
 
 			Api = new Api();
 
-			await Client.ConnectAsync();
+			await Client.ConnectAsync(new DiscordActivity("TwitchPlaysPokemon", ActivityType.Streaming)
+			{
+				StreamUrl = "https://www.twitch.tv/twitchplayspokemon"
+			});
 
 			foreach (ulong id in Settings.Channels)
 			{
@@ -140,8 +152,7 @@ namespace LiveUpdaterBot
 					if (message != null)
 					{
 						TimeSpan time = DateTime.UtcNow - RunStart;
-						await Utils.SendMessage(Client,
-							$"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim());
+						await Utils.SendMessage($"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim());
 					}
 				}
 				catch (Exception e)

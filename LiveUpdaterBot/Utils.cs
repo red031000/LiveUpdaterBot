@@ -8,7 +8,7 @@ namespace LiveUpdaterBot
 {
 	public static class Utils
 	{
-		public static async Task<List<DiscordMessage>> SendMessage(DiscordClient client, string content, DiscordEmbed embed = null)
+		public static async Task<List<DiscordMessage>> SendMessage(string content, DiscordEmbed embed = null)
 		{
 			List<DiscordMessage> messages = new List<DiscordMessage>();
 			foreach (DiscordChannel channel in Program.Channels)

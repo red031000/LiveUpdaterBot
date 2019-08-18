@@ -13,7 +13,7 @@ namespace LiveUpdaterBot
 		public RunStatus OldStatus;
 		private string message;
 
-		private Timer timer;
+		private readonly Timer timer;
 
 		public HttpClient client = new HttpClient();
 
@@ -66,7 +66,7 @@ namespace LiveUpdaterBot
 				return; //Game hasn't loaded yet
 			}
 
-			if (Status.BattleKind == BattleKind.Wild && Status.EnemyParty[0].Species.Name == "???")
+			if (Status.BattleKind == BattleKind.Wild && Status.EnemyParty != null && Status.EnemyParty.Count >= 1 && Status.EnemyParty[0].Species.Name == "???")
 			{
 				Status = OldStatus;
 				result.Dispose();

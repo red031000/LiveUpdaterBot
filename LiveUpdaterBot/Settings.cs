@@ -6,5 +6,7 @@
 		public ulong[] Channels;
 		public string OAuth;
 		public string[] BadgeNames;
+		public ulong ReportId;
+		public ulong ReportServer;
 	}
 }
