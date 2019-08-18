@@ -20,6 +20,8 @@ namespace LiveUpdaterBot
 		public static StreamWriter LogWriter = new StreamWriter(LogStream);
 		private static bool cancel, reset;
 
+		private static Dictionary<int, int> attempts = new Dictionary<int, int>();
+
 		private static uint expected;
 		private static List<Pokemon> lost = new List<Pokemon>();
 
@@ -31,12 +33,12 @@ namespace LiveUpdaterBot
 
 		public const int RefreshInterval = 15;
 
-		private static void Main(string[] args)
+		private static void Main()
 		{
 			try
 			{
 				Console.CancelKeyPress += Disconnect;
-				MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
+				MainAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 			}
 			catch (Exception e)
 			{
@@ -63,16 +65,26 @@ namespace LiveUpdaterBot
 			}
 		}
 
-		private static async void Disconnect(object sender, ConsoleCancelEventArgs e)
+		private static void Disconnect(object sender, ConsoleCancelEventArgs e)
 		{
-			if (Client != null) await Client.DisconnectAsync();
+			Client?.DisconnectAsync().Wait();
 
 			cancel = true;
+			e.Cancel = true;
+			DumpMemory();
+			Console.WriteLine("Press Enter to continue...");
 			Console.ReadLine();
 			Environment.Exit(0);
 		}
 
-		private static async Task MainAsync(string[] args)
+
+		private static void DumpMemory()
+		{
+			string json = JsonConvert.SerializeObject(attempts);
+			File.WriteAllText("memory.json", json);
+		}
+
+		private static async Task MainAsync()
 		{
 			using (FileStream stream = new FileStream("Settings.json", FileMode.Open))
 			{
@@ -80,6 +92,18 @@ namespace LiveUpdaterBot
 				{
 					string json = await reader.ReadToEndAsync();
 					Settings = JsonConvert.DeserializeObject<Settings>(json);
+				}
+			}
+
+			if (File.Exists("memory.json"))
+			{
+				using (FileStream stream = new FileStream("memory.json", FileMode.Open))
+				{
+					using (StreamReader reader = new StreamReader(stream))
+					{
+						string json = await reader.ReadToEndAsync();
+						attempts = JsonConvert.DeserializeObject<Dictionary<int, int>>(json);
+					}
 				}
 			}
 
@@ -157,8 +181,10 @@ namespace LiveUpdaterBot
 				{
 					case BattleKind.Wild:
 						string[] rand1 =
-							{"come across", "run into", "step on", "stumble upon", "encounter", "bump into", "run across"};
-						string[] rand2 = { "Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling" };
+						{
+							"come across", "run into", "step on", "stumble upon", "encounter", "bump into", "run across"
+						};
+						string[] rand2 = {"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"};
 						string[] rand3 =
 						{
 							"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
@@ -177,19 +203,35 @@ namespace LiveUpdaterBot
 						if (status.EnemyTrainers.Count == 1)
 						{
 							Trainer trainer = status.EnemyTrainers[0];
-							if (trainer.ClassName == "Magma Admin" || trainer.ClassName == "Magma Leader" || trainer.ClassName == "Aqua Leader" || trainer.ClassName == "Aqua Admin" || trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" || trainer.ClassName == "Champion" || trainer.ClassId == 50 /* brenden, may, steven, few others */)
+							if (trainer.ClassName == "Magma Admin" || trainer.ClassName == "Magma Leader" ||
+							    trainer.ClassName == "Aqua Leader" || trainer.ClassName == "Aqua Admin" ||
+							    trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" ||
+							    trainer.ClassName == "Champion" ||
+							    trainer.ClassId == 50 /* brenden, may, steven, few others */)
 							{
 								builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
+								if (attempts.TryGetValue(trainer.Id, out int val))
+								{
+									builder.Append($"Attempt #{val + 1}! ");
+									attempts.Remove(trainer.Id);
+									attempts.Add(trainer.Id, val + 1);
+								}
+								else
+								{
+									attempts.Add(trainer.Id, 1);
+								}
+
 								break;
 							}
+
 							string[] c1 = {"fight", "battle", "face off against"};
 							string[] c2 = {"cheeky", "rogue", "roving", "wandering"};
 							string[] c3 = {" wandering", "n eager"};
 							string[] choices =
 							{
-								$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. ",
-								$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. ",
-								$"{trainer.ClassName} {trainer.Name} picks a fight with us{ (status.EnemyParty.Count(x => (bool)x.Active) != 0 ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool)x.Active).Select(x => x.Species.Name))}" : "")}. "
+								$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
+								$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
+								$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. "
 							};
 							builder.Append(choices[Random.Next(choices.Length)]);
 						}
@@ -205,7 +247,16 @@ namespace LiveUpdaterBot
 							    trainer0.ClassId == 50 /* brenden, may, steven, few others */)
 							{
 								builder.Append($"**VS {trainer0.ClassName}s {trainer0.Name}!** ");
-								break;
+								if (attempts.TryGetValue(trainer0.Id, out int val))
+								{
+									builder.Append($"Attempt #{val + 1}! ");
+									attempts.Remove(trainer0.Id);
+									attempts.Add(trainer0.Id, val + 1);
+								}
+								else
+								{
+									attempts.Add(trainer0.Id, 1);
+								}
 							}
 							else if (trainer1.ClassId != 0)
 							{
@@ -236,6 +287,40 @@ namespace LiveUpdaterBot
 				reset = true;
 				lost.Clear();
 				builder.Append(message);
+			}
+
+			if (status.BattleKind == null && oldStatus.BattleKind == BattleKind.Trainer && !reset)
+			{
+				if (oldStatus.EnemyTrainers.Count == 1)
+				{
+					Trainer trainer = oldStatus.EnemyTrainers[0];
+					if (trainer.ClassName == "Magma Admin" || trainer.ClassName == "Magma Leader" ||
+					    trainer.ClassName == "Aqua Leader" || trainer.ClassName == "Aqua Admin" ||
+					    trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" ||
+					    trainer.ClassName == "Champion" ||
+					    trainer.ClassId == 50 /* brenden, may, steven, few others */)
+					{
+						builder.Append($"**Defeated {trainer.ClassName} {trainer.Name}!** ");
+					}
+
+					if (trainer.ClassName == "Champion")
+						builder.Append("**TEH URN!** ");
+				}
+				else if (oldStatus.EnemyTrainers.Count == 2)
+				{
+					if (oldStatus.EnemyTrainers[1].Id == 0)
+					{
+						Trainer trainer = oldStatus.EnemyTrainers[0];
+						if (trainer.ClassName == "Magma Admin" || trainer.ClassName == "Magma Leader" ||
+						    trainer.ClassName == "Aqua Leader" || trainer.ClassName == "Aqua Admin" ||
+						    trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" ||
+						    trainer.ClassName == "Champion" ||
+						    trainer.ClassId == 50 /* brenden, may, steven, few others */)
+						{
+							builder.Append($"**Defeated {trainer.ClassName}s {trainer.Name}!** ");
+						}
+					}
+				}
 			}
 
 			if (status.Badges != oldStatus.Badges)
@@ -288,115 +373,311 @@ namespace LiveUpdaterBot
 
 			List<uint> ids = new List<uint>();
 
-			foreach (Item item in status.Items.Balls)
+			if (!reset)
 			{
-				if (ids.Contains(item.Id)) continue;
-				long count = status.Items.Balls.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.Balls.FirstOrDefault(x => x.Id == item.Id) != null;
-				if (res)
+				foreach (Item item in status.Items.Balls)
 				{
-					long? oldCount = oldStatus.Items.Balls.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					if (ids.Contains(item.Id)) continue;
+					long count = status.Items.Balls.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					bool res = oldStatus.Items.Balls.FirstOrDefault(x => x.Id == item.Id) != null;
+					if (res)
+					{
+						long? oldCount = oldStatus.Items.Balls.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+						count -= oldCount ?? 1;
+					}
+
+					if (count != 0)
+					{
+						Pokemon[] monsGive = status.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+								oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id != x.HeldItem.Id))
+							.ToArray();
+						Pokemon[] monsTake = status.Party.Where(x =>
+								x.HeldItem == null ||
+								(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+								 x.HeldItem.Id))
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+								&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
+								item.Id)
+							.ToArray();
+						if (monsGive.Length != 0)
+						{
+							foreach (Pokemon mon in monsGive)
+							{
+								builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+								count++;
+							}
+						}
+
+						if (monsTake.Length != 0)
+						{
+							foreach (Pokemon mon in monsTake)
+							{
+								builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+								count--;
+							}
+						}
+
+						if (status.BattleKind != null && count < 0)
+							builder.Append(
+								$"We throw {(count == -1 ? $"a {item.Name}" : $"some {item.Name}s")} at the wild {status.EnemyParty[0].Species.Name}. ");
+						else if (count < 0)
+							builder.Append(
+								$"We toss {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						else if (count > 0)
+							builder.Append(
+								$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					}
+
+					ids.Add(item.Id);
 				}
 
-				if (count != 0)
+				foreach (Item item in status.Items.Berries)
 				{
-					if (status.BattleKind != null && count < 0)
-						builder.Append($"We throw {(count == -1 ? $"a {item.Name}" : $"some {item.Name}s")} at the wild {status.EnemyParty[0].Species.Name}. ");
-					else if (count < 0)
-						builder.Append($"We toss {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0)
-						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-				}
-				ids.Add(item.Id);
-			}
+					if (ids.Contains(item.Id)) continue;
+					long count = status.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					bool res = oldStatus.Items.Berries.FirstOrDefault(x => x.Id == item.Id) != null;
+					if (res)
+					{
+						long? oldCount = oldStatus.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+						count -= oldCount ?? 1;
+					}
 
-			foreach (Item item in status.Items.Berries)
-			{
-				if (ids.Contains(item.Id)) continue;
-				long count = status.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.Berries.FirstOrDefault(x => x.Id == item.Id) != null;
-				if (res)
-				{
-					long? oldCount = oldStatus.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
-				}
+					if (count != 0)
+					{
+						Pokemon[] monsGive = status.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+								 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id != x.HeldItem.Id))
+							.ToArray();
+						Pokemon[] monsTake = status.Party.Where(x =>
+								x.HeldItem == null ||
+								(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+								 x.HeldItem.Id))
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+								&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
+								item.Id)
+							.ToArray();
+						if (monsGive.Length != 0)
+						{
+							foreach (Pokemon mon in monsGive)
+							{
+								builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+								count++;
+							}
+						}
 
-				if (count != 0)
-				{
-					if (status.BattleKind != null && count < 0)
-						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count < 0)
-						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0)
-						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-				}
-				ids.Add(item.Id);
-			}
+						if (monsTake.Length != 0)
+						{
+							foreach (Pokemon mon in monsTake)
+							{
+								builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+								count--;
+							}
+						}
 
-			foreach (Item item in status.Items.Items)
-			{
-				if (ids.Contains(item.Id)) continue;
-				long count = status.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.Items.FirstOrDefault(x => x.Id == item.Id) != null;
-				if (res)
-				{
-					long? oldCount = oldStatus.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
-				}
+						if (status.BattleKind != null && count < 0)
+							builder.Append(
+								$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						else if (count < 0)
+							builder.Append(
+								$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						else if (count > 0)
+							builder.Append(
+								$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					}
 
-				if (count != 0)
-				{
-					if (status.BattleKind != null && count < 0)
-						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count < 0)
-						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0)
-						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-				}
-				ids.Add(item.Id);
-			}
-
-			foreach (Item item in status.Items.Key)
-			{
-				if (ids.Contains(item.Id)) continue;
-				long count = status.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.Key.FirstOrDefault(x => x.Id == item.Id) != null;
-				if (res)
-				{
-					long? oldCount = oldStatus.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					ids.Add(item.Id);
 				}
 
-				if (count != 0)
+				foreach (Item item in status.Items.Items)
 				{
-					if (count < 0)
-						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0)
-						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-				}
-				ids.Add(item.Id);
-			}
+					if (ids.Contains(item.Id)) continue;
+					long count = status.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					bool res = oldStatus.Items.Items.FirstOrDefault(x => x.Id == item.Id) != null;
+					if (res)
+					{
+						long? oldCount = oldStatus.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+						count -= oldCount ?? 1;
+					}
 
-			foreach (Item item in status.Items.TMs)
-			{
-				if (ids.Contains(item.Id)) continue;
-				long count = status.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.TMs.FirstOrDefault(x => x.Id == item.Id) != null;
-				if (res)
-				{
-					long? oldCount = oldStatus.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					if (count != 0)
+					{
+						Pokemon[] monsGive = status.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+								 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id != x.HeldItem.Id))
+							.ToArray();
+						Pokemon[] monsTake = status.Party.Where(x =>
+								x.HeldItem == null ||
+								(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+								 x.HeldItem.Id))
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+								&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
+								item.Id)
+							.ToArray();
+						if (monsGive.Length != 0)
+						{
+							foreach (Pokemon mon in monsGive)
+							{
+								builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+								count++;
+							}
+						}
+
+						if (monsTake.Length != 0)
+						{
+							foreach (Pokemon mon in monsTake)
+							{
+								builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+								count--;
+							}
+						}
+
+						if (status.BattleKind != null && count < 0)
+							builder.Append(
+								$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						else if (count < 0)
+							builder.Append(
+								$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						else if (count > 0)
+							builder.Append(
+								$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					}
+
+					ids.Add(item.Id);
 				}
 
-				if (count != 0)
+				foreach (Item item in status.Items.Key)
 				{
-					if (count < 0)
-						builder.Append($"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0)
-						builder.Append($"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					if (ids.Contains(item.Id)) continue;
+					long count = status.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					bool res = oldStatus.Items.Key.FirstOrDefault(x => x.Id == item.Id) != null;
+					if (res)
+					{
+						long? oldCount = oldStatus.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+						count -= oldCount ?? 1;
+					}
+
+					if (count != 0)
+					{
+						Pokemon[] monsGive = status.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+								 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id != x.HeldItem.Id))
+							.ToArray();
+						Pokemon[] monsTake = status.Party.Where(x =>
+								x.HeldItem == null ||
+								(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+								 x.HeldItem.Id))
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+								&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
+								item.Id)
+							.ToArray();
+						if (monsGive.Length != 0)
+						{
+							foreach (Pokemon mon in monsGive)
+							{
+								builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+								count++;
+							}
+						}
+
+						if (monsTake.Length != 0)
+						{
+							foreach (Pokemon mon in monsTake)
+							{
+								builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+								count--;
+							}
+						}
+
+						if (count < 0)
+							builder.Append(
+								$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						else if (count > 0)
+							builder.Append(
+								$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					}
+
+					ids.Add(item.Id);
 				}
-				ids.Add(item.Id);
+
+				foreach (Item item in status.Items.TMs)
+				{
+					if (ids.Contains(item.Id)) continue;
+					long count = status.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					bool res = oldStatus.Items.TMs.FirstOrDefault(x => x.Id == item.Id) != null;
+					if (res)
+					{
+						long? oldCount = oldStatus.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+						count -= oldCount ?? 1;
+					}
+
+					if (count != 0)
+					{
+						Pokemon[] monsGive = status.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+								 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id != x.HeldItem.Id))
+							.ToArray();
+						Pokemon[] monsTake = status.Party.Where(x =>
+								x.HeldItem == null ||
+								(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+								 x.HeldItem.Id))
+							.Where(x =>
+								oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+								&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
+								item.Id)
+							.ToArray();
+						if (monsGive.Length != 0)
+						{
+							foreach (Pokemon mon in monsGive)
+							{
+								builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+								count++;
+							}
+						}
+
+						if (monsTake.Length != 0)
+						{
+							foreach (Pokemon mon in monsTake)
+							{
+								builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+								count--;
+							}
+						}
+
+						if (count < 0)
+							builder.Append(
+								$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						else if (count > 0)
+							builder.Append(
+								$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					}
+
+					ids.Add(item.Id);
+				}
 			}
 
 			for (int i = 0; i < status.Party.Count; i++)
@@ -565,7 +846,7 @@ namespace LiveUpdaterBot
 					string message = options[Random.Next(options.Count)];
 					builder.Append(message);
 				}
-				else if (status.MapId == 13)
+				else if (status.MapId == 13 || status.MapId == 15)
 				{
 					builder.Append("Entered into a contest. ");
 				}

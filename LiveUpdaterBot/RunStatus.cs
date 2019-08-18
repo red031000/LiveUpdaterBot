@@ -93,6 +93,9 @@ namespace LiveUpdaterBot
 		[JsonProperty(PropertyName = "species")]
 		public Species Species;
 
+		[JsonProperty(PropertyName = "held_item")]
+		public Item HeldItem;
+
 		[JsonProperty(PropertyName = "moves")]
 		public List<Move> Moves;
 
