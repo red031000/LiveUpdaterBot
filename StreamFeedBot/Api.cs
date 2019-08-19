@@ -57,7 +57,17 @@ namespace StreamFeedBot
 			if (Status != null)
 				OldStatus = Status;
 
-			Status = JsonConvert.DeserializeObject<RunStatus>(content);
+			try
+			{
+				Status = JsonConvert.DeserializeObject<RunStatus>(content);
+			}
+			catch (Exception e)
+			{
+				await Utils.ReportError(e, Program.Client);
+				Status = OldStatus;
+				result.Dispose();
+				return;
+			}
 
 			if (Status.Seen == 0) //TODO temp fix
 			{

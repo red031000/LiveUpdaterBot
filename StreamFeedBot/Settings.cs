@@ -8,5 +8,6 @@
 		public string[] BadgeNames;
 		public ulong ReportId;
 		public ulong ReportServer;
+		public ulong[] SuperUsers;
 	}
 }

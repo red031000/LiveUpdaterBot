@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using Newtonsoft.Json;
 
 namespace StreamFeedBot
@@ -16,7 +17,10 @@ namespace StreamFeedBot
 		public static Settings Settings;
 		public static List<DiscordChannel> Channels = new List<DiscordChannel>();
 		public static DateTime logdate = DateTime.UtcNow.Date;
-		public static FileStream LogStream = new FileStream("TriHardEmerald" + logdate.ToString("yyyy-MM-dd") + ".txt", FileMode.Append);
+
+		public static FileStream LogStream =
+			new FileStream("TriHardEmerald" + logdate.ToString("yyyy-MM-dd") + ".txt", FileMode.Append);
+
 		public static StreamWriter LogWriter = new StreamWriter(LogStream);
 		private static bool cancel, reset;
 
@@ -42,34 +46,12 @@ namespace StreamFeedBot
 			}
 			catch (Exception e)
 			{
-				File.WriteAllText("crash.log", $"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}{e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}{Environment.NewLine}");
+				File.WriteAllText("crash.log",
+					$"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}{e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}{Environment.NewLine}");
 
 				if (Client != null)
-					ReportError(e).Wait();
+					Utils.ReportError(e, Client, true).Wait();
 				Disconnect(null, null);
-			}
-		}
-
-		private static async Task ReportError(Exception e)
-		{
-			if (Settings != null)
-			{
-				DiscordGuild RPS = await Client.GetGuildAsync(Settings.ReportServer);
-				DiscordMember red = await RPS.GetMemberAsync(Settings.ReportId);
-				string message =
-					$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception: {e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}";
-				string message2 =
-					$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception too long.";
-				await red.SendMessageAsync(message.Length >= 2000
-					? message2.Length >= 2000
-						?
-						$"Exception has occured: {e.Message}{Environment.NewLine}Stack Trace too long."
-						: message2
-					: message);
-				using (FileStream stream = new FileStream("crash.log", FileMode.Open))
-				{
-					await red.SendFileAsync(stream);
-				}
 			}
 		}
 
@@ -129,6 +111,8 @@ namespace StreamFeedBot
 				StreamUrl = "https://www.twitch.tv/twitchplayspokemon"
 			});
 
+			Client.MessageCreated += DmHandler;
+
 			foreach (ulong id in Settings.Channels)
 			{
 				DiscordChannel channel = await Client.GetChannelAsync(id);
@@ -139,6 +123,23 @@ namespace StreamFeedBot
 			await MainLoop();
 
 			await Task.Delay(-1);
+		}
+
+		private static async Task DmHandler(MessageCreateEventArgs e)
+		{
+			if (e.Guild == null)
+			{
+				if (Settings.SuperUsers.Contains(e.Author.Id) && e.Message.Content.ToLowerInvariant().Trim() == "stop")
+				{
+					await e.Message.RespondAsync("stopping <:RaccAttack:468748603632910336>");
+					Console.WriteLine($"Stopping by request of {e.Author.Username}");
+					cancel = true;
+				}
+				else if (e.Author != Client.CurrentUser)
+				{
+					await e.Message.RespondAsync("<:RaccAttack:468748603632910336>");
+				}
+			}
 		}
 
 		private static async Task MainLoop()
@@ -176,6 +177,8 @@ namespace StreamFeedBot
 
 				await Task.Delay(RefreshInterval * 1000);
 			}
+
+			Disconnect(null, null);
 		}
 
 		private static string CalculateDeltas(RunStatus status, RunStatus oldStatus)
