@@ -102,7 +102,8 @@ namespace StreamFeedBot
 			{
 				foreach (Trainer t in Status.EnemyTrainers)
 				{
-					t.ClassName = t.ClassName.Replace("πµ", "PkMn");
+					if (t?.ClassName != null)
+						t.ClassName = t.ClassName.Replace("πµ", "PkMn");
 				}
 			}
 

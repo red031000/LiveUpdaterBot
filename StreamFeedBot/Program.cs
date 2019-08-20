@@ -194,99 +194,111 @@ namespace StreamFeedBot
 				switch (status.BattleKind)
 				{
 					case BattleKind.Wild:
-						string[] rand1 =
+						if (status.EnemyParty?[0] != null)
 						{
-							"come across", "run into", "step on", "stumble upon", "encounter", "bump into", "run across"
-						};
-						string[] rand2 = {"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"};
-						string[] rand3 =
-						{
-							"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
-							"collides with", "jumps", "ambushes", "attacks", "assaults"
-						};
-						string[] choice =
-						{
-							$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
-							$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
-							$"A wild {status.EnemyParty[0].Species.Name} {rand3[Random.Next(rand3.Length)]} us. "
-						};
-						string message = choice[Random.Next(choice.Length)];
-						builder.Append(message);
+							string[] rand1 =
+							{
+								"come across", "run into", "step on", "stumble upon", "encounter", "bump into",
+								"run across"
+							};
+							string[] rand2 =
+								{"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"};
+							string[] rand3 =
+							{
+								"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
+								"collides with", "jumps", "ambushes", "attacks", "assaults"
+							};
+							string[] choice =
+							{
+								$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
+								$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
+								$"A wild {status.EnemyParty[0].Species.Name} {rand3[Random.Next(rand3.Length)]} us. "
+							};
+							string message = choice[Random.Next(choice.Length)];
+							builder.Append(message);
+						}
+
 						break;
 					case BattleKind.Trainer:
-						if (status.EnemyTrainers.Count == 1)
+						if (status.EnemyTrainers?.Count == 1)
 						{
-							Trainer trainer = status.EnemyTrainers[0];
-							if (trainer.ClassName == "Magma Admin" || trainer.ClassName == "Magma Leader" ||
-							    trainer.ClassName == "Aqua Leader" || trainer.ClassName == "Aqua Admin" ||
-							    trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" ||
-							    trainer.ClassName == "Champion" ||
-							    trainer.ClassId == 50 /* brenden, may, steven, few others */)
+							if (status.EnemyTrainers[0] != null)
 							{
-								builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
-								if (attempts.TryGetValue(trainer.Id, out int val))
+								Trainer trainer = status.EnemyTrainers[0];
+								if (trainer.ClassName == "Magma Admin" || trainer.ClassName == "Magma Leader" ||
+								    trainer.ClassName == "Aqua Leader" || trainer.ClassName == "Aqua Admin" ||
+								    trainer.ClassName == "Leader" || trainer.ClassName == "Elite Four" ||
+								    trainer.ClassName == "Champion" ||
+								    trainer.ClassId == 50 /* brenden, may, steven, few others */)
 								{
-									builder.Append($"Attempt #{val + 1}! ");
-									attempts.Remove(trainer.Id);
-									attempts.Add(trainer.Id, val + 1);
-								}
-								else
-								{
-									attempts.Add(trainer.Id, 1);
+									builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
+									if (attempts.TryGetValue(trainer.Id, out int val))
+									{
+										builder.Append($"Attempt #{val + 1}! ");
+										attempts.Remove(trainer.Id);
+										attempts.Add(trainer.Id, val + 1);
+									}
+									else
+									{
+										attempts.Add(trainer.Id, 1);
+									}
+
+									break;
 								}
 
-								break;
+								string[] c1 = {"fight", "battle", "face off against"};
+								string[] c2 = {"cheeky", "rogue", "roving", "wandering"};
+								string[] c3 = {" wandering", "n eager"};
+								string[] choices =
+								{
+									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
+									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
+									$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. "
+								};
+								builder.Append(choices[Random.Next(choices.Length)]);
 							}
-
-							string[] c1 = {"fight", "battle", "face off against"};
-							string[] c2 = {"cheeky", "rogue", "roving", "wandering"};
-							string[] c3 = {" wandering", "n eager"};
-							string[] choices =
-							{
-								$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
-								$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
-								$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. "
-							};
-							builder.Append(choices[Random.Next(choices.Length)]);
 						}
-						else if (status.EnemyTrainers.Count == 2)
+						else if (status.EnemyTrainers?.Count == 2)
 						{
-							Trainer trainer0 = status.EnemyTrainers[0];
-							Trainer trainer1 = status.EnemyTrainers[1];
-
-							if (trainer0.ClassName == "Magma Admin" || trainer0.ClassName == "Magma Leader" ||
-							    trainer0.ClassName == "Aqua Leader" || trainer0.ClassName == "Aqua Admin" ||
-							    trainer0.ClassName == "Leader" || trainer0.ClassName == "Elite Four" ||
-							    trainer0.ClassName == "Champion" ||
-							    trainer0.ClassId == 50 /* brenden, may, steven, few others */)
+							if (status.EnemyTrainers[0] != null && status.EnemyTrainers[1] != null)
 							{
-								builder.Append($"**VS {trainer0.ClassName}s {trainer0.Name}!** ");
-								if (attempts.TryGetValue(trainer0.Id, out int val))
+								Trainer trainer0 = status.EnemyTrainers[0];
+								Trainer trainer1 = status.EnemyTrainers[1];
+
+								if (trainer0.ClassName == "Magma Admin" || trainer0.ClassName == "Magma Leader" ||
+								    trainer0.ClassName == "Aqua Leader" || trainer0.ClassName == "Aqua Admin" ||
+								    trainer0.ClassName == "Leader" || trainer0.ClassName == "Elite Four" ||
+								    trainer0.ClassName == "Champion" ||
+								    trainer0.ClassId == 50 /* brenden, may, steven, few others */)
 								{
-									builder.Append($"Attempt #{val + 1}! ");
-									attempts.Remove(trainer0.Id);
-									attempts.Add(trainer0.Id, val + 1);
+									builder.Append($"**VS {trainer0.ClassName}s {trainer0.Name}!** ");
+									if (attempts.TryGetValue(trainer0.Id, out int val))
+									{
+										builder.Append($"Attempt #{val + 1}! ");
+										attempts.Remove(trainer0.Id);
+										attempts.Add(trainer0.Id, val + 1);
+									}
+									else
+									{
+										attempts.Add(trainer0.Id, 1);
+									}
+								}
+								else if (trainer1.ClassId != 0)
+								{
+									string[] choices =
+									{
+										$"Both {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name} challenge us to a battle at the same time!",
+									};
+									builder.Append(choices[Random.Next(choices.Length)]);
 								}
 								else
 								{
-									attempts.Add(trainer0.Id, 1);
+									string[] choices =
+									{
+										$"{trainer0.ClassName} {trainer0.Name} challenge us to a battle at the same time!",
+									};
+									builder.Append(choices[Random.Next(choices.Length)]);
 								}
-							}
-							else if (trainer1.ClassId != 0)
-							{
-								string[] choices =
-								{
-									$"Both {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name} challenge us to a battle at the same time!",
-								};
-								builder.Append(choices[Random.Next(choices.Length)]);
-							}
-							else
-							{
-								string[] choices =
-								{
-									$"{trainer0.ClassName} {trainer0.Name} challenge us to a battle at the same time!",
-								};
-								builder.Append(choices[Random.Next(choices.Length)]);
 							}
 						}
 
