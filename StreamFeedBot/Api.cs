@@ -39,33 +39,40 @@ namespace StreamFeedBot
 
 		public async Task UpdateStatus()
 		{
-			HttpResponseMessage result = await client.GetAsync("https://twitchplayspokemon.tv/api/run_status");
-			string content = await result.Content.ReadAsStringAsync();
-			message = content;
-			if (!result.IsSuccessStatusCode)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine($"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
-				await Program.LogWriter.WriteLineAsync(
-					$"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
-				await Program.LogWriter.FlushAsync();
-				Console.ForegroundColor = ConsoleColor.White;
-				result.Dispose();
-				return;
-			}
-
-			if (Status != null)
-				OldStatus = Status;
-
+			HttpResponseMessage result = null;
+			bool replaced = false;
 			try
 			{
+				result = await client.GetAsync("https://twitchplayspokemon.tv/api/run_status");
+				string content = await result.Content.ReadAsStringAsync();
+				message = content;
+				if (!result.IsSuccessStatusCode)
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine($"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
+					await Program.LogWriter.WriteLineAsync(
+						$"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
+					await Program.LogWriter.FlushAsync();
+					Console.ForegroundColor = ConsoleColor.White;
+					result.Dispose();
+					return;
+				}
+
+				if (Status != null)
+				{
+					OldStatus = Status;
+					replaced = true;
+				}
+
+
 				Status = JsonConvert.DeserializeObject<RunStatus>(content);
 			}
 			catch (Exception e)
 			{
 				await Utils.ReportError(e, Program.Client);
-				Status = OldStatus;
-				result.Dispose();
+				if (replaced)
+					Status = OldStatus;
+				result?.Dispose();
 				return;
 			}
 
