@@ -76,12 +76,12 @@ namespace StreamFeedBot
 				return;
 			}
 
-			if (Status.Seen == 0) //TODO temp fix
+			/*if (Status.Seen == 0) //TODO temp fix
 			{
 				Status = OldStatus;
 				result.Dispose();
 				return; //Game hasn't loaded yet
-			}
+			}*/
 
 			if (Status.BattleKind == BattleKind.Wild && Status.EnemyParty != null && Status.EnemyParty.Count >= 1 && Status.EnemyParty[0].Species.Name == "???")
 			{
@@ -91,11 +91,9 @@ namespace StreamFeedBot
 				await UpdateStatus();
 			}
 
-			int j = 0;
-			foreach (string _ in Program.Settings.BadgeNames)
+			for (int j = 0; j < Program.Settings.BadgeNames.Length; j++)
 			{
 				Status.BadgesFlags.Add((Status.Badges & (int)Math.Pow(2, j)) != 0);
-				j++;
 			}
 
 			if (Status.EnemyTrainers != null)
