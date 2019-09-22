@@ -57,6 +57,7 @@ namespace StreamFeedBot
 			if (e != null)
 				e.Cancel = true;
 			DumpMemory();
+			Api.StopTimer();
 			Console.WriteLine("Press Enter to continue...");
 			Console.ReadLine();
 			Environment.Exit(0);
@@ -183,7 +184,6 @@ namespace StreamFeedBot
 
 				await Task.Delay(RefreshInterval * 1000);
 			}
-
 			Disconnect(null, null);
 		}
 	}

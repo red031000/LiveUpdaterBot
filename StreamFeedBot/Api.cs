@@ -37,6 +37,12 @@ namespace StreamFeedBot
 			File.WriteAllText("Snapshots/ApiSnapshot" + DateTime.UtcNow.ToString("o") + ".txt", message);
 		}
 
+		public void StopTimer()
+		{
+			timer.Elapsed -= TimerOnElapsed;
+			timer.Enabled = false;
+		}
+
 		public async Task UpdateStatus()
 		{
 			HttpResponseMessage result = null;
