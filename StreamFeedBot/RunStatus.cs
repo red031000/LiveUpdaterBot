@@ -47,6 +47,33 @@ namespace StreamFeedBot
 
 		[JsonProperty(PropertyName = "name")]
 		public string Name;
+
+		[JsonProperty(PropertyName = "pc")]
+		public PC PC;
+
+		[JsonProperty(PropertyName = "daycare")]
+		public List<Pokemon> Daycare;
+	}
+
+	public class PC
+	{
+		[JsonProperty(PropertyName = "boxes")]
+		public List<Box> Boxes;
+
+		[JsonProperty(PropertyName = "current_box_number")]
+		public uint CurrentBoxNumber;
+	}
+
+	public class Box
+	{
+		[JsonProperty(PropertyName = "box_contents")]
+		public List<Pokemon> BoxContents;
+
+		[JsonProperty(PropertyName = "box_name")]
+		public string BoxName;
+
+		[JsonProperty(PropertyName = "box_number")]
+		public uint BoxNumber;
 	}
 
 	public class ItemGroup
