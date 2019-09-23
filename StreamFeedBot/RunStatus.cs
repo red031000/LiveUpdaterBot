@@ -41,6 +41,12 @@ namespace StreamFeedBot
 
 		[JsonProperty(PropertyName = "items")]
 		public ItemGroup Items;
+
+		[JsonProperty(PropertyName = "gender")]
+		public Gender? Gender;
+
+		[JsonProperty(PropertyName = "name")]
+		public string Name;
 	}
 
 	public class ItemGroup

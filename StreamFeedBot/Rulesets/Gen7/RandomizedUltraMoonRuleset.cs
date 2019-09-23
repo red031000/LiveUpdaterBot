@@ -116,6 +116,13 @@ namespace StreamFeedBot.Rulesets
 			if (oldStatus == null)
 				return null; //calculate deltas between two statuses, not just one
 
+			if ((oldStatus.Name == null || oldStatus.Gender == null) && status.Name != null && status.Gender != null)
+			{
+				string choice = status.Gender == Gender.Female ? "girl" : "boy";
+
+				builder.Append($"**We are a {choice} named {status.Name}!** ");
+			}
+
 			if (status.BattleKind != null && status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
 			{
 				switch (status.BattleKind)
