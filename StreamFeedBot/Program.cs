@@ -156,12 +156,14 @@ namespace StreamFeedBot
 				await Api.UpdateStatus();
 				try
 				{
-					string message = Ruleset.CalculateDeltas(Api.Status, Api.OldStatus);
+					string message = Ruleset.CalculateDeltas(Api.Status, Api.OldStatus, out string announcement);
 					if (message != null)
 					{
 						TimeSpan time = DateTime.UtcNow - RunStart;
 						await Utils.SendMessage($"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim());
 					}
+
+					if (announcement != null) await Utils.AnnounceMessage(announcement, Client);
 				}
 				catch (Exception e)
 				{

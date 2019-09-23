@@ -48,5 +48,22 @@ namespace StreamFeedBot
 				}
 			}
 		}
+
+		public static async Task<List<DiscordMessage>> AnnounceMessage(string message, DiscordClient client)
+		{
+			List<DiscordMessage> messages = new List<DiscordMessage>();
+			foreach (AnnounceSettings setting in Program.Settings.AnnounceSettings)
+			{
+				DiscordGuild guild = await client.GetGuildAsync(setting.AnnounceServer);
+				DiscordRole role = guild.GetRole(setting.AnnounceRole);
+				role.ModifyAsync(mentionable: true).Wait();
+				DiscordChannel channel = await client.GetChannelAsync(setting.AnnounceChannel);
+				DiscordMessage sent = await channel.SendMessageAsync($"<@&{setting.AnnounceRole}> " + message);
+				messages.Add(sent);
+				role.ModifyAsync(mentionable: false).Wait();
+			}
+
+			return messages;
+		}
 	}
 }

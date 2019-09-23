@@ -110,11 +110,15 @@ namespace StreamFeedBot.Rulesets
 			: base(attempts, settings)
 		{ }
 
-		public override string CalculateDeltas(RunStatus status, RunStatus oldStatus)
+		public override string CalculateDeltas(RunStatus status, RunStatus oldStatus, out string announcement)
 		{
 			StringBuilder builder = new StringBuilder();
+			StringBuilder aBuilder = new StringBuilder();
 			if (oldStatus == null)
+			{
+				announcement = null;
 				return null; //calculate deltas between two statuses, not just one
+			}
 
 			if ((oldStatus.Name == null || oldStatus.Gender == null) && status.Name != null && status.Gender != null)
 			{
@@ -250,7 +254,7 @@ namespace StreamFeedBot.Rulesets
 					}
 
 					/*if (trainer.ClassName == "Champion")
-						builder.Append("**TEH URN!** ");*/ //TODO see what champion is randomised into
+						builder.Append("**TEH URN!** ");*/ //TODO see what champion is randomised into - also announce
 				}
 				else if (oldStatus.EnemyTrainers.Count == 2)
 				{
@@ -311,7 +315,7 @@ namespace StreamFeedBot.Rulesets
 						builder.Append(choices[Random.Next(choices.Length)]);
 					}
 				}
-			}*/ //TODO work out badges for USUM
+			}*/ //TODO work out badges for USUM - also announce
 
 			List<uint> ids = new List<uint>();
 
@@ -741,8 +745,10 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
+			announcement = aBuilder.ToString().Length == 0 ? null : aBuilder.ToString();
+
 			return builder.ToString().Length == 0 ? null : builder.ToString();
-			//TODO PC
+			//TODO PC / Release
 		}
 	}
 }

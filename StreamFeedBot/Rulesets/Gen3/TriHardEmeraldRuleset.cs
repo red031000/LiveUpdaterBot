@@ -13,8 +13,9 @@ namespace StreamFeedBot.Rulesets
 		public TriHardEmeraldRuleset(Dictionary<int, int> attempts, Settings settings)
 			: base (attempts, settings)
 		{ }
-		public override string CalculateDeltas(RunStatus status, RunStatus oldStatus)
+		public override string CalculateDeltas(RunStatus status, RunStatus oldStatus, out string announcement)
 		{
+			announcement = null;
 			bool reset2 = Reset;
 
 			StringBuilder builder = new StringBuilder();

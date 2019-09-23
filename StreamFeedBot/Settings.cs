@@ -10,5 +10,6 @@
 		public ulong ReportId;
 		public ulong ReportServer;
 		public ulong[] SuperUsers;
+		public AnnounceSettings[] AnnounceSettings;
 	}
 }
