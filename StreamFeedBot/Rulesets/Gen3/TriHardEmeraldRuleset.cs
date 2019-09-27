@@ -10,8 +10,8 @@ namespace StreamFeedBot.Rulesets
 		private bool Reset;
 		private readonly List<Pokemon> Lost = new List<Pokemon>();
 		private uint Expected;
-		public TriHardEmeraldRuleset(Dictionary<int, int> attempts, Settings settings)
-			: base (attempts, settings)
+		public TriHardEmeraldRuleset(Memory memory, Settings settings)
+			: base (memory, settings)
 		{ }
 		public override string CalculateDeltas(RunStatus status, RunStatus oldStatus, out string announcement)
 		{

@@ -78,11 +78,15 @@ namespace StreamFeedBot
 
 	public class ItemGroup
 	{
-		[JsonProperty(PropertyName = "balls")]
+		//[JsonProperty(PropertyName = "balls")]
+		[JsonIgnore] //not in Gen 7
 		public List<Item> Balls;
 
 		[JsonProperty(PropertyName = "berries")]
 		public List<Item> Berries;
+
+		[JsonProperty(PropertyName = "medicine")] //Gen 7 specific
+		public List<Item> Medicine;
 
 		[JsonProperty(PropertyName = "items")]
 		public List<Item> Items;
@@ -92,6 +96,9 @@ namespace StreamFeedBot
 
 		[JsonProperty(PropertyName = "tms")]
 		public List<Item> TMs;
+		
+		[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
+		public List<Item> ZCrystals;
 	}
 
 	public class Item

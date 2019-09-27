@@ -66,7 +66,7 @@ namespace StreamFeedBot
 
 		private static void DumpMemory()
 		{
-			string json = JsonConvert.SerializeObject(Ruleset.Attempts);
+			string json = JsonConvert.SerializeObject(Ruleset.Memory);
 			File.WriteAllText("memory.json", json);
 		}
 
@@ -89,7 +89,7 @@ namespace StreamFeedBot
 
 			LogWriter = new StreamWriter(LogStream);
 
-			Dictionary<int, int> attempts = new Dictionary<int, int>();
+			Memory memory = new Memory();
 
 			if (File.Exists("memory.json"))
 			{
@@ -98,7 +98,7 @@ namespace StreamFeedBot
 					using (StreamReader reader = new StreamReader(stream))
 					{
 						string json = await reader.ReadToEndAsync();
-						attempts = JsonConvert.DeserializeObject<Dictionary<int, int>>(json);
+						memory = JsonConvert.DeserializeObject<Memory>(json);
 					}
 				}
 			}
@@ -125,7 +125,7 @@ namespace StreamFeedBot
 				Channels.Add(channel);
 			}
 
-			Ruleset = new TriHardEmeraldRuleset(attempts, Settings);
+			Ruleset = new RandomizedUltraMoonRuleset(memory, Settings);
 
 			await MainLoop();
 

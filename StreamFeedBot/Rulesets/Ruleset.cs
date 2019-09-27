@@ -7,14 +7,16 @@ namespace StreamFeedBot.Rulesets
 	{
 		protected Random Random;
 
-		public Dictionary<int, int> Attempts { get; protected set; }
+		public Memory Memory;
+
+		public Dictionary<int, int> Attempts => Memory.Attempts;
 
 		protected Settings Settings;
 
-		protected Ruleset(Dictionary<int, int> attempts, Settings settings)
+		protected Ruleset(Memory memory, Settings settings)
 		{
 			Random = new Random();
-			Attempts = attempts;
+			Memory = memory;
 			Settings = settings;
 		}
 
