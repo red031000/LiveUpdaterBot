@@ -13,21 +13,21 @@ namespace StreamFeedBot
 		public RunStatus OldStatus;
 		private string message;
 
-		private readonly Timer timer;
+		private readonly Timer Timer;
 
-		public HttpClient client = new HttpClient();
+		public HttpClient Client = new HttpClient();
 
 		public Api()
 		{
-			client.DefaultRequestHeaders.Add("Accept", "application/json");
-			client.DefaultRequestHeaders.Add("OAuth-Token", Program.Settings.OAuth);
-			timer = new Timer
+			Client.DefaultRequestHeaders.Add("Accept", "application/json");
+			Client.DefaultRequestHeaders.Add("OAuth-Token", Program.Settings.OAuth);
+			Timer = new Timer
 			{
 				AutoReset = true,
 				Interval = 3.6e+6
 			};
-			timer.Elapsed += TimerOnElapsed;
-			timer.Enabled = true;
+			Timer.Elapsed += TimerOnElapsed;
+			Timer.Enabled = true;
 		}
 
 		private void TimerOnElapsed(object sender, ElapsedEventArgs e)
@@ -39,8 +39,8 @@ namespace StreamFeedBot
 
 		public void StopTimer()
 		{
-			timer.Elapsed -= TimerOnElapsed;
-			timer.Enabled = false;
+			Timer.Elapsed -= TimerOnElapsed;
+			Timer.Enabled = false;
 		}
 
 		public async Task UpdateStatus()
@@ -49,7 +49,7 @@ namespace StreamFeedBot
 			bool replaced = false;
 			try
 			{
-				result = await client.GetAsync("https://twitchplayspokemon.tv/api/run_status");
+				result = await Client.GetAsync("https://twitchplayspokemon.tv/api/run_status");
 				string content = await result.Content.ReadAsStringAsync();
 				message = content;
 				if (!result.IsSuccessStatusCode)
@@ -78,13 +78,6 @@ namespace StreamFeedBot
 				result?.Dispose();
 				return;
 			}
-
-			/*if (Status.Seen == 0) //TODO temp fix
-			{
-				Status = OldStatus;
-				result.Dispose();
-				return; //Game hasn't loaded yet
-			}*/
 
 			if (Status.BattleKind == BattleKind.Wild && Status.EnemyParty != null && Status.EnemyParty.Count >= 1 && Status.EnemyParty[0].Species.Name == "???")
 			{
