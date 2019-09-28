@@ -9,7 +9,8 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "area_name")]
 		public string AreaName;
 
-		[JsonProperty(PropertyName = "badges")]
+		//[JsonProperty(PropertyName = "badges")]
+		[JsonIgnore] //Gen 7 doesn't have badges
 		public uint Badges;
 
 		[JsonIgnore]

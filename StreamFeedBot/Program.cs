@@ -27,7 +27,7 @@ namespace StreamFeedBot
 
 		private static Api Api;
 
-		public static readonly DateTime RunStart = new DateTime(2019, 08, 10, 21, 00, 00);
+		public static readonly DateTime RunStart = new DateTime(2019, 10, 12, 21, 00, 00);
 
 		public const int RefreshInterval = 15;
 
