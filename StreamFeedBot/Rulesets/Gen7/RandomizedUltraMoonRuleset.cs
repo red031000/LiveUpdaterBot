@@ -266,8 +266,11 @@ namespace StreamFeedBot.Rulesets
 						EnemyName = trainer.ClassName + " " + trainer.Name;
 					}
 
-					/*if (trainer.ClassName == "Champion")
-						builder.Append("**TEH URN!** ");*/ //TODO see what champion is randomised into - also announce
+					if (Enumerable.Range(494, 3).Contains(trainer.ClassId))
+					{
+						builder.Append("**TEH URN!** ");
+						aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
+					}
 				}
 				else if (oldStatus.EnemyTrainers.Count == 2)
 				{
