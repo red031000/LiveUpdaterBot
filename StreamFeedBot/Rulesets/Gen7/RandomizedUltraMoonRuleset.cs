@@ -1186,16 +1186,6 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-			if (status.GameStats.PokemonCentersUsed > oldStatus.GameStats.PokemonCentersUsed)
-			{
-				builder.Append("**We heal** at the Poké Center! Progress saved. ");
-			}
-
-			if (status.GameStats.Saves > oldStatus.GameStats.Saves)
-			{
-				builder.Append("**We save!** ");
-			}
-
 			if (status.MapName != oldStatus.MapName)
 			{
 				if (!string.IsNullOrWhiteSpace(status.MapName))

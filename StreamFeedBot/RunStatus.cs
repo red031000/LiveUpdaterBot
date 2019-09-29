@@ -185,10 +185,12 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "blackouts")]
 		public uint Blackouts;
 
-		[JsonProperty(PropertyName = "Saves Made")]
+		//[JsonProperty(PropertyName = "Saves Made")]
+		[JsonIgnore] //Not in USUM
 		public uint Saves;
 
-		[JsonProperty(PropertyName = "Pok\u00e9mon Center Uses")]
+		//[JsonProperty(PropertyName = "Pok\u00e9mon Center Uses")]
+		[JsonIgnore] //Not in USUM
 		public uint PokemonCentersUsed;
 
 		[JsonProperty(PropertyName = "Battles Fought (Total)")]
