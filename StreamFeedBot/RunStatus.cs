@@ -40,6 +40,9 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "party")]
 		public List<Pokemon> Party;
 
+		[JsonProperty(PropertyName = "battle_party")]
+		public List<Pokemon> BattleParty;
+
 		[JsonProperty(PropertyName = "items")]
 		public ItemGroup Items;
 

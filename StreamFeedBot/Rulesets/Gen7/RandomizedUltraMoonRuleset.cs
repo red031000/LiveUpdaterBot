@@ -983,13 +983,15 @@ namespace StreamFeedBot.Rulesets
 				uint pv = oldMon.PersonalityValue;
 				if (oldMon.Species.Id == 292)
 					pv++;
-				Pokemon mon = status.Party.FirstOrDefault(x =>
+				Pokemon mon = status.Party.Where(x => x != null).FirstOrDefault(x =>
+					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+				Pokemon oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
 					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
 				if (mon == null)
 				{
 					continue;
 				}
-				if (mon.Level != oldMon.Level)
+				if (mon.Level != oldMon.Level && mon.Level != oldBattleMon.Level)
 				{
 					string[] choices =
 					{
@@ -1001,7 +1003,7 @@ namespace StreamFeedBot.Rulesets
 					builder.Append(message);
 				}
 
-				if (mon.Species.Id != oldMon.Species.Id)
+				if (mon.Species.Id != oldMon.Species.Id && mon.Species.Id != oldBattleMon.Species.Id)
 				{
 					string[] choices =
 					{
@@ -1013,6 +1015,48 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
+			if (status.BattleParty != null && oldStatus.BattleParty != null)
+			{
+				for (int i = 0; i < status.BattleParty.Count; i++)
+				{
+					Pokemon oldMon = oldStatus.BattleParty[i];
+					if (oldMon == null) continue;
+					uint pv = oldMon.PersonalityValue;
+					if (oldMon.Species.Id == 292)
+						pv++;
+					Pokemon mon = status.BattleParty.Where(x => x != null).FirstOrDefault(x =>
+						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					Pokemon partyMon = status.Party.Where(x => x != null).FirstOrDefault(x =>
+						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					if (mon == null)
+					{
+						continue;
+					}
+					if (mon.Level != oldMon.Level && mon.Level != partyMon.Level)
+					{
+						string[] choices =
+						{
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has grown to level {mon.Level}!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) is now level {mon.Level}!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has leveled up to {mon.Level}!** "
+						};
+						string message = choices[Random.Next(choices.Length)];
+						builder.Append(message);
+					}
+
+					if (mon.Species.Id != oldMon.Species.Id && mon.Species.Id != partyMon?.Species?.Id)
+					{
+						string[] choices =
+						{
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}! **",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}! **"
+						};
+						string message = choices[Random.Next(choices.Length)];
+						builder.Append(message);
+					}
+				}
+			}
+
 			foreach (Pokemon mon in status.Party)
 			{
 				if (mon == null) continue;
@@ -1021,17 +1065,28 @@ namespace StreamFeedBot.Rulesets
 					pv++;
 				Pokemon oldMon = oldStatus.Party.Where(x => x != null).FirstOrDefault(x =>
 					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+				Pokemon oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
+					x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
 				if (oldMon == null) continue;
 				foreach (Move move in mon.Moves)
 				{
 					if (move == null) continue;
-					if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id))
+					if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id) &&
+					    (oldBattleMon == null || !oldBattleMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id)))
 					{
-						if (oldMon.Moves.Count == 4)
+						if (oldMon.Moves.Count == 4 || (oldBattleMon != null && oldBattleMon.Moves.Count == 4))
 						{
-							Move oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
+							Move oldMove;
+							if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id) &&
+							    oldMon.Moves.Count == 4)
+							{
+								oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
+							}
+							else
+								oldMove = oldBattleMon.Moves.First(x => !mon.Moves.Contains(x));
+
 							builder.Append(
-								$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
+									$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
 						}
 						else
 						{
@@ -1040,7 +1095,7 @@ namespace StreamFeedBot.Rulesets
 					}
 				}
 
-				if (mon.Health[0] == 0 && oldMon.Health[0] != 0)
+				if (mon.Health[0] == 0 && oldMon.Health[0] != 0 && oldBattleMon?.Health?[0] != 0)
 				{
 					string[] choice =
 					{
@@ -1050,6 +1105,50 @@ namespace StreamFeedBot.Rulesets
 						$"**{oldMon.Name} ({oldMon.Species.Name}) is no more!** ",
 					};
 					builder.Append(choice[Random.Next(choice.Length)]);
+				}
+			}
+
+			if (status.BattleParty != null && oldStatus.BattleParty != null)
+			{
+				foreach (Pokemon mon in status.BattleParty)
+				{
+					if (mon == null) continue;
+					uint pv = mon.PersonalityValue;
+					if (mon.Species.Id == 292)
+						pv++;
+					Pokemon oldMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
+						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					if (oldMon == null) continue;
+					foreach (Move move in mon.Moves)
+					{
+						if (move == null) continue;
+						if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id))
+						{
+							if (oldMon.Moves.Count == 4)
+							{
+								Move oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
+
+								builder.Append(
+									$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
+							}
+							else
+							{
+								builder.Append($"**{mon.Name} ({mon.Species.Name}) learned {move.Name}!** ");
+							}
+						}
+					}
+
+					if (mon.Health[0] == 0 && oldMon.Health[0] != 0)
+					{
+						string[] choice =
+						{
+							$"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has fainted!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has fallen!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) is no more!** ",
+						};
+						builder.Append(choice[Random.Next(choice.Length)]);
+					}
 				}
 			}
 
@@ -1119,6 +1218,30 @@ namespace StreamFeedBot.Rulesets
 						$"**We withdraw {mon.Name} ({mon.Species.Name}) from the PC!** "
 					};
 					builder.Append(choices[Random.Next(choices.Length)]);
+				}
+			}
+
+			if (status.BattleParty != null && oldStatus.BattleParty != null)
+			{
+				foreach (Pokemon mon in status.BattleParty)
+				{
+					if (mon == null) continue;
+					uint pv = mon.PersonalityValue;
+					if (mon.Species.Id == 292)
+						pv++;
+					List<uint> values =
+						oldStatus.BattleParty.Where(x => x != null).Select(x => x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
+							.ToList();
+
+					if (!values.Contains(pv))
+					{
+						builder.Append(
+							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
+						if (oldStatus.BattleParty.Count(x => x != null) == 6)
+						{
+							builder.Append($"Sent to box #{status.PC.CurrentBoxNumber}. ");
+						}
+					}
 				}
 			}
 
