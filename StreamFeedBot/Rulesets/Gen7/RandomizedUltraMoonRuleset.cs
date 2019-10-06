@@ -266,7 +266,7 @@ namespace StreamFeedBot.Rulesets
 						EnemyName = trainer.ClassName + " " + trainer.Name;
 					}
 
-					if (Enumerable.Range(494, 3).Contains(trainer.ClassId))
+					if (Enumerable.Range(494, 3).Contains(trainer.Id))
 					{
 						builder.Append("**TEH URN!** ");
 						aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
