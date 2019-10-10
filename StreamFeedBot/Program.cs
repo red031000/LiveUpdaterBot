@@ -127,6 +127,13 @@ namespace StreamFeedBot
 
 			Ruleset = new RandomizedUltraMoonRuleset(memory, Settings);
 
+			if (DateTime.UtcNow < RunStart)
+			{
+				TimeSpan span = RunStart - DateTime.UtcNow;
+				await Utils.SendMessage(
+					$"Connected, {span.Days}d {span.Hours}h {span.Minutes}m {span.Seconds}s until {Settings.RunName}!");
+			}
+
 			await MainLoop();
 
 			await Task.Delay(-1);

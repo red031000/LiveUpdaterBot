@@ -1236,7 +1236,7 @@ namespace StreamFeedBot.Rulesets
 					if (!values.Contains(pv))
 					{
 						builder.Append(
-							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
+							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) + " " : "")}Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
 						if (oldStatus.BattleParty.Count(x => x != null) == 6)
 						{
 							builder.Append($"Sent to box #{status.PC.CurrentBoxNumber}. ");
