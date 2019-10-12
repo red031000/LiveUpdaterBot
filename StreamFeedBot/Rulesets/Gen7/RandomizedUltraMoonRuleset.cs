@@ -126,7 +126,7 @@ namespace StreamFeedBot.Rulesets
 		{
 			StringBuilder builder = new StringBuilder();
 			StringBuilder aBuilder = new StringBuilder();
-			if (oldStatus == null)
+			if (oldStatus == null || status == null)
 			{
 				announcement = null;
 				return null; //calculate deltas between two statuses, not just one
@@ -197,9 +197,9 @@ namespace StreamFeedBot.Rulesets
 								string[] c3 = { " wandering", "n eager" };
 								string[] choices =
 								{
-									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
-									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
-									$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Count(x => (bool) x.Active) != 0 ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. "
+									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Any(x => (bool) x.Active) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
+									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Any(x => (bool) x.Active) ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
+									$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Any(x => (bool) x.Active) ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. "
 								};
 								builder.Append(choices[Random.Next(choices.Length)]);
 							}

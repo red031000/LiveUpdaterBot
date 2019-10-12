@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -14,36 +15,38 @@ namespace StreamFeedBot
 			List<DiscordMessage> messages = new List<DiscordMessage>();
 			foreach (DiscordChannel channel in Program.Channels)
 			{
-				DiscordMessage message = await channel.SendMessageAsync(content, embed: embed);
+				DiscordMessage message = await channel.SendMessageAsync(content, embed: embed).ConfigureAwait(true);
 				messages.Add(message);
 			}
-			Console.WriteLine($"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "" )}");
-			await Program.LogWriter.WriteLineAsync($"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}");
-			await Program.LogWriter.FlushAsync();
+
+			Console.WriteLine($"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}");
+			await Program.LogWriter
+				.WriteLineAsync($"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}")
+				.ConfigureAwait(true);
+			await Program.LogWriter.FlushAsync().ConfigureAwait(false);
 			return messages;
 		}
 
 		public static async Task ReportError(Exception e, DiscordClient client, bool crashLog = false)
 		{
-			if (Program.Settings != null)
+			if (Program.Settings != null && client != null && e != null)
 			{
-				DiscordGuild RPS = await client.GetGuildAsync(Program.Settings.ReportServer);
-				DiscordMember red = await RPS.GetMemberAsync(Program.Settings.ReportId);
+				DiscordGuild rps = await client.GetGuildAsync(Program.Settings.ReportServer).ConfigureAwait(true);
+				DiscordMember red = await rps.GetMemberAsync(Program.Settings.ReportId).ConfigureAwait(true);
 				string message =
 					$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception: {e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}";
 				string message2 =
 					$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}Inner exception too long.";
 				await red.SendMessageAsync(message.Length >= 2000
 					? message2.Length >= 2000
-						?
-						$"Exception has occured: {e.Message}{Environment.NewLine}Stack Trace too long."
+						? $"Exception has occured: {e.Message}{Environment.NewLine}Stack Trace too long."
 						: message2
-					: message);
+					: message).ConfigureAwait(true);
 				if (crashLog)
 				{
 					using (FileStream stream = new FileStream("crash.log", FileMode.Open))
 					{
-						await red.SendFileAsync(stream);
+						await red.SendFileAsync(stream).ConfigureAwait(false);
 					}
 				}
 			}
@@ -51,19 +54,25 @@ namespace StreamFeedBot
 
 		public static async Task<List<DiscordMessage>> AnnounceMessage(string message, DiscordClient client)
 		{
-			List<DiscordMessage> messages = new List<DiscordMessage>();
-			foreach (AnnounceSettings setting in Program.Settings.AnnounceSettings)
+			if (client != null && message != null)
 			{
-				DiscordGuild guild = await client.GetGuildAsync(setting.AnnounceServer);
-				DiscordRole role = guild.GetRole(setting.AnnounceRole);
-				role.ModifyAsync(mentionable: true).Wait();
-				DiscordChannel channel = await client.GetChannelAsync(setting.AnnounceChannel);
-				DiscordMessage sent = await channel.SendMessageAsync($"<@&{setting.AnnounceRole}> " + message);
-				messages.Add(sent);
-				role.ModifyAsync(mentionable: false).Wait();
+				List<DiscordMessage> messages = new List<DiscordMessage>();
+				foreach (AnnounceSettings setting in Program.Settings.AnnounceSettings)
+				{
+					DiscordGuild guild = await client.GetGuildAsync(setting.AnnounceServer).ConfigureAwait(true);
+					DiscordRole role = guild.GetRole(setting.AnnounceRole);
+					role.ModifyAsync(mentionable: true).Wait();
+					DiscordChannel channel = await client.GetChannelAsync(setting.AnnounceChannel).ConfigureAwait(true);
+					DiscordMessage sent = await channel.SendMessageAsync($"<@&{setting.AnnounceRole}> " + message)
+						.ConfigureAwait(true);
+					messages.Add(sent);
+					role.ModifyAsync(mentionable: false).Wait();
+				}
+
+				return messages;
 			}
 
-			return messages;
+			return null;
 		}
 	}
 }

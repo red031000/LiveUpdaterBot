@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -76,7 +77,7 @@ namespace StreamFeedBot
 			{
 				using (StreamReader reader = new StreamReader(stream))
 				{
-					string json = await reader.ReadToEndAsync();
+					string json = await reader.ReadToEndAsync().ConfigureAwait(true);
 					Settings = JsonConvert.DeserializeObject<Settings>(json);
 				}
 			}
@@ -85,7 +86,7 @@ namespace StreamFeedBot
 				Directory.CreateDirectory("logs");
 
 			LogStream =
-				new FileStream(Path.Combine("logs", Settings.RunName + logdate.ToString("yyyy-MM-dd") + ".txt"), FileMode.Append);
+				new FileStream(Path.Combine("logs", Settings.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
 
 			LogWriter = new StreamWriter(LogStream);
 
@@ -97,7 +98,7 @@ namespace StreamFeedBot
 				{
 					using (StreamReader reader = new StreamReader(stream))
 					{
-						string json = await reader.ReadToEndAsync();
+						string json = await reader.ReadToEndAsync().ConfigureAwait(true);
 						memory = JsonConvert.DeserializeObject<Memory>(json);
 					}
 				}
@@ -114,13 +115,13 @@ namespace StreamFeedBot
 			await Client.ConnectAsync(new DiscordActivity("TwitchPlaysPokemon", ActivityType.Streaming)
 			{
 				StreamUrl = "https://www.twitch.tv/twitchplayspokemon"
-			});
+			}).ConfigureAwait(false);
 
 			Client.MessageCreated += DmHandler;
 
 			foreach (ulong id in Settings.Channels)
 			{
-				DiscordChannel channel = await Client.GetChannelAsync(id);
+				DiscordChannel channel = await Client.GetChannelAsync(id).ConfigureAwait(false);
 				Console.WriteLine($"Connecting to channel {id}.");
 				Channels.Add(channel);
 			}
@@ -131,27 +132,27 @@ namespace StreamFeedBot
 			{
 				TimeSpan span = RunStart - DateTime.UtcNow;
 				await Utils.SendMessage(
-					$"Connected, {span.Days}d {span.Hours}h {span.Minutes}m {span.Seconds}s until {Settings.RunName}!");
+					$"Connected, {span.Days}d {span.Hours}h {span.Minutes}m {span.Seconds}s until {Settings.RunName}!").ConfigureAwait(false);
 			}
 
-			await MainLoop();
+			await MainLoop().ConfigureAwait(false);
 
-			await Task.Delay(-1);
+			await Task.Delay(-1).ConfigureAwait(false);
 		}
 
 		private static async Task DmHandler(MessageCreateEventArgs e)
 		{
 			if (e.Guild == null)
 			{
-				if (Settings.SuperUsers.Contains(e.Author.Id) && e.Message.Content.ToLowerInvariant().Trim() == "stop")
+				if (Settings.SuperUsers.Contains(e.Author.Id) && e.Message.Content.ToUpperInvariant().Trim() == "STOP")
 				{
-					await e.Message.RespondAsync("stopping <:RaccAttack:468748603632910336>");
+					await e.Message.RespondAsync("stopping <:RaccAttack:468748603632910336>").ConfigureAwait(true);
 					Console.WriteLine($"Stopping by request of {e.Author.Username}");
 					cancel = true;
 				}
 				else if (e.Author != Client.CurrentUser)
 				{
-					await e.Message.RespondAsync("<:RaccAttack:468748603632910336>");
+					await e.Message.RespondAsync("<:RaccAttack:468748603632910336>").ConfigureAwait(false);
 				}
 			}
 		}
@@ -160,25 +161,25 @@ namespace StreamFeedBot
 		{
 			while (!cancel)
 			{
-				await Api.UpdateStatus();
+				await Api.UpdateStatus().ConfigureAwait(false);
 				try
 				{
 					string message = Ruleset.CalculateDeltas(Api.Status, Api.OldStatus, out string announcement);
 					if (message != null)
 					{
 						TimeSpan time = DateTime.UtcNow - RunStart;
-						await Utils.SendMessage($"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim());
+						await Utils.SendMessage($"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim()).ConfigureAwait(true);
 					}
 
-					if (announcement != null) await Utils.AnnounceMessage(announcement, Client);
+					if (announcement != null) await Utils.AnnounceMessage(announcement, Client).ConfigureAwait(false);
 				}
 				catch (Exception e)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine($"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
 					await LogWriter.WriteLineAsync(
-						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
-					await LogWriter.FlushAsync();
+						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}").ConfigureAwait(true);
+					await LogWriter.FlushAsync().ConfigureAwait(true);
 					Console.ForegroundColor = ConsoleColor.White;
 				}
 
@@ -187,11 +188,11 @@ namespace StreamFeedBot
 					LogWriter.Dispose();
 					LogStream.Dispose();
 					logdate = DateTime.UtcNow.Date;
-					LogStream = new FileStream(Path.Combine("logs", Settings.RunName + logdate.ToString("yyyy-MM-dd") + ".txt"), FileMode.Append);
+					LogStream = new FileStream(Path.Combine("logs", Settings.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
 					LogWriter = new StreamWriter(LogStream);
 				}
 
-				await Task.Delay(RefreshInterval * 1000);
+				await Task.Delay(RefreshInterval * 1000).ConfigureAwait(false);
 			}
 			Disconnect(null, null);
 		}

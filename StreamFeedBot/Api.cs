@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace StreamFeedBot
 {
-	public class Api
+	public class Api : IDisposable
 	{
 		public RunStatus Status;
 		public RunStatus OldStatus;
@@ -34,7 +35,7 @@ namespace StreamFeedBot
 		{
 			if (!Directory.Exists("Snapshots"))
 				Directory.CreateDirectory("Snapshots");
-			File.WriteAllText("Snapshots/ApiSnapshot" + DateTime.UtcNow.ToString("o") + ".txt", message);
+			File.WriteAllText("Snapshots/ApiSnapshot" + DateTime.UtcNow.ToString("o", CultureInfo.CurrentCulture) + ".txt", message);
 		}
 
 		public void StopTimer()
@@ -49,8 +50,8 @@ namespace StreamFeedBot
 			bool replaced = false;
 			try
 			{
-				result = await Client.GetAsync("https://twitchplayspokemon.tv/api/run_status");
-				string content = await result.Content.ReadAsStringAsync();
+				result = await Client.GetAsync(new Uri("https://twitchplayspokemon.tv/api/run_status")).ConfigureAwait(true);
+				string content = await result.Content.ReadAsStringAsync().ConfigureAwait(true);
 				message = content;
 				if (!result.IsSuccessStatusCode)
 				{
@@ -72,7 +73,7 @@ namespace StreamFeedBot
 			}
 			catch (Exception e)
 			{
-				await Utils.ReportError(e, Program.Client);
+				await Utils.ReportError(e, Program.Client).ConfigureAwait(false);
 				if (replaced)
 					Status = OldStatus;
 				result?.Dispose();
@@ -83,8 +84,8 @@ namespace StreamFeedBot
 			{
 				Status = OldStatus;
 				result.Dispose();
-				await Task.Delay(1000);
-				await UpdateStatus();
+				await Task.Delay(1000).ConfigureAwait(true);
+				await UpdateStatus().ConfigureAwait(true);
 			}
 
 			/*for (int j = 0; j < Program.Settings.BadgeNames.Length; j++)
@@ -97,11 +98,23 @@ namespace StreamFeedBot
 				foreach (Trainer t in Status.EnemyTrainers)
 				{
 					if (t?.ClassName != null)
-						t.ClassName = t.ClassName.Replace("πµ", "PkMn");
+						t.ClassName = t.ClassName.Replace("πµ", "PkMn", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
 			result.Dispose();
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool managed)
+		{
+			Timer.Dispose();
+			Client.Dispose();
 		}
 	}
 }
