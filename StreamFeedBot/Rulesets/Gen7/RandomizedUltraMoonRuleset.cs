@@ -248,7 +248,7 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-			if (status?.GameStats?.Blackouts != oldStatus?.GameStats?.Blackouts)
+			if (status.GameStats?.Blackouts != oldStatus?.GameStats?.Blackouts)
 			{
 				string[] options = {"**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** "};
 				string message = options[Random.Next(options.Length)];
@@ -256,7 +256,7 @@ namespace StreamFeedBot.Rulesets
 			}
 
 			if (status.BattleKind == null && oldStatus.BattleKind == BattleKind.Trainer &&
-			    status.GameStats.Blackouts == oldStatus.GameStats.Blackouts)
+			    status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts)
 			{
 				if (oldStatus.EnemyTrainers.Count == 1)
 				{
@@ -293,14 +293,14 @@ namespace StreamFeedBot.Rulesets
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.Medicine.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.Medicine.FirstOrDefault(x => x.Id == item.Id) != null;
+				bool res = oldStatus?.Items?.Medicine?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
-					long? oldCount = oldStatus.Items.Medicine.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					long? oldCount = oldStatus?.Items?.Medicine?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
-				if (count != 0) //TODO: for the love of god please split these into sub-methods
+				if (count != 0)
 				{
 					Pokemon[] monsGive = status.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
 						.Where(x =>
@@ -402,10 +402,10 @@ namespace StreamFeedBot.Rulesets
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.Berries.FirstOrDefault(x => x.Id == item.Id) != null;
+				bool res = oldStatus?.Items?.Berries?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
-					long? oldCount = oldStatus.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					long? oldCount = oldStatus?.Items?.Berries?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -510,10 +510,10 @@ namespace StreamFeedBot.Rulesets
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.Items.FirstOrDefault(x => x.Id == item.Id) != null;
+				bool res = oldStatus?.Items?.Items?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
-					long? oldCount = oldStatus.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					long? oldCount = oldStatus?.Items?.Items?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -621,10 +621,10 @@ namespace StreamFeedBot.Rulesets
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.Key.FirstOrDefault(x => x.Id == item.Id) != null;
+				bool res = oldStatus?.Items?.Key?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
-					long? oldCount = oldStatus.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					long? oldCount = oldStatus?.Items?.Key?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -726,10 +726,10 @@ namespace StreamFeedBot.Rulesets
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.TMs.FirstOrDefault(x => x.Id == item.Id) != null;
+				bool res = oldStatus?.Items?.TMs?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
-					long? oldCount = oldStatus.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					long? oldCount = oldStatus?.Items?.TMs?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -831,10 +831,10 @@ namespace StreamFeedBot.Rulesets
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.ZCrystals.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
-				bool res = oldStatus.Items.ZCrystals.FirstOrDefault(x => x.Id == item.Id) != null;
+				bool res = oldStatus?.Items?.ZCrystals?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
-					long? oldCount = oldStatus.Items.ZCrystals.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+					long? oldCount = oldStatus?.Items?.ZCrystals?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
