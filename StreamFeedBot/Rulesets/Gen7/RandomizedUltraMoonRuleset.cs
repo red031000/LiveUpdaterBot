@@ -1046,6 +1046,7 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
+			bool flag = false;
 			if (status.Party != null)
 			{
 				foreach (Pokemon mon in status.Party)
@@ -1100,6 +1101,7 @@ namespace StreamFeedBot.Rulesets
 							$"**{oldMon.Name} ({oldMon.Species.Name}) has fallen!** ",
                         };
 						builder.Append(choice[Random.Next(choice.Length)]);
+						flag = true;
 					}
 				}
 			}
@@ -1134,7 +1136,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (mon.Health[0] == 0 && oldMon.Health[0] != 0)
+					if (mon.Health[0] == 0 && oldMon.Health[0] != 0 && !flag)
 					{
 						string[] choice =
 						{
