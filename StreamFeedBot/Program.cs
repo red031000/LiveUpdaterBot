@@ -180,6 +180,7 @@ namespace StreamFeedBot
 					await LogWriter.WriteLineAsync(
 						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}").ConfigureAwait(true);
 					await LogWriter.FlushAsync().ConfigureAwait(true);
+					await Utils.ReportError(e, Client).ConfigureAwait(true);
 					Console.ForegroundColor = ConsoleColor.White;
 				}
 

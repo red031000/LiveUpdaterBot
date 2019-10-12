@@ -63,9 +63,6 @@ namespace StreamFeedBot
 	{
 		[JsonProperty(PropertyName = "boxes")]
 		public List<Box> Boxes;
-
-		[JsonProperty(PropertyName = "current_box_number")]
-		public uint CurrentBoxNumber;
 	}
 
 	public class Box

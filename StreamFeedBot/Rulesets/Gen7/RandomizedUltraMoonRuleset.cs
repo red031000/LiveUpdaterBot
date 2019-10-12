@@ -320,38 +320,34 @@ namespace StreamFeedBot.Rulesets
 							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
 							item.Id)
 						.ToArray();
-					Pokemon[] monsGivePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsGivePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsGivePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.ToArray();
-					Pokemon[] monsTakePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsTakePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-							.Where(x =>
-								x.HeldItem == null ||
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-								&& oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
-								item.Id)
-							.ToArray();
+							.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            (oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem == null ||
+							             oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).ToList());
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsTakePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem == null ||
+							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
+									.Id == item.Id).ToList());
+					}
+
 					if (monsGive.Length != 0)
 					{
 						foreach (Pokemon mon in monsGive)
@@ -361,7 +357,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsGivePc != null && monsGivePc.Length != 0)
+					if (monsGivePc != null && monsGivePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
@@ -379,7 +375,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsTakePc != null && monsTakePc.Length != 0)
+					if (monsTakePc != null && monsTakePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
@@ -433,38 +429,33 @@ namespace StreamFeedBot.Rulesets
 							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
 							item.Id)
 						.ToArray();
-					Pokemon[] monsGivePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsGivePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsGivePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.ToArray();
-					Pokemon[] monsTakePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsTakePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-							.Where(x =>
-								x.HeldItem == null ||
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-								&& oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
-								item.Id)
-							.ToArray();
+							.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            (oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem == null ||
+							             oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).ToList());
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsTakePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem == null ||
+							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
+									.Id == item.Id).ToList());
+					}
 					if (monsGive.Length != 0)
 					{
 						foreach (Pokemon mon in monsGive)
@@ -474,7 +465,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsGivePc != null && monsGivePc.Length != 0)
+					if (monsGivePc != null && monsGivePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
@@ -492,7 +483,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsTakePc != null && monsTakePc.Length != 0)
+					if (monsTakePc != null && monsTakePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
@@ -546,38 +537,33 @@ namespace StreamFeedBot.Rulesets
 							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
 							item.Id)
 						.ToArray();
-					Pokemon[] monsGivePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsGivePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsGivePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.ToArray();
-					Pokemon[] monsTakePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsTakePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-							.Where(x =>
-								x.HeldItem == null ||
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-								&& oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
-								item.Id)
-							.ToArray();
+							.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            (oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem == null ||
+							             oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).ToList());
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsTakePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem == null ||
+							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
+									.Id == item.Id).ToList());
+					}
 					if (monsGive.Length != 0)
 					{
 						foreach (Pokemon mon in monsGive)
@@ -587,7 +573,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsGivePc != null && monsGivePc.Length != 0)
+					if (monsGivePc != null && monsGivePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
@@ -605,7 +591,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsTakePc != null && monsTakePc.Length != 0)
+					if (monsTakePc != null && monsTakePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
@@ -662,38 +648,33 @@ namespace StreamFeedBot.Rulesets
 							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
 							item.Id)
 						.ToArray();
-					Pokemon[] monsGivePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsGivePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsGivePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.ToArray();
-					Pokemon[] monsTakePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsTakePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-							.Where(x =>
-								x.HeldItem == null ||
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-								&& oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
-								item.Id)
-							.ToArray();
+							.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            (oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem == null ||
+							             oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).ToList());
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsTakePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem == null ||
+							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
+									.Id == item.Id).ToList());
+					}
 					if (monsGive.Length != 0)
 					{
 						foreach (Pokemon mon in monsGive)
@@ -703,7 +684,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsGivePc != null && monsGivePc.Length != 0)
+					if (monsGivePc != null && monsGivePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
@@ -721,7 +702,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsTakePc != null && monsTakePc.Length != 0)
+					if (monsTakePc != null && monsTakePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
@@ -772,38 +753,33 @@ namespace StreamFeedBot.Rulesets
 							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
 							item.Id)
 						.ToArray();
-					Pokemon[] monsGivePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsGivePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsGivePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.ToArray();
-					Pokemon[] monsTakePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsTakePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-							.Where(x =>
-								x.HeldItem == null ||
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-								&& oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
-								item.Id)
-							.ToArray();
+							.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            (oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem == null ||
+							             oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).ToList());
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsTakePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem == null ||
+							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
+									.Id == item.Id).ToList());
+					}
 					if (monsGive.Length != 0)
 					{
 						foreach (Pokemon mon in monsGive)
@@ -813,7 +789,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsGivePc != null && monsGivePc.Length != 0)
+					if (monsGivePc != null && monsGivePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
@@ -831,7 +807,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsTakePc != null && monsTakePc.Length != 0)
+					if (monsTakePc != null && monsTakePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
@@ -882,38 +858,33 @@ namespace StreamFeedBot.Rulesets
 							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
 							item.Id)
 						.ToArray();
-					Pokemon[] monsGivePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsGivePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsGivePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.ToArray();
-					Pokemon[] monsTakePc = null;
-					if (status.PC.Boxes.Any(x => x.BoxNumber == status.PC.CurrentBoxNumber))
-						monsTakePc = status.PC.Boxes.First(x => x.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-							.Where(x =>
-								x.HeldItem == null ||
-								(oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								 oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									 .First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-								 x.HeldItem.Id))
-							.Where(x =>
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-								&& oldStatus.PC.Boxes.First(y => y.BoxNumber == status.PC.CurrentBoxNumber).BoxContents
-									.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
-								item.Id)
-							.ToArray();
+							.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            (oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem == null ||
+							             oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).ToList());
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsTakePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem == null ||
+							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
+									.Id == item.Id).ToList());
+					}
 					if (monsGive.Length != 0)
 					{
 						foreach (Pokemon mon in monsGive)
@@ -923,7 +894,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsGivePc != null && monsGivePc.Length != 0)
+					if (monsGivePc != null && monsGivePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
@@ -941,7 +912,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (monsTakePc != null && monsTakePc.Length != 0)
+					if (monsTakePc != null && monsTakePc.Count != 0)
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
@@ -988,7 +959,7 @@ namespace StreamFeedBot.Rulesets
 			{
 				for (int i = 0; i < status.Party.Count; i++)
 				{
-					Pokemon oldMon = oldStatus?.Party[i];
+					Pokemon oldMon = i >= oldStatus?.Party?.Count ? null : oldStatus?.Party[i];
 					if (oldMon == null) continue;
 					uint pv = oldMon.PersonalityValue;
 					if (oldMon.Species.Id == 292)
@@ -1036,7 +1007,7 @@ namespace StreamFeedBot.Rulesets
 			{
 				for (int i = 0; i < status.BattleParty.Count; i++)
 				{
-					Pokemon oldMon = oldStatus.BattleParty[i];
+					Pokemon oldMon = i >= oldStatus?.BattleParty?.Count ? null : oldStatus.BattleParty[i];
 					if (oldMon == null) continue;
 					uint pv = oldMon.PersonalityValue;
 					if (oldMon.Species.Id == 292)
@@ -1167,10 +1138,8 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choice =
 						{
-							$"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ",
 							$"**{oldMon.Name} ({oldMon.Species.Name}) has fainted!** ",
 							$"**{oldMon.Name} ({oldMon.Species.Name}) has fallen!** ",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) is no more!** ",
 						};
 						builder.Append(choice[Random.Next(choice.Length)]);
 					}
@@ -1224,19 +1193,16 @@ namespace StreamFeedBot.Rulesets
 								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
 							.ToList();
 					List<uint> boxValues = new List<uint>();
-					if (oldStatus.PC.Boxes.Any(x => x.BoxNumber == oldStatus.PC.CurrentBoxNumber))
+					List<Pokemon> pokemon = new List<Pokemon>();
+					foreach (List<Pokemon> p in oldStatus.PC.Boxes.Select(x => x.BoxContents))
 					{
-						List<Pokemon> pokemon = new List<Pokemon>();
-						foreach (List<Pokemon> p in oldStatus.PC.Boxes.Select(x => x.BoxContents))
-						{
-							pokemon.AddRange(p);
-						}
-
-						values.AddRange(pokemon.Select(x =>
-							x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
-						boxValues.AddRange(pokemon.Select(x =>
-							x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+						pokemon.AddRange(p);
 					}
+
+					values.AddRange(pokemon.Select(x =>
+						x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+					boxValues.AddRange(pokemon.Select(x =>
+						x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
 
 					if (!values.Contains(pv))
 					{
@@ -1244,7 +1210,7 @@ namespace StreamFeedBot.Rulesets
 							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
 						if (oldStatus.Party.Count(x => x != null) == 6)
 						{
-							builder.Append($"Sent to box #{status.PC.CurrentBoxNumber}. ");
+							builder.Append($"Sent to the PC. ");
 						}
 					}
 					else if (boxValues.Contains(pv))
@@ -1278,7 +1244,7 @@ namespace StreamFeedBot.Rulesets
 							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) + " " : "")}Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
 						if (oldStatus.BattleParty.Count(x => x != null) == 6)
 						{
-							builder.Append($"Sent to box #{status.PC.CurrentBoxNumber}. ");
+							builder.Append($"Sent to the PC. ");
 						}
 					}
 				}
@@ -1286,47 +1252,44 @@ namespace StreamFeedBot.Rulesets
 
 			if (oldStatus.PC != null)
 			{
-				if (oldStatus.PC.Boxes.Any(x => x.BoxNumber == oldStatus.PC.CurrentBoxNumber))
+				List<Pokemon> oldBoxedMons = new List<Pokemon>();
+				foreach (List<Pokemon> p in oldStatus.PC.Boxes.Select(x => x.BoxContents))
 				{
-					List<Pokemon> oldBoxedMons = new List<Pokemon>();
-					foreach (List<Pokemon> p in oldStatus.PC.Boxes.Select(x => x.BoxContents))
-					{
-						oldBoxedMons.AddRange(p);
-					}
+					oldBoxedMons.AddRange(p);
+				}
 
-					List<Pokemon> newBoxedMons = new List<Pokemon>();
-					foreach (List<Pokemon> p in status.PC.Boxes.Select(x => x.BoxContents))
-					{
-						newBoxedMons.AddRange(p);
-					}
+				List<Pokemon> newBoxedMons = new List<Pokemon>();
+				foreach (List<Pokemon> p in status.PC.Boxes.Select(x => x.BoxContents))
+				{
+					newBoxedMons.AddRange(p);
+				}
 
-					foreach (Pokemon mon in newBoxedMons)
+				foreach (Pokemon mon in newBoxedMons)
+				{
+					if (oldStatus.Party.Any(x => x.PersonalityValue == mon.PersonalityValue))
 					{
-						if (oldStatus.Party.Any(x => x.PersonalityValue == mon.PersonalityValue))
+						string[] choices =
 						{
-							string[] choices =
-							{
-								$"**We deposited {mon.Name} ({mon.Species.Name}) in box {status.PC.CurrentBoxNumber}!** ",
-								$"**We put {mon.Name} ({mon.Species.Name}) in box {status.PC.CurrentBoxNumber}!** ",
-								$"**Deposited {mon.Name} ({mon.Species.Name}) in box {status.PC.CurrentBoxNumber}!** "
-							};
-							builder.Append(choices[Random.Next(choices.Length)]);
-						}
+							$"**We deposited {mon.Name} ({mon.Species.Name}) in the PC!** ",
+							$"**We put {mon.Name} ({mon.Species.Name}) in the PC!** ",
+							$"**Deposited {mon.Name} ({mon.Species.Name}) in the PC!** "
+						};
+						builder.Append(choices[Random.Next(choices.Length)]);
 					}
+				}
 
-					foreach (Pokemon oldMon in oldBoxedMons)
+				foreach (Pokemon oldMon in oldBoxedMons)
+				{
+					if (status.Party.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
+					    newBoxedMons.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
+					    status.Daycare.All(x => x.PersonalityValue != oldMon.PersonalityValue))
 					{
-						if (status.Party.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
-						    newBoxedMons.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
-						    status.Daycare.All(x => x.PersonalityValue != oldMon.PersonalityValue))
+						string[] choices =
 						{
-							string[] choices =
-							{
-								$"**WE RELEASE {oldMon.Name} ({oldMon.Species.Name})!** ",
-								$"**{oldMon.Name} ({oldMon.Species.Name}) HAS BEEN RELEASED! BYE {oldMon.Name.ToUpperInvariant()}!** "
-							};
-							builder.Append(choices[Random.Next(choices.Length)]);
-						}
+							$"**WE RELEASE {oldMon.Name} ({oldMon.Species.Name})!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) HAS BEEN RELEASED! BYE {oldMon.Name.ToUpperInvariant()}!** "
+						};
+						builder.Append(choices[Random.Next(choices.Length)]);
 					}
 				}
 			}
