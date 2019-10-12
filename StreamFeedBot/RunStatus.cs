@@ -185,7 +185,7 @@ namespace StreamFeedBot
 
 	public class GameStats
 	{
-		[JsonProperty(PropertyName = "blackouts")]
+		[JsonProperty(PropertyName = "Blackouts")]
 		public uint Blackouts;
 
 		//[JsonProperty(PropertyName = "Saves Made")]

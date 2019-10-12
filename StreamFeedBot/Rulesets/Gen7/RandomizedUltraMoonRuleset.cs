@@ -248,7 +248,7 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-			if (status.GameStats.Blackouts != oldStatus.GameStats.Blackouts)
+			if (status?.GameStats?.Blackouts != oldStatus?.GameStats?.Blackouts)
 			{
 				string[] options = {"**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** "};
 				string message = options[Random.Next(options.Length)];
@@ -988,33 +988,38 @@ namespace StreamFeedBot.Rulesets
 			{
 				for (int i = 0; i < status.Party.Count; i++)
 				{
-					Pokemon oldMon = oldStatus.Party[i];
+					Pokemon oldMon = oldStatus?.Party[i];
 					if (oldMon == null) continue;
 					uint pv = oldMon.PersonalityValue;
 					if (oldMon.Species.Id == 292)
 						pv++;
 					Pokemon mon = status.Party.Where(x => x != null).FirstOrDefault(x =>
 						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
-					Pokemon oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					Pokemon oldBattleMon = null;
+					if (oldStatus.BattleParty != null)
+					{
+						oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
+							x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					}
+
 					if (mon == null)
 					{
 						continue;
 					}
 
-					if (mon.Level != oldMon.Level && mon.Level != oldBattleMon.Level)
+					if (mon.Level != oldMon.Level && mon.Level != oldBattleMon?.Level)
 					{
 						string[] choices =
 						{
 							$"**{oldMon.Name} ({oldMon.Species.Name}) has grown to level {mon.Level}!** ",
 							$"**{oldMon.Name} ({oldMon.Species.Name}) is now level {mon.Level}!** ",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) has leveled up to {mon.Level}!** "
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has leveled up to level {mon.Level}!** "
 						};
 						string message = choices[Random.Next(choices.Length)];
 						builder.Append(message);
 					}
 
-					if (mon.Species.Id != oldMon.Species.Id && mon.Species.Id != oldBattleMon.Species.Id)
+					if (mon.Species.Id != oldMon.Species.Id && mon.Species.Id != oldBattleMon?.Species?.Id)
 					{
 						string[] choices =
 						{
@@ -1080,8 +1085,13 @@ namespace StreamFeedBot.Rulesets
 						pv++;
 					Pokemon oldMon = oldStatus.Party.Where(x => x != null).FirstOrDefault(x =>
 						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
-					Pokemon oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					Pokemon oldBattleMon = null;
+					if (oldStatus.BattleParty != null)
+					{
+						oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
+							x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					}
+
 					if (oldMon == null) continue;
 					foreach (Move move in mon.Moves)
 					{
@@ -1115,11 +1125,9 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choice =
 						{
-							$"**We lose {oldMon.Name} ({oldMon.Species.Name})!** ",
 							$"**{oldMon.Name} ({oldMon.Species.Name}) has fainted!** ",
 							$"**{oldMon.Name} ({oldMon.Species.Name}) has fallen!** ",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) is no more!** ",
-						};
+                        };
 						builder.Append(choice[Random.Next(choice.Length)]);
 					}
 				}
