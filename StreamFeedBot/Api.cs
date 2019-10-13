@@ -57,7 +57,7 @@ namespace StreamFeedBot
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine($"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
-					Console.ForegroundColor = ConsoleColor.White;
+					Console.ResetColor();
 					result.Dispose();
 					return;
 				}

@@ -150,6 +150,15 @@ namespace StreamFeedBot
 					Console.WriteLine($"Stopping by request of {e.Author.Username}");
 					cancel = true;
 				}
+				else if (Settings.SuperUsers.Contains(e.Author.Id) &&
+				         e.Message.Content.ToUpperInvariant().Trim() == "DUMPMEM"
+				         || e.Message.Content.ToUpperInvariant().Trim() == "DUMPMEMORY"
+				         || e.Message.Content.ToUpperInvariant().Trim() == "DUMP MEMORY")
+				{
+					await e.Message.RespondAsync("dumping memory to ~/publish/memory.json <:RaccAttack:468748603632910336>").ConfigureAwait(true);
+					DumpMemory();
+					Console.WriteLine($"Dumping memory by request of {e.Author.Username}");
+				}
 				else if (e.Author != Client.CurrentUser)
 				{
 					await e.Message.RespondAsync("<:RaccAttack:468748603632910336>").ConfigureAwait(false);
@@ -181,7 +190,7 @@ namespace StreamFeedBot
 						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}").ConfigureAwait(true);
 					await LogWriter.FlushAsync().ConfigureAwait(true);
 					await Utils.ReportError(e, Client).ConfigureAwait(true);
-					Console.ForegroundColor = ConsoleColor.White;
+					Console.ResetColor();
 				}
 
 				if (logdate != DateTime.UtcNow.Date)

@@ -1257,6 +1257,11 @@ namespace StreamFeedBot.Rulesets
 						x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
 					boxValues.AddRange(pokemon.Select(x =>
 						x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+					if (oldStatus.Daycare != null)
+					{
+						values.AddRange(oldStatus.Daycare.Where(x => x != null).Select(x =>
+							x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+					}
 
 					if (!values.Contains(pv))
 					{
@@ -1275,6 +1280,46 @@ namespace StreamFeedBot.Rulesets
 							$"**We withdraw {mon.Name} ({mon.Species.Name}) from the PC!** "
 						};
 						builder.Append(choices[Random.Next(choices.Length)]);
+					}
+				}
+			}
+
+			if (status.PC.Boxes != null)
+			{
+				foreach (Box box in status.PC.Boxes)
+				{
+					foreach (Pokemon mon in box.BoxContents)
+					{
+						if (mon == null) continue;
+						uint pv = mon.PersonalityValue;
+						if (mon.Species.Id == 292)
+							pv++;
+						List<uint> values =
+							oldStatus.Party.Where(x => x != null).Select(x =>
+								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue).ToList();
+						List<uint> boxValues = new List<uint>();
+						List<Pokemon> pokemon = new List<Pokemon>();
+						foreach (List<Pokemon> p in oldStatus.PC.Boxes.Select(x => x.BoxContents))
+						{
+							pokemon.AddRange(p);
+						}
+
+						values.AddRange(pokemon.Select(x =>
+							x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+						boxValues.AddRange(pokemon.Select(x =>
+							x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+						if (oldStatus.Daycare != null)
+						{
+							values.AddRange(oldStatus.Daycare.Where(x => x != null).Select(x =>
+								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+						}
+
+						if (!values.Contains(pv))
+						{
+							builder.Append(
+								$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}`. ")}");
+							builder.Append($"Sent to Box {box.BoxNumber}. ");
+						}
 					}
 				}
 			}
