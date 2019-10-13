@@ -290,14 +290,28 @@ namespace StreamFeedBot.Rulesets
 			List<uint> ids = new List<uint>();
 			bool shopping = false;
 
-			foreach (Item item in status.Items.Medicine)
+			ItemEqualityComparer comparer = new ItemEqualityComparer();
+
+			List<Item> distinctMedicine = new List<Item>();
+			distinctMedicine.AddRange(status.Items.Medicine);
+			if (oldStatus?.Items?.Medicine != null)
+				distinctMedicine.AddRange(oldStatus.Items.Medicine);
+			distinctMedicine = distinctMedicine.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctMedicine)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.Medicine.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				count += status.Items.FreeSpace.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
 				bool res = oldStatus?.Items?.Medicine?.FirstOrDefault(x => x.Id == item.Id) != null;
+				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.Medicine?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					if (oldCount != null)
+						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					else
+						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -388,7 +402,7 @@ namespace StreamFeedBot.Rulesets
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -397,7 +411,7 @@ namespace StreamFeedBot.Rulesets
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money < oldStatus.Money)
+					else if (count > 0 && status.Money != oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -411,14 +425,26 @@ namespace StreamFeedBot.Rulesets
 				ids.Add(item.Id);
 			}
 
-			foreach (Item item in status.Items.Berries)
+			List<Item> distinctBerries = new List<Item>();
+			distinctBerries.AddRange(status.Items.Berries);
+			if (oldStatus?.Items?.Berries != null)
+				distinctBerries.AddRange(oldStatus.Items.Berries);
+			distinctBerries = distinctBerries.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctBerries)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.Berries.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				count += status.Items.FreeSpace.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
 				bool res = oldStatus?.Items?.Berries?.FirstOrDefault(x => x.Id == item.Id) != null;
+				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.Berries?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					if (oldCount != null)
+						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					else
+						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -508,7 +534,7 @@ namespace StreamFeedBot.Rulesets
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -517,7 +543,7 @@ namespace StreamFeedBot.Rulesets
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money < oldStatus.Money)
+					else if (count > 0 && status.Money != oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -531,14 +557,26 @@ namespace StreamFeedBot.Rulesets
 				ids.Add(item.Id);
 			}
 
-			foreach (Item item in status.Items.Items)
+			List<Item> distinctItems = new List<Item>();
+			distinctItems.AddRange(status.Items.Items);
+			if (oldStatus?.Items?.Items != null)
+				distinctItems.AddRange(oldStatus.Items.Items);
+			distinctItems = distinctItems.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctItems)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.Items.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				count += status.Items.FreeSpace.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
 				bool res = oldStatus?.Items?.Items?.FirstOrDefault(x => x.Id == item.Id) != null;
+				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.Items?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					if (oldCount != null)
+						oldCount -= oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					else
+						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -631,7 +669,7 @@ namespace StreamFeedBot.Rulesets
 					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {item.Name}s")} at the opponent's {status.EnemyParty[0].Species.Name}. ");
-					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -640,7 +678,7 @@ namespace StreamFeedBot.Rulesets
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money < oldStatus.Money)
+					else if (count > 0 && status.Money != oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -654,14 +692,26 @@ namespace StreamFeedBot.Rulesets
 				ids.Add(item.Id);
 			}
 
-			foreach (Item item in status.Items.Key)
+			List<Item> distinctKey = new List<Item>();
+			distinctKey.AddRange(status.Items.Key);
+			if (oldStatus?.Items?.Key != null)
+				distinctKey.AddRange(oldStatus.Items.Key);
+			distinctKey = distinctKey.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctKey)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.Key.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				count += status.Items.FreeSpace.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
 				bool res = oldStatus?.Items?.Key?.FirstOrDefault(x => x.Id == item.Id) != null;
+				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.Key?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					if (oldCount != null)
+						oldCount -= oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					else
+						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -759,14 +809,26 @@ namespace StreamFeedBot.Rulesets
 				ids.Add(item.Id);
 			}
 
-			foreach (Item item in status.Items.TMs)
+			List<Item> distinctTMs = new List<Item>();
+			distinctTMs.AddRange(status.Items.TMs);
+			if (oldStatus?.Items?.TMs != null)
+				distinctTMs.AddRange(oldStatus.Items.TMs);
+			distinctTMs = distinctTMs.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctTMs)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.TMs.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				count += status.Items.FreeSpace.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
 				bool res = oldStatus?.Items?.TMs?.FirstOrDefault(x => x.Id == item.Id) != null;
+				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.TMs?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					if (oldCount != null)
+						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					else
+						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -853,7 +915,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
+					if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -862,7 +924,7 @@ namespace StreamFeedBot.Rulesets
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money < oldStatus.Money)
+					else if (count > 0 && status.Money != oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -879,14 +941,26 @@ namespace StreamFeedBot.Rulesets
 			if (shopping)
 				builder.Append($"We have ₽{status.Money} left. ");
 
-			foreach (Item item in status.Items.ZCrystals)
+			List<Item> distinctZCrystals = new List<Item>();
+			distinctZCrystals.AddRange(status.Items.ZCrystals);
+			if (oldStatus?.Items?.ZCrystals != null)
+				distinctZCrystals.AddRange(oldStatus.Items.ZCrystals);
+			distinctZCrystals = distinctZCrystals.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctZCrystals)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status.Items.ZCrystals.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				count += status.Items.FreeSpace.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
 				bool res = oldStatus?.Items?.ZCrystals?.FirstOrDefault(x => x.Id == item.Id) != null;
+				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.ZCrystals?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					if (oldCount != null)
+						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					else
+						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 1;
 				}
 
@@ -1002,6 +1076,133 @@ namespace StreamFeedBot.Rulesets
 							Memory.AnnouncedCrystals.Add(item.Id);
 						}
 					}
+				}
+
+				ids.Add(item.Id);
+			}
+
+			List<Item> distinctFreeSpace = new List<Item>();
+			distinctFreeSpace.AddRange(status.Items.FreeSpace);
+			if (oldStatus?.Items?.FreeSpace != null)
+				distinctFreeSpace.AddRange(oldStatus.Items.FreeSpace);
+			distinctFreeSpace = distinctFreeSpace.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctFreeSpace)
+			{
+				if (ids.Contains(item.Id)) continue;
+				long count = status.Items.FreeSpace.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				bool res = oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
+				if (res)
+				{
+					long? oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					count -= oldCount ?? 1;
+				}
+
+				if (count != 0)
+				{
+					Pokemon[] monsGive = status.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+						.Where(x =>
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id !=
+							 x.HeldItem.Id))
+						.ToArray();
+					Pokemon[] monsTake = status.Party.Where(x =>
+							x.HeldItem == null ||
+							(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							 x.HeldItem.Id))
+						.Where(x =>
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
+							item.Id)
+						.ToArray();
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsGivePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+							.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+										(oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+											 .HeldItem == null ||
+										 oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+											 .HeldItem.Id != x.HeldItem.Id)).ToList());
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsTakePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem == null ||
+										(oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+										 oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+											 .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
+									.Id == item.Id).ToList());
+					}
+
+					if (monsGive.Length != 0)
+					{
+						foreach (Pokemon mon in monsGive)
+						{
+							builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+							count++;
+						}
+					}
+
+					if (monsGivePc != null && monsGivePc.Count != 0)
+					{
+						foreach (Pokemon mon in monsGivePc)
+						{
+							builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+							count++;
+						}
+					}
+
+					if (monsTake.Length != 0)
+					{
+						foreach (Pokemon mon in monsTake)
+						{
+							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+							count--;
+						}
+					}
+
+					if (monsTakePc != null && monsTakePc.Count != 0)
+					{
+						foreach (Pokemon mon in monsTakePc)
+						{
+							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+							count--;
+						}
+					}
+
+					if (status.BattleKind != null && count < 0)
+						builder.Append(
+							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
+					{
+						builder.Append(
+							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
+					else if (count < 0)
+						builder.Append(
+							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0 && status.Money != oldStatus.Money)
+					{
+						builder.Append(
+							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
+					else if (count > 0)
+						builder.Append(
+							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
 				}
 
 				ids.Add(item.Id);
@@ -1445,7 +1646,6 @@ namespace StreamFeedBot.Rulesets
 			}
 
 			announcement = aBuilder.ToString().Length == 0 ? null : aBuilder.ToString();
-
 			return builder.ToString().Length == 0 ? null : builder.ToString();
 		}
 	}

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -103,6 +104,9 @@ namespace StreamFeedBot
 		
 		[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
 		public List<Item> ZCrystals;
+
+		[JsonProperty(PropertyName = "free_space")] //Gen 7 specific
+		public List<Item> FreeSpace;
 	}
 
 	public class Item
@@ -210,5 +214,29 @@ namespace StreamFeedBot
 	{
 		Male,
 		Female
+	}
+
+	public class ItemEqualityComparer : IEqualityComparer<Item>
+	{
+		public bool Equals(Item item, Item other)
+		{
+			if (other is null) return false;
+
+			if (item is null) return false;
+
+			if (ReferenceEquals(other, item)) return true;
+
+			return item.Id == other.Id && item.Name == other.Name;
+		}
+
+		public int GetHashCode(Item item)
+		{
+#pragma warning disable CA1062 // Validate arguments of public methods
+			int hashItemName = item.Name == null ? 0 : item.Name.GetHashCode(StringComparison.InvariantCulture);
+#pragma warning restore CA1062 // Validate arguments of public methods
+			int idItemName = item.Id.GetHashCode();
+
+			return idItemName ^ hashItemName;
+		}
 	}
 }
