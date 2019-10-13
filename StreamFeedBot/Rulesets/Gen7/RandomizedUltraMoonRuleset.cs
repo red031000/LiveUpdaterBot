@@ -326,9 +326,9 @@ namespace StreamFeedBot.Rulesets
 						.ToArray();
 					Pokemon[] monsTake = status.Party.Where(x =>
 							x.HeldItem == null ||
-							(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-							 x.HeldItem.Id))
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							x.HeldItem.Id)
 						.Where(x =>
 							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
@@ -354,9 +354,9 @@ namespace StreamFeedBot.Rulesets
 						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
 						monsTakePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem == null ||
-							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+							            oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								            .HeldItem.Id != x.HeldItem.Id).Where(x =>
 								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
 								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
@@ -459,9 +459,9 @@ namespace StreamFeedBot.Rulesets
 						.ToArray();
 					Pokemon[] monsTake = status.Party.Where(x =>
 							x.HeldItem == null ||
-							(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-							 x.HeldItem.Id))
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							x.HeldItem.Id)
 						.Where(x =>
 							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
@@ -487,9 +487,9 @@ namespace StreamFeedBot.Rulesets
 						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
 						monsTakePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem == null ||
-							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+							            oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								            .HeldItem.Id != x.HeldItem.Id).Where(x =>
 								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
 								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
@@ -591,9 +591,9 @@ namespace StreamFeedBot.Rulesets
 						.ToArray();
 					Pokemon[] monsTake = status.Party.Where(x =>
 							x.HeldItem == null ||
-							(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-							 x.HeldItem.Id))
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							x.HeldItem.Id)
 						.Where(x =>
 							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
@@ -619,9 +619,9 @@ namespace StreamFeedBot.Rulesets
 						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
 						monsTakePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem == null ||
-							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+							            oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								            .HeldItem.Id != x.HeldItem.Id).Where(x =>
 								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
 								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
@@ -726,9 +726,9 @@ namespace StreamFeedBot.Rulesets
 						.ToArray();
 					Pokemon[] monsTake = status.Party.Where(x =>
 							x.HeldItem == null ||
-							(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-							 x.HeldItem.Id))
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							x.HeldItem.Id)
 						.Where(x =>
 							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
@@ -754,9 +754,9 @@ namespace StreamFeedBot.Rulesets
 						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
 						monsTakePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem == null ||
-							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+							            oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								            .HeldItem.Id != x.HeldItem.Id).Where(x =>
 								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
 								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
@@ -843,9 +843,9 @@ namespace StreamFeedBot.Rulesets
 						.ToArray();
 					Pokemon[] monsTake = status.Party.Where(x =>
 							x.HeldItem == null ||
-							(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-							 x.HeldItem.Id))
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							x.HeldItem.Id)
 						.Where(x =>
 							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
@@ -871,9 +871,9 @@ namespace StreamFeedBot.Rulesets
 						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
 						monsTakePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem == null ||
-							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+							            oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								            .HeldItem.Id != x.HeldItem.Id).Where(x =>
 								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
 								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
@@ -975,9 +975,9 @@ namespace StreamFeedBot.Rulesets
 						.ToArray();
 					Pokemon[] monsTake = status.Party.Where(x =>
 							x.HeldItem == null ||
-							(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-							 x.HeldItem.Id))
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							x.HeldItem.Id)
 						.Where(x =>
 							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
@@ -1003,9 +1003,9 @@ namespace StreamFeedBot.Rulesets
 						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
 						monsTakePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem == null ||
-							            (oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							             oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-								             .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+							            oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							            oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+								            .HeldItem.Id != x.HeldItem.Id).Where(x =>
 								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
 								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
@@ -1109,9 +1109,9 @@ namespace StreamFeedBot.Rulesets
 						.ToArray();
 					Pokemon[] monsTake = status.Party.Where(x =>
 							x.HeldItem == null ||
-							(oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							 oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
-							 x.HeldItem.Id))
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							x.HeldItem.Id)
 						.Where(x =>
 							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
@@ -1137,9 +1137,9 @@ namespace StreamFeedBot.Rulesets
 						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
 						monsTakePc.AddRange(box.BoxContents
 							.Where(x => x.HeldItem == null ||
-										(oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-										 oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-											 .HeldItem.Id != x.HeldItem.Id)).Where(x =>
+										oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+										oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+											.HeldItem.Id != x.HeldItem.Id).Where(x =>
 								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
 								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
