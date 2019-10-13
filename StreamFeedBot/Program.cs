@@ -144,10 +144,14 @@ namespace StreamFeedBot
 		{
 			if (e.Guild == null)
 			{
+				if (e.Author != Client.CurrentUser)
+				{
+					Console.WriteLine($"Recieved DM from {e.Author.Username}#{e.Author.Discriminator}: {e.Message.Content}");
+				}
 				if (Settings.SuperUsers.Contains(e.Author.Id) && e.Message.Content.ToUpperInvariant().Trim() == "STOP")
 				{
 					await e.Message.RespondAsync("stopping <:RaccAttack:468748603632910336>").ConfigureAwait(true);
-					Console.WriteLine($"Stopping by request of {e.Author.Username}");
+					Console.WriteLine($"Stopping by request of {e.Author.Username}#{e.Author.Discriminator}");
 					cancel = true;
 				}
 				else if (Settings.SuperUsers.Contains(e.Author.Id) &&
@@ -157,7 +161,7 @@ namespace StreamFeedBot
 				{
 					await e.Message.RespondAsync("dumping memory to ~/publish/memory.json <:RaccAttack:468748603632910336>").ConfigureAwait(true);
 					DumpMemory();
-					Console.WriteLine($"Dumping memory by request of {e.Author.Username}");
+					Console.WriteLine($"Dumping memory by request of {e.Author.Username}#{e.Author.Discriminator}");
 				}
 				else if (e.Author != Client.CurrentUser)
 				{
