@@ -64,6 +64,11 @@ namespace StreamFeedBot
 					DiscordChannel channel = await client.GetChannelAsync(setting.AnnounceChannel).ConfigureAwait(true);
 					DiscordMessage sent = await channel.SendMessageAsync($"<@&{setting.AnnounceRole}> " + message)
 						.ConfigureAwait(true);
+					Console.WriteLine($"Announced message: <@&{setting.AnnounceRole}> {message}");
+					await Program.LogWriter
+						.WriteLineAsync($"Announced message: <@&{setting.AnnounceRole}> {message}")
+						.ConfigureAwait(true);
+					await Program.LogWriter.FlushAsync().ConfigureAwait(true);
 					messages.Add(sent);
 					role.ModifyAsync(mentionable: false).Wait();
 				}

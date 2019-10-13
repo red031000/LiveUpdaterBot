@@ -312,7 +312,7 @@ namespace StreamFeedBot.Rulesets
 						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					else
 						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					count -= oldCount ?? 0;
 				}
 
 				if (count != 0)
@@ -445,7 +445,7 @@ namespace StreamFeedBot.Rulesets
 						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					else
 						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					count -= oldCount ?? 0;
 				}
 
 				if (count != 0)
@@ -577,7 +577,7 @@ namespace StreamFeedBot.Rulesets
 						oldCount -= oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					else
 						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					count -= oldCount ?? 0;
 				}
 
 				if (count != 0)
@@ -712,7 +712,7 @@ namespace StreamFeedBot.Rulesets
 						oldCount -= oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					else
 						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					count -= oldCount ?? 0;
 				}
 
 				if (count != 0)
@@ -829,7 +829,7 @@ namespace StreamFeedBot.Rulesets
 						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					else
 						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					count -= oldCount ?? 0;
 				}
 
 				if (count != 0)
@@ -961,7 +961,7 @@ namespace StreamFeedBot.Rulesets
 						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					else
 						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					count -= oldCount ?? 0;
 				}
 
 				if (count != 0)
@@ -1095,7 +1095,7 @@ namespace StreamFeedBot.Rulesets
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 1;
+					count -= oldCount ?? 0;
 				}
 
 				if (count != 0)
