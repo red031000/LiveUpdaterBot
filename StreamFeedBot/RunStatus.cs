@@ -57,6 +57,9 @@ namespace StreamFeedBot
 
 		[JsonProperty(PropertyName = "daycare")]
 		public List<Pokemon> Daycare;
+
+		[JsonProperty(PropertyName = "money")]
+		public uint Money;
 	}
 
 	public class PC

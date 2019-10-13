@@ -288,6 +288,7 @@ namespace StreamFeedBot.Rulesets
 			}
 
 			List<uint> ids = new List<uint>();
+			bool shopping = false;
 
 			foreach (Item item in status.Items.Medicine)
 			{
@@ -387,9 +388,21 @@ namespace StreamFeedBot.Rulesets
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
+					{
+						builder.Append(
+							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0 && status.Money < oldStatus.Money)
+					{
+						builder.Append(
+							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
 					else if (count > 0)
 						builder.Append(
 							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -495,9 +508,21 @@ namespace StreamFeedBot.Rulesets
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
+					{
+						builder.Append(
+							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0 && status.Money < oldStatus.Money)
+					{
+						builder.Append(
+							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
 					else if (count > 0)
 						builder.Append(
 							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -606,9 +631,21 @@ namespace StreamFeedBot.Rulesets
 					else if (status.BattleKind == BattleKind.Trainer && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {item.Name}s")} at the opponent's {status.EnemyParty[0].Species.Name}. ");
+					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
+					{
+						builder.Append(
+							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0 && status.Money < oldStatus.Money)
+					{
+						builder.Append(
+							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
 					else if (count > 0)
 						builder.Append(
 							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -816,9 +853,21 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (count < 0)
+					if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
+					{
+						builder.Append(
+							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
+					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0 && status.Money < oldStatus.Money)
+					{
+						builder.Append(
+							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+						shopping = true;
+					}
 					else if (count > 0)
 						builder.Append(
 							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
@@ -826,6 +875,9 @@ namespace StreamFeedBot.Rulesets
 
 				ids.Add(item.Id);
 			}
+
+			if (shopping)
+				builder.Append($"We have ₽{status.Money} left. ");
 
 			foreach (Item item in status.Items.ZCrystals)
 			{
