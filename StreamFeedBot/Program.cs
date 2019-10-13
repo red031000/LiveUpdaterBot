@@ -160,8 +160,27 @@ namespace StreamFeedBot
 				         || e.Message.Content.ToUpperInvariant().Trim() == "DUMP MEMORY")
 				{
 					await e.Message.RespondAsync("dumping memory to ~/publish/memory.json <:RaccAttack:468748603632910336>").ConfigureAwait(true);
-					DumpMemory();
+					if (File.Exists("memory.json"))
+					{
+						using (FileStream stream = new FileStream("memory.json", FileMode.Open))
+						{
+							using (StreamReader reader = new StreamReader(stream))
+							{
+								string json = await reader.ReadToEndAsync().ConfigureAwait(true);
+								Ruleset.Memory = JsonConvert.DeserializeObject<Memory>(json);
+							}
+						}
+					}
 					Console.WriteLine($"Dumping memory by request of {e.Author.Username}#{e.Author.Discriminator}");
+				}
+				else if (Settings.SuperUsers.Contains(e.Author.Id) &&
+				         e.Message.Content.ToUpperInvariant().Trim() == "RELOADMEM"
+				         || e.Message.Content.ToUpperInvariant().Trim() == "RELOADMEMORY"
+				         || e.Message.Content.ToUpperInvariant().Trim() == "RELOAD MEMORY")
+				{
+					await e.Message.RespondAsync("reloading memory from ~/publish/memory.json <:RaccAttack:468748603632910336>").ConfigureAwait(true);
+					DumpMemory();
+					Console.WriteLine($"Reloading memory by request of {e.Author.Username}#{e.Author.Discriminator}");
 				}
 				else if (e.Author != Client.CurrentUser)
 				{

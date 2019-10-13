@@ -144,7 +144,7 @@ namespace StreamFeedBot.Rulesets
 				switch (status.BattleKind)
 				{
 					case BattleKind.Wild:
-						if (status.EnemyParty?[0] != null)
+						if (status.EnemyParty != null && status.EnemyParty.Count > 0 && status.EnemyParty[0] != null)
 						{
 							string[] rand1 =
 							{
@@ -625,10 +625,10 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (status.BattleKind == BattleKind.Wild && count < 0 && BallIds.Contains(item.Id))
+					if (status.BattleKind == BattleKind.Wild && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {item.Name}s")} at the wild {status.EnemyParty[0].Species.Name}. ");
-					else if (status.BattleKind == BattleKind.Trainer && count < 0 && BallIds.Contains(item.Id))
+					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {item.Name}s")} at the opponent's {status.EnemyParty[0].Species.Name}. ");
 					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
@@ -1284,7 +1284,7 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-			if (status.PC.Boxes != null)
+			if (status.PC.Boxes != null && oldStatus.Party != null && oldStatus.Party.Count != 0)
 			{
 				foreach (Box box in status.PC.Boxes)
 				{
@@ -1297,6 +1297,15 @@ namespace StreamFeedBot.Rulesets
 						List<uint> values =
 							oldStatus.Party.Where(x => x != null).Select(x =>
 								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue).ToList();
+						if (oldStatus.BattleParty != null)
+						{
+							foreach (uint id in oldStatus.BattleParty.Where(x => x != null).Select(x =>
+								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue))
+							{
+								if (!values.Contains(id))
+									values.Add(id);
+							}
+						}
 						List<uint> boxValues = new List<uint>();
 						List<Pokemon> pokemon = new List<Pokemon>();
 						foreach (List<Pokemon> p in oldStatus.PC.Boxes.Select(x => x.BoxContents))
@@ -1379,9 +1388,9 @@ namespace StreamFeedBot.Rulesets
 
 				foreach (Pokemon oldMon in oldBoxedMons)
 				{
-					if (status.Party.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
+					if ((status?.Party?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? false) &&
 					    newBoxedMons.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
-					    status.Daycare.All(x => x.PersonalityValue != oldMon.PersonalityValue))
+					    (status?.Daycare?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? false))
 					{
 						string[] choices =
 						{
@@ -1403,9 +1412,9 @@ namespace StreamFeedBot.Rulesets
 						newBoxedMons.AddRange(p);
 					}
 
-					if (status.Party.All(x => x.PersonalityValue != mon.PersonalityValue) &&
+					if ((status?.Party?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? false) &&
 					    newBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue) &&
-					    status.Daycare.All(x => x.PersonalityValue != mon.PersonalityValue))
+					    (status?.Daycare?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? false))
 					{
 						string[] choices =
 						{
