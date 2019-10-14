@@ -275,7 +275,6 @@ namespace StreamFeedBot.Rulesets
 									string message = choice[Random.Next(choice.Length)];
 									builder.Append(message);
 									EnemyName = null;
-									break;
 								}
 								else if (trainer1.ClassId != 0)
 								{
@@ -990,9 +989,6 @@ namespace StreamFeedBot.Rulesets
 				ids.Add(item.Id);
 			}
 
-			if (shopping)
-				builder.Append($"We have ₽{status.Money} left. ");
-
 			List<Item> distinctZCrystals = new List<Item>();
 			distinctZCrystals.AddRange(status.Items.ZCrystals);
 			if (oldStatus?.Items?.ZCrystals != null)
@@ -1259,6 +1255,9 @@ namespace StreamFeedBot.Rulesets
 
 				ids.Add(item.Id);
 			}
+
+			if (shopping)
+				builder.Append($"We have ₽{status.Money} left. ");
 
 			if (status.Party != null)
 			{
