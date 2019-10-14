@@ -168,6 +168,7 @@ namespace StreamFeedBot.Rulesets
 							builder.Append(message);
 						}
 
+						EnemyName = null;
 						break;
 					case BattleKind.Trainer:
 						if (status.EnemyTrainers?.Count == 1)
@@ -189,6 +190,32 @@ namespace StreamFeedBot.Rulesets
 										Attempts.Add(trainer.Id, 1);
 									}
 
+									break;
+								}
+
+								if (trainer.ClassId == -1)
+								{
+									string[] rand1 =
+									{
+										"come across", "run into", "step on", "stumble upon", "encounter", "bump into",
+										"run across"
+									};
+									string[] rand2 =
+										{"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"};
+									string[] rand3 =
+									{
+										"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
+										"collides with", "jumps", "ambushes", "attacks", "assaults"
+									};
+									string[] choice =
+									{
+										$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
+										$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
+										$"A wild {status.EnemyParty[0].Species.Name} {rand3[Random.Next(rand3.Length)]} us. "
+									};
+									string message = choice[Random.Next(choice.Length)];
+									builder.Append(message);
+									EnemyName = null;
 									break;
 								}
 
@@ -224,6 +251,31 @@ namespace StreamFeedBot.Rulesets
 									{
 										Attempts.Add(trainer0.Id, 1);
 									}
+								}
+								else if (trainer0.ClassId == -1 || trainer1.ClassId == -1)
+								{
+									string[] rand1 =
+									{
+										"come across", "run into", "step on", "stumble upon", "encounter", "bump into",
+										"run across"
+									};
+									string[] rand2 =
+										{"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"};
+									string[] rand3 =
+									{
+										"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
+										"collides with", "jumps", "ambushes", "attacks", "assaults"
+									};
+									string[] choice =
+									{
+										$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
+										$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
+										$"A wild {status.EnemyParty[0].Species.Name} {rand3[Random.Next(rand3.Length)]} us. "
+									};
+									string message = choice[Random.Next(choice.Length)];
+									builder.Append(message);
+									EnemyName = null;
+									break;
 								}
 								else if (trainer1.ClassId != 0)
 								{
@@ -1215,15 +1267,11 @@ namespace StreamFeedBot.Rulesets
 					Pokemon oldMon = i >= oldStatus?.Party?.Count ? null : oldStatus?.Party[i];
 					if (oldMon == null) continue;
 					uint pv = oldMon.PersonalityValue;
-					if (oldMon.Species.Id == 292)
-						pv++;
-					Pokemon mon = status.Party.Where(x => x != null).FirstOrDefault(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					Pokemon mon = status.Party.Where(x => x != null).FirstOrDefault(x => x.PersonalityValue == pv);
 					Pokemon oldBattleMon = null;
 					if (oldStatus.BattleParty != null)
 					{
-						oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
-							x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+						oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x => x.PersonalityValue == pv);
 					}
 
 					if (mon == null)
@@ -1263,12 +1311,8 @@ namespace StreamFeedBot.Rulesets
 					Pokemon oldMon = i >= oldStatus?.BattleParty?.Count ? null : oldStatus.BattleParty[i];
 					if (oldMon == null) continue;
 					uint pv = oldMon.PersonalityValue;
-					if (oldMon.Species.Id == 292)
-						pv++;
-					Pokemon mon = status.BattleParty.Where(x => x != null).FirstOrDefault(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
-					Pokemon partyMon = status.Party.Where(x => x != null).FirstOrDefault(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					Pokemon mon = status.BattleParty.Where(x => x != null).FirstOrDefault(x => x.PersonalityValue == pv);
+					Pokemon partyMon = status.Party.Where(x => x != null).FirstOrDefault(x => x.PersonalityValue == pv);
 					if (mon == null)
 					{
 						continue;
@@ -1306,15 +1350,11 @@ namespace StreamFeedBot.Rulesets
 				{
 					if (mon == null) continue;
 					uint pv = mon.PersonalityValue;
-					if (mon.Species.Id == 292)
-						pv++;
-					Pokemon oldMon = oldStatus.Party.Where(x => x != null).FirstOrDefault(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					Pokemon oldMon = oldStatus.Party.Where(x => x != null).FirstOrDefault(x => x.PersonalityValue == pv);
 					Pokemon oldBattleMon = null;
 					if (oldStatus.BattleParty != null)
 					{
-						oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
-							x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+						oldBattleMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x => x.PersonalityValue == pv);
 					}
 
 					if (oldMon == null) continue;
@@ -1365,10 +1405,8 @@ namespace StreamFeedBot.Rulesets
 				{
 					if (mon == null) continue;
 					uint pv = mon.PersonalityValue;
-					if (mon.Species.Id == 292)
-						pv++;
-					Pokemon oldMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+
+					Pokemon oldMon = oldStatus.BattleParty.Where(x => x != null).FirstOrDefault(x => x.PersonalityValue == pv);
 					if (oldMon == null) continue;
 					foreach (Move move in mon.Moves)
 					{
@@ -1441,11 +1479,9 @@ namespace StreamFeedBot.Rulesets
 				{
 					if (mon == null) continue;
 					uint pv = mon.PersonalityValue;
-					if (mon.Species.Id == 292)
-						pv++;
+
 					List<uint> values =
-						oldStatus.Party.Where(x => x != null).Select(x =>
-								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
+						oldStatus.Party.Where(x => x != null).Select(x => x.PersonalityValue)
 							.ToList();
 					List<uint> boxValues = new List<uint>();
 					List<Pokemon> pokemon = new List<Pokemon>();
@@ -1454,23 +1490,32 @@ namespace StreamFeedBot.Rulesets
 						pokemon.AddRange(p);
 					}
 
-					values.AddRange(pokemon.Select(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
-					boxValues.AddRange(pokemon.Select(x =>
-						x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+					values.AddRange(pokemon.Select(x => x.PersonalityValue));
+					boxValues.AddRange(pokemon.Select(x => x.PersonalityValue));
 					if (oldStatus.Daycare != null)
 					{
-						values.AddRange(oldStatus.Daycare.Where(x => x != null).Select(x =>
-							x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+						values.AddRange(oldStatus.Daycare.Where(x => x != null).Select(x => x.PersonalityValue));
 					}
 
-					if (!values.Contains(pv))
+					if (ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue))
+					{
+						string[] choices =
+						{
+							$"**We retrieve {mon.Name} ({mon.Species.Name}) from the PC!** ",
+							$"**We withdraw {mon.Name} ({mon.Species.Name}) from the PC!** "
+						};
+						builder.Append(choices[Random.Next(choices.Length)]);
+						Pokemon temp = ReleasedDictionary.First(x => x.Key.PersonalityValue == mon.PersonalityValue)
+							.Key;
+						ReleasedDictionary.Remove(temp);
+					}
+					else if (!values.Contains(pv))
 					{
 						builder.Append(
-							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
-						if (oldStatus.Party.Count(x => x != null) == 6)
+							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) + " " : "")}Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}`. ")}");
+						if (status.Party.All(x => x.PersonalityValue != pv))
 						{
-							builder.Append($"Sent to the PC. ");
+							builder.Append("Sent to the PC. ");
 						}
 					}
 					else if (boxValues.Contains(pv))
@@ -1493,15 +1538,11 @@ namespace StreamFeedBot.Rulesets
 					{
 						if (mon == null) continue;
 						uint pv = mon.PersonalityValue;
-						if (mon.Species.Id == 292)
-							pv++;
 						List<uint> values =
-							oldStatus.Party.Where(x => x != null).Select(x =>
-								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue).ToList();
+							oldStatus.Party.Where(x => x != null).Select(x => x.PersonalityValue).ToList();
 						if (oldStatus.BattleParty != null)
 						{
-							foreach (uint id in oldStatus.BattleParty.Where(x => x != null).Select(x =>
-								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue))
+							foreach (uint id in oldStatus.BattleParty.Where(x => x != null).Select(x => x.PersonalityValue))
 							{
 								if (!values.Contains(id))
 									values.Add(id);
@@ -1514,20 +1555,30 @@ namespace StreamFeedBot.Rulesets
 							pokemon.AddRange(p);
 						}
 
-						values.AddRange(pokemon.Select(x =>
-							x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
-						boxValues.AddRange(pokemon.Select(x =>
-							x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+						values.AddRange(pokemon.Select(x => x.PersonalityValue));
+						boxValues.AddRange(pokemon.Select(x => x.PersonalityValue));
 						if (oldStatus.Daycare != null)
 						{
-							values.AddRange(oldStatus.Daycare.Where(x => x != null).Select(x =>
-								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue));
+							values.AddRange(oldStatus.Daycare.Where(x => x != null).Select(x => x.PersonalityValue));
 						}
 
-						if (!values.Contains(pv))
+						if (ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue))
+						{
+							string[] choices =
+							{
+								$"**We deposited {mon.Name} ({mon.Species.Name}) in the PC!** ",
+								$"**We put {mon.Name} ({mon.Species.Name}) in the PC!** ",
+								$"**Deposited {mon.Name} ({mon.Species.Name}) in the PC!** "
+							};
+							builder.Append(choices[Random.Next(choices.Length)]);
+							Pokemon temp = ReleasedDictionary.First(x => x.Key.PersonalityValue == mon.PersonalityValue)
+								.Key;
+							ReleasedDictionary.Remove(temp);
+						}
+						else if (!values.Contains(pv))
 						{
 							builder.Append(
-								$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) : "")} Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}`. ")}");
+								$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) + " " : "")}Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}`. ")}");
 							builder.Append($"Sent to Box {box.BoxNumber}. ");
 						}
 					}
@@ -1540,11 +1591,8 @@ namespace StreamFeedBot.Rulesets
 				{
 					if (mon == null) continue;
 					uint pv = mon.PersonalityValue;
-					if (mon.Species.Id == 292)
-						pv++;
 					List<uint> values =
-						oldStatus.BattleParty.Where(x => x != null).Select(x =>
-								x.Species.Id == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
+						oldStatus.BattleParty.Where(x => x != null).Select(x => x.PersonalityValue)
 							.ToList();
 
 					if (!values.Contains(pv))
@@ -1553,7 +1601,7 @@ namespace StreamFeedBot.Rulesets
 							$"**Caught a {(mon.Gender != null ? Enum.GetName(typeof(Gender), mon.Gender) + " " : "")}Lv. {mon.Level} {mon.Species.Name}!** {(mon.Name == mon.Species.Name ? "No nickname. " : $"Nickname: `{mon.Name}` ")}");
 						if (oldStatus.BattleParty.Count(x => x != null) == 6)
 						{
-							builder.Append($"Sent to the PC. ");
+							builder.Append("Sent to the PC. ");
 						}
 					}
 				}
@@ -1575,7 +1623,8 @@ namespace StreamFeedBot.Rulesets
 
 				foreach (Pokemon mon in newBoxedMons)
 				{
-					if (oldStatus.Party.Any(x => x.PersonalityValue == mon.PersonalityValue))
+					if (oldStatus.Party.Any(x => x.PersonalityValue == mon.PersonalityValue) ||
+					    ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue))
 					{
 						string[] choices =
 						{
@@ -1584,21 +1633,23 @@ namespace StreamFeedBot.Rulesets
 							$"**Deposited {mon.Name} ({mon.Species.Name}) in the PC!** "
 						};
 						builder.Append(choices[Random.Next(choices.Length)]);
+						if (ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue))
+						{
+							Pokemon temp =
+								ReleasedDictionary.First(x => x.Key.PersonalityValue == mon.PersonalityValue).Key;
+							ReleasedDictionary.Remove(temp);
+						}
 					}
 				}
 
 				foreach (Pokemon oldMon in oldBoxedMons)
 				{
-					if ((status?.Party?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? false) &&
+					if ((status?.Party?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true) &&
 					    newBoxedMons.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
-					    (status?.Daycare?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? false))
+					    (status?.Daycare?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true))
 					{
-						string[] choices =
-						{
-							$"**WE RELEASE {oldMon.Name} ({oldMon.Species.Name})!** ",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) HAS BEEN RELEASED! BYE {oldMon.Name.ToUpperInvariant()}!** "
-						};
-						builder.Append(choices[Random.Next(choices.Length)]);
+						if (ReleasedDictionary.All(x => x.Key.PersonalityValue != oldMon.PersonalityValue))
+							ReleasedDictionary.Add(oldMon, 1);
 					}
 				}
 			}
@@ -1613,9 +1664,36 @@ namespace StreamFeedBot.Rulesets
 						newBoxedMons.AddRange(p);
 					}
 
-					if ((status?.Party?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? false) &&
+					if ((status?.Party?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true) &&
 					    newBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue) &&
-					    (status?.Daycare?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? false))
+					    (status?.Daycare?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true))
+					{
+						if (ReleasedDictionary.All(x => x.Key.PersonalityValue != mon.PersonalityValue))
+							ReleasedDictionary.Add(mon, 1);
+					}
+				}
+			}
+			Dictionary<Pokemon, int> releasedCopy = new Dictionary<Pokemon, int>(ReleasedDictionary);
+			foreach ((Pokemon mon, int time) in releasedCopy)
+			{
+				List<uint> values = status.Party
+					.Select(x => x.PersonalityValue)
+					.ToList();
+
+				List<Pokemon> mons = new List<Pokemon>();
+				foreach (List<Pokemon> boxedMons in status.PC.Boxes.Select(x => x.BoxContents))
+				{
+					mons.AddRange(boxedMons);
+				}
+				values.AddRange(mons.Select(x => x.PersonalityValue));
+				if (status.Daycare != null)
+				{
+					values.AddRange(oldStatus.Daycare.Where(x => x != null).Select(x => x.PersonalityValue));
+				}
+
+				if (!values.Contains(mon.PersonalityValue))
+				{
+					if (time == 3)
 					{
 						string[] choices =
 						{
@@ -1623,9 +1701,15 @@ namespace StreamFeedBot.Rulesets
 							$"**{mon.Name} ({mon.Species.Name}) HAS BEEN RELEASED! BYE {mon.Name.ToUpperInvariant()}!** "
 						};
 						builder.Append(choices[Random.Next(choices.Length)]);
+						ReleasedDictionary.Remove(mon);
+					}
+					else
+					{
+						ReleasedDictionary[mon] = time + 1;
 					}
 				}
 			}
+
 
 			if (status.MapName != oldStatus.MapName)
 			{

@@ -11,6 +11,8 @@ namespace StreamFeedBot.Rulesets
 
 		public Dictionary<int, int> Attempts => Memory.Attempts;
 
+		protected Dictionary<Pokemon, int> ReleasedDictionary = new Dictionary<Pokemon, int>();
+
 		protected Settings Settings;
 
 		protected Ruleset(Memory memory, Settings settings)

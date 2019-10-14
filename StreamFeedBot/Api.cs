@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
@@ -102,6 +104,8 @@ namespace StreamFeedBot
 				}
 			}
 
+			ProcessShedinja();
+
 			result.Dispose();
 		}
 
@@ -115,6 +119,36 @@ namespace StreamFeedBot
 		{
 			Timer.Dispose();
 			Client.Dispose();
+		}
+
+		private void ProcessShedinja()
+		{
+			if (Status.Party != null)
+			{
+				foreach (Pokemon mon in Status.Party)
+				{
+					if (mon.Species.Id == 292) mon.PersonalityValue++;
+				}
+			}
+
+			if (Status.Daycare != null)
+			{
+				foreach (Pokemon mon in Status.Daycare)
+				{
+					if (mon.Species.Id == 292) mon.PersonalityValue++;
+				}
+			}
+
+			if (Status.PC?.Boxes != null)
+			{
+				foreach (List<Pokemon> mons in Status.PC.Boxes.Select(x => x.BoxContents))
+				{
+					foreach (Pokemon mon in mons)
+					{
+						if (mon.Species.Id == 292) mon.PersonalityValue++;
+					}
+				}
+			}
 		}
 	}
 }
