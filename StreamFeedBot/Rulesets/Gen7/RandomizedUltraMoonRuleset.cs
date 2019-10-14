@@ -1108,20 +1108,21 @@ namespace StreamFeedBot.Rulesets
 							{
 								aBuilder.Append(
 									$"**We defeated {oldStatus.EnemyTrainers[0].ClassName} {oldStatus.EnemyTrainers[0].Name} and received the {item.Name} crystal!** ");
+								Memory.AnnouncedCrystals.Add(item.Id);
 							}
 							else if (ImportantCrystalIds.Contains(item.Id) && EnemyName != null)
 							{
 								aBuilder.Append(
 									$"**We defeated {EnemyName} and received the {item.Name} crystal!** ");
 								EnemyName = null;
+								Memory.AnnouncedCrystals.Add(item.Id);
 							}
 							else if (ImportantCrystalIds.Contains(item.Id))
 							{
 								aBuilder.Append(
 									$"**We received the {item.Name} crystal!** ");
+								Memory.AnnouncedCrystals.Add(item.Id);
 							}
-
-							Memory.AnnouncedCrystals.Add(item.Id);
 						}
 					}
 				}
