@@ -107,6 +107,9 @@ namespace StreamFeedBot
 
 		[JsonProperty(PropertyName = "free_space")] //Gen 7 specific
 		public List<Item> FreeSpace;
+
+		[JsonProperty(PropertyName = "rotom_powers")] //USUM specific
+		public List<Item> RotomPowers;
 	}
 
 	public class Item

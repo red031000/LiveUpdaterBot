@@ -339,7 +339,6 @@ namespace StreamFeedBot.Rulesets
 			}
 
 			List<uint> ids = new List<uint>();
-			bool shopping = false;
 
 			ItemEqualityComparer comparer = new ItemEqualityComparer();
 
@@ -453,20 +452,18 @@ namespace StreamFeedBot.Rulesets
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money != oldStatus.Money)
+					else if (count > 0 && status.Money < oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count > 0)
 						builder.Append(
@@ -585,20 +582,18 @@ namespace StreamFeedBot.Rulesets
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money != oldStatus.Money)
+					else if (count > 0 && status.Money < oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count > 0)
 						builder.Append(
@@ -625,7 +620,7 @@ namespace StreamFeedBot.Rulesets
 				{
 					long? oldCount = oldStatus?.Items?.Items?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					if (oldCount != null)
-						oldCount -= oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					else
 						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 0;
@@ -720,20 +715,18 @@ namespace StreamFeedBot.Rulesets
 					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {item.Name}s")} at the opponent's {status.EnemyParty[0].Species.Name}. ");
-					else if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money != oldStatus.Money)
+					else if (count > 0 && status.Money < oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count > 0)
 						builder.Append(
@@ -760,7 +753,7 @@ namespace StreamFeedBot.Rulesets
 				{
 					long? oldCount = oldStatus?.Items?.Key?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					if (oldCount != null)
-						oldCount -= oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					else
 						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 0;
@@ -966,20 +959,18 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
+					if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money != oldStatus.Money)
+					else if (count > 0 && status.Money < oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count > 0)
 						builder.Append(
@@ -1234,20 +1225,18 @@ namespace StreamFeedBot.Rulesets
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count < 0 && status.Money != oldStatus.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money > oldStatus.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-					else if (count > 0 && status.Money != oldStatus.Money)
+					else if (count > 0 && status.Money < oldStatus.Money)
 					{
 						builder.Append(
 							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
-						shopping = true;
 					}
 					else if (count > 0)
 						builder.Append(
@@ -1257,7 +1246,124 @@ namespace StreamFeedBot.Rulesets
 				ids.Add(item.Id);
 			}
 
-			if (shopping)
+			List<Item> distinctRotomPowers = new List<Item>();
+			distinctRotomPowers.AddRange(status.Items.RotomPowers);
+			if (oldStatus?.Items?.RotomPowers != null)
+				distinctRotomPowers.AddRange(oldStatus.Items.RotomPowers);
+			distinctRotomPowers = distinctRotomPowers.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctRotomPowers)
+			{
+				if (ids.Contains(item.Id)) continue;
+				long count = status.Items.RotomPowers.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				count += status.Items.FreeSpace.Where(x => x.Id == item.Id).Sum(x => x.Count ?? 1);
+				bool res = oldStatus?.Items?.RotomPowers?.FirstOrDefault(x => x.Id == item.Id) != null;
+				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
+				if (res)
+				{
+					long? oldCount = oldStatus?.Items?.RotomPowers?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					if (oldCount != null)
+						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					else
+						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					count -= oldCount ?? 0;
+				}
+
+				if (count != 0)
+				{
+					Pokemon[] monsGive = status.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+						.Where(x =>
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id !=
+							 x.HeldItem.Id))
+						.ToArray();
+					Pokemon[] monsTake = status.Party.Where(x =>
+							x.HeldItem == null ||
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem.Id !=
+							x.HeldItem.Id)
+						.Where(x =>
+							oldStatus.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem.Id ==
+							item.Id)
+						.ToArray();
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsGivePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+							.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+										(oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+											 .HeldItem == null ||
+										 oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+											 .HeldItem.Id != x.HeldItem.Id)).ToList());
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC.Boxes)
+					{
+						Box oldBox = oldStatus.PC.Boxes.First(x => x.BoxNumber == box.BoxNumber);
+						monsTakePc.AddRange(box.BoxContents
+							.Where(x => x.HeldItem == null ||
+										oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+										oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+											.HeldItem.Id != x.HeldItem.Id).Where(x =>
+								oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+								oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+								null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem
+									.Id == item.Id).ToList());
+					}
+					if (monsGive.Length != 0)
+					{
+						foreach (Pokemon mon in monsGive)
+						{
+							builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+							count++;
+						}
+					}
+
+					if (monsGivePc != null && monsGivePc.Count != 0)
+					{
+						foreach (Pokemon mon in monsGivePc)
+						{
+							builder.Append($"We give {mon.Name} ({mon.Species.Name}) a {item.Name} to hold. ");
+							count++;
+						}
+					}
+
+					if (monsTake.Length != 0)
+					{
+						foreach (Pokemon mon in monsTake)
+						{
+							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+							count--;
+						}
+					}
+
+					if (monsTakePc != null && monsTakePc.Count != 0)
+					{
+						foreach (Pokemon mon in monsTakePc)
+						{
+							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species.Name}). ");
+							count--;
+						}
+					}
+
+					if (count < 0)
+						builder.Append(
+							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+					else if (count > 0)
+						builder.Append(
+							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {item.Name}s")}. ");
+				}
+
+				ids.Add(item.Id);
+			}
+
+			if ((status.Money < oldStatus.Money || status.Money > oldStatus.Money) && oldStatus.BattleKind == null)
 				builder.Append($"We have ₽{status.Money} left. ");
 
 			if (status.Party != null)
