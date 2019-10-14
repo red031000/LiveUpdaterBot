@@ -1115,7 +1115,7 @@ namespace StreamFeedBot.Rulesets
 									$"**We defeated {EnemyName} and received the {item.Name} crystal!** ");
 								EnemyName = null;
 							}
-							else
+							else if (ImportantCrystalIds.Contains(item.Id))
 							{
 								aBuilder.Append(
 									$"**We received the {item.Name} crystal!** ");
