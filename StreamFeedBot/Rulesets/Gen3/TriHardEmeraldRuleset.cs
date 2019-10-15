@@ -22,7 +22,8 @@ namespace StreamFeedBot.Rulesets
 			if (oldStatus == null || status == null)
 				return null; //calculate deltas between two statuses, not just one
 
-			if (status.BattleKind != null && status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
+			if (status.BattleKind != null && status.GameStats != null && oldStatus.GameStats != null &&
+			    status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
 			{
 				switch (status.BattleKind)
 				{
@@ -43,9 +44,9 @@ namespace StreamFeedBot.Rulesets
 							};
 							string[] choice =
 							{
-								$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
-								$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species.Name}. ",
-								$"A wild {status.EnemyParty[0].Species.Name} {rand3[Random.Next(rand3.Length)]} us. "
+								$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty[0].Species!.Name}. ",
+								$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species!.Name}. ",
+								$"A wild {status.EnemyParty[0].Species!.Name} {rand3[Random.Next(rand3.Length)]} us. "
 							};
 							string message = choice[Random.Next(choice.Length)];
 							builder.Append(message);
@@ -84,9 +85,9 @@ namespace StreamFeedBot.Rulesets
 								string[] c3 = { " wandering", "n eager" };
 								string[] choices =
 								{
-									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Any(x => (bool) x.Active) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
-									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Any(x => (bool) x.Active) ? $" against their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. ",
-									$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Any(x => (bool) x.Active) ? $", using their {string.Join(", ", status.EnemyParty.Where(x => (bool) x.Active).Select(x => x.Species.Name))}" : "")}. "
+									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Any(x => x.Active == true) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
+									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Any(x => x.Active == true) ? $" against their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
+									$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Any(x => x.Active == true) ? $", using their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. "
 								};
 								builder.Append(choices[Random.Next(choices.Length)]);
 							}
@@ -139,7 +140,7 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-			if (status.GameStats.Blackouts != oldStatus.GameStats.Blackouts)
+			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts != oldStatus.GameStats.Blackouts)
 			{
 				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
 				string message = options[Random.Next(options.Length)];
@@ -148,9 +149,9 @@ namespace StreamFeedBot.Rulesets
 				builder.Append(message);
 			}
 
-			if (status.BattleKind == null && oldStatus.BattleKind == BattleKind.Trainer && !Reset)
+			if (status?.BattleKind == null && oldStatus.BattleKind == BattleKind.Trainer && !Reset)
 			{
-				if (oldStatus.EnemyTrainers.Count == 1)
+				if (oldStatus?.EnemyTrainers?.Count == 1)
 				{
 					Trainer trainer = oldStatus.EnemyTrainers[0];
 					if (trainer.ClassName == "Magma Admin" || trainer.ClassName == "Magma Leader" ||

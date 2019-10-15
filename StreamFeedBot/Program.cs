@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -14,19 +16,19 @@ namespace StreamFeedBot
 {
 	internal class Program
 	{
-		public static DiscordClient Client;
-		public static Settings Settings;
+		public static DiscordClient? Client;
+		public static Settings? Settings;
 		public static List<DiscordChannel> Channels = new List<DiscordChannel>();
 		public static DateTime logdate = DateTime.UtcNow.Date;
 
-		public static FileStream LogStream;
+		public static FileStream? LogStream;
 
-		public static StreamWriter LogWriter;
+		public static StreamWriter? LogWriter;
 		private static bool cancel;
 
-		private static Ruleset Ruleset;
+		private static Ruleset? Ruleset;
 
-		private static Api Api;
+		private static Api? Api;
 
 		public static readonly DateTime RunStart = new DateTime(2019, 10, 12, 21, 00, 00, DateTimeKind.Utc);
 
@@ -50,7 +52,7 @@ namespace StreamFeedBot
 			}
 		}
 
-		private static void Disconnect(object sender, ConsoleCancelEventArgs e)
+		private static void Disconnect(object? sender, ConsoleCancelEventArgs? e)
 		{
 			Client?.DisconnectAsync().Wait();
 
@@ -58,7 +60,7 @@ namespace StreamFeedBot
 			if (e != null)
 				e.Cancel = true;
 			DumpMemory();
-			Api.StopTimer();
+			Api?.StopTimer();
 			Console.WriteLine("Press Enter to continue...");
 			Console.ReadLine();
 			Environment.Exit(0);
@@ -67,19 +69,18 @@ namespace StreamFeedBot
 
 		private static void DumpMemory()
 		{
+			if (Ruleset?.Memory == null) return;
 			string json = JsonConvert.SerializeObject(Ruleset.Memory);
 			File.WriteAllText("memory.json", json);
 		}
 
 		private static async Task MainAsync()
 		{
-			using (FileStream stream = new FileStream("Settings.json", FileMode.Open))
+			await using (FileStream stream = new FileStream("Settings.json", FileMode.Open))
 			{
-				using (StreamReader reader = new StreamReader(stream))
-				{
-					string json = await reader.ReadToEndAsync().ConfigureAwait(true);
-					Settings = JsonConvert.DeserializeObject<Settings>(json);
-				}
+				using StreamReader reader = new StreamReader(stream);
+				string json = await reader.ReadToEndAsync().ConfigureAwait(true);
+				Settings = JsonConvert.DeserializeObject<Settings>(json);
 			}
 
 			if (!Directory.Exists("logs"))
@@ -94,14 +95,10 @@ namespace StreamFeedBot
 
 			if (File.Exists("memory.json"))
 			{
-				using (FileStream stream = new FileStream("memory.json", FileMode.Open))
-				{
-					using (StreamReader reader = new StreamReader(stream))
-					{
-						string json = await reader.ReadToEndAsync().ConfigureAwait(true);
-						memory = JsonConvert.DeserializeObject<Memory>(json);
-					}
-				}
+				await using FileStream stream = new FileStream("memory.json", FileMode.Open);
+				using StreamReader reader = new StreamReader(stream);
+				string json = await reader.ReadToEndAsync().ConfigureAwait(true);
+				memory = JsonConvert.DeserializeObject<Memory>(json);
 			}
 
 			Client = new DiscordClient(new DiscordConfiguration
@@ -119,7 +116,7 @@ namespace StreamFeedBot
 
 			Client.MessageCreated += DmHandler;
 
-			foreach (ulong id in Settings.Channels)
+			foreach (ulong id in Settings.Channels!)
 			{
 				DiscordChannel channel = await Client.GetChannelAsync(id).ConfigureAwait(false);
 				Console.WriteLine($"Connecting to channel {id}.");
@@ -144,11 +141,11 @@ namespace StreamFeedBot
 		{
 			if (e.Guild == null)
 			{
-				if (e.Author != Client.CurrentUser)
+				if (e.Author != Client!.CurrentUser)
 				{
-					Console.WriteLine($"Recieved DM from {e.Author.Username}#{e.Author.Discriminator}: {e.Message.Content}");
+					Console.WriteLine($"Received DM from {e.Author.Username}#{e.Author.Discriminator}: {e.Message.Content}");
 				}
-				if (Settings.SuperUsers.Contains(e.Author.Id) && e.Message.Content.ToUpperInvariant().Trim() == "STOP")
+				if (Settings!.SuperUsers.Contains(e.Author.Id) && e.Message.Content.ToUpperInvariant().Trim() == "STOP")
 				{
 					await e.Message.RespondAsync("stopping <:RaccAttack:468748603632910336>").ConfigureAwait(true);
 					Console.WriteLine($"Stopping by request of {e.Author.Username}#{e.Author.Discriminator}");
@@ -171,14 +168,10 @@ namespace StreamFeedBot
 					await e.Message.RespondAsync("reloading memory from ~/publish/memory.json <:RaccAttack:468748603632910336>").ConfigureAwait(true);
 					if (File.Exists("memory.json"))
 					{
-						using (FileStream stream = new FileStream("memory.json", FileMode.Open))
-						{
-							using (StreamReader reader = new StreamReader(stream))
-							{
-								string json = await reader.ReadToEndAsync().ConfigureAwait(true);
-								Ruleset.Memory = JsonConvert.DeserializeObject<Memory>(json);
-							}
-						}
+						await using FileStream stream = new FileStream("memory.json", FileMode.Open);
+						using StreamReader reader = new StreamReader(stream);
+						string json = await reader.ReadToEndAsync().ConfigureAwait(true);
+						Ruleset!.Memory = JsonConvert.DeserializeObject<Memory>(json);
 					}
 					Console.WriteLine($"Reloading memory by request of {e.Author.Username}#{e.Author.Discriminator}");
 				}
@@ -193,10 +186,10 @@ namespace StreamFeedBot
 		{
 			while (!cancel)
 			{
-				await Api.UpdateStatus().ConfigureAwait(false);
+				await Api!.UpdateStatus().ConfigureAwait(false);
 				try
 				{
-					string message = Ruleset.CalculateDeltas(Api.Status, Api.OldStatus, out string announcement);
+					string? message = Ruleset!.CalculateDeltas(Api.Status, Api.OldStatus, out string? announcement);
 					if (message != null)
 					{
 						TimeSpan time = DateTime.UtcNow - RunStart;
@@ -209,7 +202,7 @@ namespace StreamFeedBot
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine($"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
-					await LogWriter.WriteLineAsync(
+					await LogWriter!.WriteLineAsync(
 						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}").ConfigureAwait(true);
 					await LogWriter.FlushAsync().ConfigureAwait(true);
 					await Utils.ReportError(e, Client).ConfigureAwait(true);
@@ -218,10 +211,10 @@ namespace StreamFeedBot
 
 				if (logdate != DateTime.UtcNow.Date)
 				{
-					LogWriter.Dispose();
-					LogStream.Dispose();
+					LogWriter?.Dispose();
+					LogStream?.Dispose();
 					logdate = DateTime.UtcNow.Date;
-					LogStream = new FileStream(Path.Combine("logs", Settings.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
+					LogStream = new FileStream(Path.Combine("logs", Settings!.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
 					LogWriter = new StreamWriter(LogStream);
 				}
 

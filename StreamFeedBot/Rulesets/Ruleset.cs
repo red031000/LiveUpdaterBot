@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 
 namespace StreamFeedBot.Rulesets
@@ -22,6 +24,6 @@ namespace StreamFeedBot.Rulesets
 			Settings = settings;
 		}
 
-		public abstract string CalculateDeltas(RunStatus status, RunStatus oldStatus, out string announcement);
+		public abstract string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement);
 	}
 }

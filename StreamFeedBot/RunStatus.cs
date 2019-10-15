@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -8,7 +10,7 @@ namespace StreamFeedBot
 	public class RunStatus
 	{
 		[JsonProperty(PropertyName = "area_name")]
-		public string AreaName;
+		public string? AreaName;
 
 		//[JsonProperty(PropertyName = "badges")]
 		[JsonIgnore] //Gen 7 doesn't have badges
@@ -18,13 +20,13 @@ namespace StreamFeedBot
 		public List<bool> BadgesFlags = new List<bool>();
 
 		[JsonProperty(PropertyName = "game_stats")]
-		public GameStats GameStats;
+		public GameStats? GameStats;
 
 		[JsonProperty(PropertyName = "seen")]
 		public uint Seen;
 
 		[JsonProperty(PropertyName = "map_name")]
-		public string MapName;
+		public string? MapName;
 
 		[JsonProperty(PropertyName = "map_id")]
 		public uint MapId;
@@ -33,31 +35,31 @@ namespace StreamFeedBot
 		public BattleKind? BattleKind;
 
 		[JsonProperty(PropertyName = "enemy_party")]
-		public List<Pokemon> EnemyParty;
+		public List<Pokemon>? EnemyParty;
 
 		[JsonProperty(PropertyName = "enemy_trainers")]
-		public List<Trainer> EnemyTrainers;
+		public List<Trainer>? EnemyTrainers;
 
 		[JsonProperty(PropertyName = "party")]
-		public List<Pokemon> Party;
+		public List<Pokemon>? Party;
 
 		[JsonProperty(PropertyName = "battle_party")]
-		public List<Pokemon> BattleParty;
+		public List<Pokemon>? BattleParty;
 
 		[JsonProperty(PropertyName = "items")]
-		public ItemGroup Items;
+		public ItemGroup? Items;
 
 		[JsonProperty(PropertyName = "gender")]
 		public Gender? Gender;
 
 		[JsonProperty(PropertyName = "name")]
-		public string Name;
+		public string? Name;
 
 		[JsonProperty(PropertyName = "pc")]
-		public PC PC;
+		public PC? PC;
 
 		[JsonProperty(PropertyName = "daycare")]
-		public List<Pokemon> Daycare;
+		public List<Pokemon>? Daycare;
 
 		[JsonProperty(PropertyName = "money")]
 		public uint Money;
@@ -66,16 +68,16 @@ namespace StreamFeedBot
 	public class PC
 	{
 		[JsonProperty(PropertyName = "boxes")]
-		public List<Box> Boxes;
+		public List<Box>? Boxes;
 	}
 
 	public class Box
 	{
 		[JsonProperty(PropertyName = "box_contents")]
-		public List<Pokemon> BoxContents;
+		public List<Pokemon>? BoxContents;
 
 		[JsonProperty(PropertyName = "box_name")]
-		public string BoxName;
+		public string? BoxName;
 
 		[JsonProperty(PropertyName = "box_number")]
 		public uint BoxNumber;
@@ -85,31 +87,31 @@ namespace StreamFeedBot
 	{
 		//[JsonProperty(PropertyName = "balls")]
 		[JsonIgnore] //not in Gen 7
-		public List<Item> Balls;
+		public List<Item>? Balls;
 
 		[JsonProperty(PropertyName = "berries")]
-		public List<Item> Berries;
+		public List<Item>? Berries;
 
 		[JsonProperty(PropertyName = "medicine")] //Gen 7 specific
-		public List<Item> Medicine;
+		public List<Item>? Medicine;
 
 		[JsonProperty(PropertyName = "items")]
-		public List<Item> Items;
+		public List<Item>? Items;
 
 		[JsonProperty(PropertyName = "key")]
-		public List<Item> Key;
+		public List<Item>? Key;
 
 		[JsonProperty(PropertyName = "tms")]
-		public List<Item> TMs;
+		public List<Item>? TMs;
 		
 		[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
-		public List<Item> ZCrystals;
+		public List<Item>? ZCrystals;
 
 		[JsonProperty(PropertyName = "free_space")] //Gen 7 specific
-		public List<Item> FreeSpace;
+		public List<Item>? FreeSpace;
 
 		[JsonProperty(PropertyName = "rotom_powers")] //USUM specific
-		public List<Item> RotomPowers;
+		public List<Item>? RotomPowers;
 	}
 
 	public class Item
@@ -121,7 +123,7 @@ namespace StreamFeedBot
 		public uint Id;
 
 		[JsonProperty(PropertyName = "name")]
-		public string Name;
+		public string? Name;
 	}
 
 	public class Pokemon
@@ -133,7 +135,7 @@ namespace StreamFeedBot
 		public uint? Level;
 
 		[JsonProperty(PropertyName = "name")]
-		public string Name;
+		public string? Name;
 
 		[JsonProperty(PropertyName = "personality_value")]
 		public uint PersonalityValue;
@@ -142,22 +144,22 @@ namespace StreamFeedBot
 		public Gender? Gender;
 
 		[JsonProperty(PropertyName = "species")]
-		public Species Species;
+		public Species? Species;
 
 		[JsonProperty(PropertyName = "held_item")]
-		public Item HeldItem;
+		public Item? HeldItem;
 
 		[JsonProperty(PropertyName = "moves")]
-		public List<Move> Moves;
+		public List<Move>? Moves;
 
 		[JsonProperty(PropertyName = "health")]
-		public int[] Health;
+		public int[]? Health;
 	}
 
 	public class Species
 	{
 		[JsonProperty(PropertyName = "name")]
-		public string Name;
+		public string? Name;
 
 		[JsonProperty(PropertyName = "id")]
 		public int Id;
@@ -169,19 +171,19 @@ namespace StreamFeedBot
 		public int Id;
 
 		[JsonProperty(PropertyName = "name")]
-		public string Name;
+		public string? Name;
 	}
 
 	public class Trainer
 	{
 		[JsonProperty(PropertyName = "class_name")]
-		public string ClassName;
+		public string? ClassName;
 
 		[JsonProperty(PropertyName = "gender")]
 		public Gender? Gender;
 
 		[JsonProperty(PropertyName = "name")]
-		public string Name;
+		public string? Name;
 
 		[JsonProperty(PropertyName = "id")]
 		public int Id;

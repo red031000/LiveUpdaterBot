@@ -1,4 +1,6 @@
-﻿namespace StreamFeedBot
+﻿#nullable enable
+
+namespace StreamFeedBot
 {
 	public class AnnounceSettings
 	{

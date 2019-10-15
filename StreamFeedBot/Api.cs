@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -12,9 +14,9 @@ namespace StreamFeedBot
 {
 	public class Api : IDisposable
 	{
-		public RunStatus Status;
-		public RunStatus OldStatus;
-		private string message;
+		public RunStatus? Status;
+		public RunStatus? OldStatus;
+		private string? message;
 
 		private readonly Timer Timer;
 
@@ -23,7 +25,7 @@ namespace StreamFeedBot
 		public Api()
 		{
 			Client.DefaultRequestHeaders.Add("Accept", "application/json");
-			Client.DefaultRequestHeaders.Add("OAuth-Token", Program.Settings.OAuth);
+			Client.DefaultRequestHeaders.Add("OAuth-Token", Program.Settings!.OAuth);
 			Timer = new Timer
 			{
 				AutoReset = true,
@@ -48,7 +50,7 @@ namespace StreamFeedBot
 
 		public async Task UpdateStatus()
 		{
-			HttpResponseMessage result = null;
+			HttpResponseMessage? result = null;
 			bool replaced = false;
 			try
 			{
@@ -70,7 +72,6 @@ namespace StreamFeedBot
 					replaced = true;
 				}
 
-
 				Status = JsonConvert.DeserializeObject<RunStatus>(content);
 			}
 			catch (Exception e)
@@ -82,7 +83,7 @@ namespace StreamFeedBot
 				return;
 			}
 
-			if (Status.BattleKind == BattleKind.Wild && Status.EnemyParty != null && Status.EnemyParty.Count >= 1 && Status.EnemyParty[0].Species.Name == "???")
+			if (Status.BattleKind == BattleKind.Wild && Status.EnemyParty != null && Status.EnemyParty.Count >= 1 && Status.EnemyParty[0].Species?.Name == "???")
 			{
 				Status = OldStatus;
 				result.Dispose();
@@ -95,7 +96,7 @@ namespace StreamFeedBot
 				Status.BadgesFlags.Add((Status.Badges & (int)Math.Pow(2, j)) != 0);
 			}*/
 
-			if (Status.EnemyTrainers != null)
+			if (Status!.EnemyTrainers != null)
 			{
 				foreach (Trainer t in Status.EnemyTrainers)
 				{
@@ -123,29 +124,32 @@ namespace StreamFeedBot
 
 		private void ProcessShedinja()
 		{
-			if (Status.Party != null)
+			if (Status!.Party != null)
 			{
 				foreach (Pokemon mon in Status.Party)
 				{
-					if (mon.Species.Id == 292) mon.PersonalityValue++;
+					if (mon.Species!.Id == 292) mon.PersonalityValue++;
 				}
 			}
 
-			if (Status.Daycare != null)
+			if (Status!.Daycare != null)
 			{
 				foreach (Pokemon mon in Status.Daycare)
 				{
-					if (mon.Species.Id == 292) mon.PersonalityValue++;
+					if (mon.Species!.Id == 292) mon.PersonalityValue++;
 				}
 			}
 
 			if (Status.PC?.Boxes != null)
 			{
-				foreach (List<Pokemon> mons in Status.PC.Boxes.Select(x => x.BoxContents))
+				foreach (List<Pokemon>? mons in Status.PC.Boxes.Select(x => x.BoxContents))
 				{
-					foreach (Pokemon mon in mons)
+					if (mons != null)
 					{
-						if (mon.Species.Id == 292) mon.PersonalityValue++;
+						foreach (Pokemon mon in mons)
+						{
+							if (mon.Species!.Id == 292) mon.PersonalityValue++;
+						}
 					}
 				}
 			}

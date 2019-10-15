@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,7 +11,7 @@ namespace StreamFeedBot
 {
 	public static class Utils
 	{
-		public static async Task<List<DiscordMessage>> SendMessage(string content, DiscordEmbed embed = null)
+		public static async Task<List<DiscordMessage>> SendMessage(string content, DiscordEmbed? embed = null)
 		{
 			List<DiscordMessage> messages = new List<DiscordMessage>();
 			foreach (DiscordChannel channel in Program.Channels)
@@ -19,14 +21,19 @@ namespace StreamFeedBot
 			}
 
 			Console.WriteLine($"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}");
-			await Program.LogWriter
-				.WriteLineAsync($"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}")
-				.ConfigureAwait(true);
-			await Program.LogWriter.FlushAsync().ConfigureAwait(false);
+			if (Program.LogWriter != null)
+			{
+				await Program.LogWriter
+					.WriteLineAsync(
+						$"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}")
+					.ConfigureAwait(true);
+				await Program.LogWriter.FlushAsync().ConfigureAwait(false);
+			}
+
 			return messages;
 		}
 
-		public static async Task ReportError(Exception e, DiscordClient client, bool crashLog = false)
+		public static async Task ReportError(Exception? e, DiscordClient? client, bool crashLog = false)
 		{
 			if (Program.Settings != null && client != null && e != null)
 			{
@@ -43,20 +50,18 @@ namespace StreamFeedBot
 					: message).ConfigureAwait(true);
 				if (crashLog)
 				{
-					using (FileStream stream = new FileStream("crash.log", FileMode.Open))
-					{
-						await red.SendFileAsync(stream).ConfigureAwait(false);
-					}
+					await using FileStream stream = new FileStream("crash.log", FileMode.Open);
+					await red.SendFileAsync(stream).ConfigureAwait(false);
 				}
 			}
 		}
 
-		public static async Task<List<DiscordMessage>> AnnounceMessage(string message, DiscordClient client)
+		public static async Task<List<DiscordMessage>?> AnnounceMessage(string? message, DiscordClient? client)
 		{
-			if (client != null && message != null)
+			if (client != null && message != null && Program.Settings != null)
 			{
 				List<DiscordMessage> messages = new List<DiscordMessage>();
-				foreach (AnnounceSettings setting in Program.Settings.AnnounceSettings)
+				foreach (AnnounceSettings setting in Program.Settings.AnnounceSettings!)
 				{
 					DiscordGuild guild = await client.GetGuildAsync(setting.AnnounceServer).ConfigureAwait(true);
 					DiscordRole role = guild.GetRole(setting.AnnounceRole);
@@ -65,10 +70,14 @@ namespace StreamFeedBot
 					DiscordMessage sent = await channel.SendMessageAsync($"<@&{setting.AnnounceRole}> " + message)
 						.ConfigureAwait(true);
 					Console.WriteLine($"Announced message: <@&{setting.AnnounceRole}> {message}");
-					await Program.LogWriter
-						.WriteLineAsync($"Announced message: <@&{setting.AnnounceRole}> {message}")
-						.ConfigureAwait(true);
-					await Program.LogWriter.FlushAsync().ConfigureAwait(true);
+					if (Program.LogWriter != null)
+					{
+						await Program.LogWriter
+							.WriteLineAsync($"Announced message: <@&{setting.AnnounceRole}> {message}")
+							.ConfigureAwait(true);
+						await Program.LogWriter.FlushAsync().ConfigureAwait(true);
+					}
+
 					messages.Add(sent);
 					role.ModifyAsync(mentionable: false).Wait();
 				}
