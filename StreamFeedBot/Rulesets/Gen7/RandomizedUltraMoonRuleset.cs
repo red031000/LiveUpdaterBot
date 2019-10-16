@@ -86,6 +86,7 @@ namespace StreamFeedBot.Rulesets
             152, // Captain
             153, // Captain
             154, // Pokémon Professor
+			162, // Aether Foundation
             164, // Island Kahuna
             166, // Pokémon Trainer
             167, // Pokémon Trainer
@@ -1837,7 +1838,8 @@ namespace StreamFeedBot.Rulesets
 				foreach (Pokemon mon in newBoxedMons)
 				{
 					if (oldStatus?.Party?.Any(x => x.PersonalityValue == mon.PersonalityValue) == true ||
-					    ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue))
+					    ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue) &&
+					    oldBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue))
 					{
 						string[] choices =
 						{
@@ -1846,12 +1848,12 @@ namespace StreamFeedBot.Rulesets
 							$"**Deposited {mon.Name} ({mon.Species.Name}) in the PC!** "
 						};
 						builder.Append(choices[Random.Next(choices.Length)]);
-						if (ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue))
-						{
-							Pokemon temp =
-								ReleasedDictionary.First(x => x.Key.PersonalityValue == mon.PersonalityValue).Key;
-							ReleasedDictionary.Remove(temp);
-						}
+					}
+					if (ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue))
+					{
+						Pokemon temp =
+							ReleasedDictionary.First(x => x.Key.PersonalityValue == mon.PersonalityValue).Key;
+						ReleasedDictionary.Remove(temp);
 					}
 				}
 
@@ -1908,7 +1910,7 @@ namespace StreamFeedBot.Rulesets
 
 				if (!values.Contains(mon.PersonalityValue))
 				{
-					if (time == 3)
+					if (time == 6)
 					{
 						string[] choices =
 						{
