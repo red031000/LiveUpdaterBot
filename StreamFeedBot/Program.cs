@@ -9,8 +9,12 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using EmbedIO;
+using EmbedIO.Files;
 using Newtonsoft.Json;
 using StreamFeedBot.Rulesets;
+using StreamFeedBot.Web;
+using Swan.Logging;
 
 namespace StreamFeedBot
 {
@@ -22,11 +26,15 @@ namespace StreamFeedBot
 		public static DateTime logdate = DateTime.UtcNow.Date;
 
 		public static FileStream? LogStream;
-
 		public static StreamWriter? LogWriter;
+
+		public static FileStream? PrivateStream;
+		public static StreamWriter? PrivateWriter;
+
 		private static bool cancel;
 
 		private static Ruleset? Ruleset;
+		private static WebServer? Server;
 
 		private static Api? Api;
 
@@ -61,6 +69,7 @@ namespace StreamFeedBot
 				e.Cancel = true;
 			DumpMemory();
 			Api?.StopTimer();
+			Server?.Dispose();
 			Console.WriteLine("Press Enter to continue...");
 			Console.ReadLine();
 			Environment.Exit(0);
@@ -90,6 +99,14 @@ namespace StreamFeedBot
 				new FileStream(Path.Combine("logs", Settings.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
 
 			LogWriter = new StreamWriter(LogStream);
+
+			if (!Directory.Exists("privatelogs"))
+				Directory.CreateDirectory("privatelogs");
+
+			PrivateStream =
+				new FileStream(Path.Combine("privatelogs", Settings.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
+
+			PrivateWriter = new StreamWriter(PrivateStream);
 
 			Memory memory = new Memory();
 
@@ -131,6 +148,23 @@ namespace StreamFeedBot
 				await Utils.SendMessage(
 					$"Connected, {span.Days}d {span.Hours}h {span.Minutes}m {span.Seconds}s until {Settings.RunName}!").ConfigureAwait(false);
 			}
+
+			Logger.RegisterLogger<WebLogger>();
+
+			Server = new WebServer(opt => opt
+					.WithUrlPrefix($"http://*:{Settings.WebSettings!.Port}/")
+					.WithMode(HttpListenerMode.EmbedIO))
+				.WithLocalSessionManager()
+				.WithWebApi("/api", m => m
+					.RegisterController(() => new ApiController(Ruleset.Memory, Ruleset.ReleasedDictionary, Api)));
+
+			if (Settings.WebSettings?.LogsDir != null && Settings.WebSettings?.ResDir != null)
+			{
+				Server.WithStaticFolder("/logs", Settings.WebSettings.LogsDir, true, m => m.WithDirectoryLister(new LogsDirectoryLister()).WithContentCaching(false));
+				Server.WithStaticFolder("/", Settings.WebSettings.ResDir, true, m => m.WithContentCaching(true));
+			}
+
+			_ = Server.RunAsync();
 
 			await MainLoop().ConfigureAwait(false);
 
@@ -202,9 +236,9 @@ namespace StreamFeedBot
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine($"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
-					await LogWriter!.WriteLineAsync(
-						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}").ConfigureAwait(true);
-					await LogWriter.FlushAsync().ConfigureAwait(true);
+					PrivateWriter!.WriteLine(
+						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
+					PrivateWriter.Flush();
 					await Utils.ReportError(e, Client).ConfigureAwait(true);
 					Console.ResetColor();
 				}
@@ -216,6 +250,12 @@ namespace StreamFeedBot
 					logdate = DateTime.UtcNow.Date;
 					LogStream = new FileStream(Path.Combine("logs", Settings!.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
 					LogWriter = new StreamWriter(LogStream);
+					PrivateWriter?.Dispose();
+					PrivateStream?.Dispose();
+					PrivateStream =
+						new FileStream(Path.Combine("privatelogs", Settings.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
+
+					PrivateWriter = new StreamWriter(PrivateStream);
 				}
 
 				await Task.Delay(RefreshInterval * 1000).ConfigureAwait(false);

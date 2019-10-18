@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using StreamFeedBot.Web;
+
 namespace StreamFeedBot
 {
 	public class Settings
@@ -13,5 +15,6 @@ namespace StreamFeedBot
 		public ulong ReportServer;
 		public ulong[]? SuperUsers;
 		public AnnounceSettings[]? AnnounceSettings;
+		public WebSettings? WebSettings;
 	}
 }
