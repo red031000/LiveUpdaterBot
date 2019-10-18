@@ -356,6 +356,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						builder.Append("**TEH URN!** ");
 						aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
+						Memory.Urned = true;
 					}
 				}
 				else if (oldStatus.EnemyTrainers != null && oldStatus.EnemyTrainers.Count == 2)
@@ -1930,7 +1931,22 @@ namespace StreamFeedBot.Rulesets
 
 			if (status?.MapName != oldStatus?.MapName)
 			{
-				if (!string.IsNullOrWhiteSpace(status?.MapName))
+				if (status?.MapName == "Pokémon League")
+				{
+					List<string> options = new List<string>
+					{
+						$"**We're locked into the E4 for {(Memory.Urned ? "Rematch " : "")}Attempt #{(Memory.Urned ? Memory.E4RematchNum : Memory.E4AttemptNum)}!** ",
+						$"**We're in for E4 {(Memory.Urned ? "Rematch " : "")}Attempt #{(Memory.Urned ? Memory.E4RematchNum : Memory.E4AttemptNum)}!** ",
+						$"**Welcome back to the E4! {(Memory.Urned ? "Rematch " : "")}Attempt #{(Memory.Urned ? Memory.E4RematchNum : Memory.E4AttemptNum)}!** ",
+						$"**The door slams shut behind us! E4 {(Memory.Urned ? "Rematch " : "")}Attempt #{(Memory.Urned ? Memory.E4RematchNum : Memory.E4AttemptNum)}!** ",
+						$"**We stroll boldly into the E4 chambers and are locked inside! {(Memory.Urned ? "Rematch " : "")}Attempt #{(Memory.Urned ? Memory.E4RematchNum : Memory.E4AttemptNum)}!** "
+					};
+					string message = options[Random.Next(options.Count)];
+					builder.Append(message);
+					if (Memory.Urned) Memory.E4RematchNum++;
+					else Memory.E4AttemptNum++;
+				}
+				else if (!string.IsNullOrWhiteSpace(status?.MapName))
 				{
 					string[] move = { "head", "go", "step", "move", "travel", "walk", "stroll", "stride" };
 					string choice = move[Random.Next(move.Length)];
