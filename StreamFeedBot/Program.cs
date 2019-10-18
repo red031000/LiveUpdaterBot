@@ -12,6 +12,7 @@ using DSharpPlus.EventArgs;
 using EmbedIO;
 using EmbedIO.Files;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StreamFeedBot.Rulesets;
 using StreamFeedBot.Web;
 using Swan.Logging;
@@ -79,7 +80,7 @@ namespace StreamFeedBot
 		private static void DumpMemory()
 		{
 			if (Ruleset?.Memory == null) return;
-			string json = JsonConvert.SerializeObject(Ruleset.Memory);
+			string json = JsonConvert.SerializeObject(Ruleset.Memory, Formatting.Indented);
 			File.WriteAllText("memory.json", json);
 		}
 

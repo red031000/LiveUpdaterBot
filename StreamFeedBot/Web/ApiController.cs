@@ -34,7 +34,7 @@ namespace StreamFeedBot.Web
 				Released = ReleasedDictionary.Keys.ToList(),
 				RunStatus = Api.Status
 			};
-			await HttpContext.SendStringAsync(JsonConvert.SerializeObject(status), "application/json", Encoding.UTF8).ConfigureAwait(false);
+			await HttpContext.SendStringAsync(JsonConvert.SerializeObject(status, Formatting.Indented), "application/json", Encoding.UTF8).ConfigureAwait(false);
 		}
 	}
 }

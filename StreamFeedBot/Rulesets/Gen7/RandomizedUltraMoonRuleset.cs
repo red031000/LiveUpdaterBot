@@ -355,8 +355,11 @@ namespace StreamFeedBot.Rulesets
 					if (Enumerable.Range(494, 3).Contains(trainer.Id))
 					{
 						builder.Append("**TEH URN!** ");
-						aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
-						Memory.Urned = true;
+						if (!Memory.Urned)
+						{
+							aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
+							Memory.Urned = true;
+						}	
 					}
 				}
 				else if (oldStatus.EnemyTrainers != null && oldStatus.EnemyTrainers.Count == 2)
