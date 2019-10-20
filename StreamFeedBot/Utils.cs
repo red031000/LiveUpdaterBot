@@ -51,7 +51,7 @@ namespace StreamFeedBot
 				if (crashLog)
 				{
 					await using FileStream stream = new FileStream("crash.log", FileMode.Open);
-					await red.SendFileAsync(stream).ConfigureAwait(false);
+					await red.SendFileAsync("crash.log", stream).ConfigureAwait(false);
 				}
 			}
 		}
@@ -65,8 +65,6 @@ namespace StreamFeedBot
 				{
 					DiscordGuild guild = await client.GetGuildAsync(setting.AnnounceServer).ConfigureAwait(true);
 					DiscordRole role = guild.GetRole(setting.AnnounceRole);
-					if (role == null)
-						Console.WriteLine("DEBUG: ROLE IS NULL!");
 					role?.ModifyAsync(mentionable: true)?.Wait();
 					DiscordChannel channel = await client.GetChannelAsync(setting.AnnounceChannel).ConfigureAwait(true);
 					DiscordMessage sent = await channel.SendMessageAsync($"<@&{setting.AnnounceRole}> " + message)

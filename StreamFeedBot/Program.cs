@@ -12,7 +12,6 @@ using DSharpPlus.EventArgs;
 using EmbedIO;
 using EmbedIO.Files;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using StreamFeedBot.Rulesets;
 using StreamFeedBot.Web;
 using Swan.Logging;
@@ -127,6 +126,8 @@ namespace StreamFeedBot
 
 			Api = new Api();
 
+			Client.DebugLogger.LogMessageReceived += DebugLoggerOnLogMessageReceived;
+
 			await Client.ConnectAsync(new DiscordActivity("TwitchPlaysPokemon", ActivityType.Streaming)
 			{
 				StreamUrl = "https://www.twitch.tv/twitchplayspokemon"
@@ -170,6 +171,57 @@ namespace StreamFeedBot
 			await MainLoop().ConfigureAwait(false);
 
 			await Task.Delay(-1).ConfigureAwait(false);
+		}
+
+		private static void DebugLoggerOnLogMessageReceived(object? sender, DebugLogMessageEventArgs? e)
+		{
+			if (e != null)
+			{
+				if (PrivateWriter != null)
+				{
+					PrivateWriter
+						.WriteLine(
+							$"{DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)} [{e.Application}] {Enum.GetName(typeof(DSharpPlus.LogLevel), e.Level)}: {e.Message}");
+					if (e.Exception != null)
+					{
+						PrivateWriter.WriteLine(
+							$"{e.Exception} {e.Exception.Message}{Environment.NewLine}{e.Exception.StackTrace}");
+						if (e.Exception.InnerException != null)
+						{
+							PrivateWriter.WriteLine("Inner Exception:");
+							PrivateWriter.WriteLine(
+								$"{e.Exception.InnerException} {e.Exception.InnerException.Message}{Environment.NewLine}{e.Exception.InnerException.StackTrace}");
+						}
+					}
+
+					PrivateWriter.Flush();
+				}
+
+				switch (e.Level)
+				{
+					case LogLevel.Warning:
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						break;
+					case LogLevel.Critical:
+					case LogLevel.Error:
+						Console.ForegroundColor = ConsoleColor.Red;
+						break;
+				}
+				Console.WriteLine($"[{e.Application}] {Enum.GetName(typeof(DSharpPlus.LogLevel), e.Level)}: {e.Message}");
+				if (e.Exception != null)
+				{
+					Console.WriteLine(
+						$"{e.Exception} {e.Exception.Message}{Environment.NewLine}{e.Exception.StackTrace}");
+					if (e.Exception.InnerException != null)
+					{
+						Console.WriteLine("Inner Exception:");
+						Console.WriteLine(
+							$"{e.Exception.InnerException} {e.Exception.InnerException.Message}{Environment.NewLine}{e.Exception.InnerException.StackTrace}");
+					}
+				}
+				Console.ResetColor();
+
+			}
 		}
 
 		private static async Task DmHandler(MessageCreateEventArgs e)
