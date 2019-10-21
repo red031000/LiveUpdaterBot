@@ -158,8 +158,8 @@ namespace StreamFeedBot
 					.WithMode(HttpListenerMode.EmbedIO))
 				.WithLocalSessionManager()
 				.WithWebApi("/api", m => m
-					.RegisterController(() => new ApiController(Ruleset.Memory, Ruleset.ReleasedDictionary, Api)));
-
+					.RegisterController(() => new ApiController(Ruleset.Memory, Ruleset.ReleasedDictionary, Api)))
+				.HandleHttpException(GenericHttpExceptionHandler.Handler);
 			if (Settings.WebSettings?.LogsDir != null && Settings.WebSettings?.ResDir != null)
 			{
 				Server.WithStaticFolder("/logs", Settings.WebSettings.LogsDir, true, m => m.WithDirectoryLister(new LogsDirectoryLister()).WithContentCaching(false));
