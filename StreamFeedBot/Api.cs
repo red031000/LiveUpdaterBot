@@ -6,8 +6,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Timers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -19,7 +19,7 @@ namespace StreamFeedBot
 		public RunStatus? OldStatus;
 		private string? message;
 
-		private readonly Timer Timer;
+		public int Hour;
 
 		public HttpClient Client = new HttpClient();
 
@@ -27,26 +27,19 @@ namespace StreamFeedBot
 		{
 			Client.DefaultRequestHeaders.Add("Accept", "application/json");
 			Client.DefaultRequestHeaders.Add("OAuth-Token", Program.Settings!.OAuth);
-			Timer = new Timer
-			{
-				AutoReset = true,
-				Interval = 3.6e+6
-			};
-			Timer.Elapsed += TimerOnElapsed;
-			Timer.Enabled = true;
+			Hour = DateTime.UtcNow.Hour;
 		}
 
-		private void TimerOnElapsed(object sender, ElapsedEventArgs e)
+		private void PostSnapshot()
 		{
 			if (!Directory.Exists("Snapshots"))
 				Directory.CreateDirectory("Snapshots");
-			File.WriteAllText("Snapshots/ApiSnapshot" + DateTime.UtcNow.ToString("o", CultureInfo.CurrentCulture) + ".txt", message);
-		}
-
-		public void StopTimer()
-		{
-			Timer.Elapsed -= TimerOnElapsed;
-			Timer.Enabled = false;
+			if (!Directory.Exists(Path.Combine("Snapshots", Program.Settings?.RunName ?? "UntitledRun")))
+				Directory.CreateDirectory(Path.Combine("Snapshots", Program.Settings?.RunName ?? "UntitledRun"));
+			string date = DateTime.UtcNow.ToString("o", CultureInfo.CurrentCulture);
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) //windows is weird
+				date = date.Replace(":", "-", StringComparison.InvariantCultureIgnoreCase);
+            File.WriteAllText($"Snapshots/{Program.Settings?.RunName ?? "UntitledRun"}/ApiSnapshot{date}.txt", message);
 		}
 
 		public async Task UpdateStatus()
@@ -108,6 +101,12 @@ namespace StreamFeedBot
 
 			ProcessShedinja();
 
+			if (DateTime.UtcNow.Hour != Hour)
+			{
+				PostSnapshot();
+				Hour = DateTime.UtcNow.Hour;
+			}
+
 			result.Dispose();
 		}
 
@@ -119,7 +118,6 @@ namespace StreamFeedBot
 
 		protected virtual void Dispose(bool managed)
 		{
-			Timer.Dispose();
 			Client.Dispose();
 		}
 

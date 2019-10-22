@@ -68,7 +68,6 @@ namespace StreamFeedBot
 			if (e != null)
 				e.Cancel = true;
 			DumpMemory();
-			Api?.StopTimer();
 			Server?.Dispose();
 			Console.WriteLine("Press Enter to continue...");
 			Console.ReadLine();
