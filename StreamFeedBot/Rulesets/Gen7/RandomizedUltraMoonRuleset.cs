@@ -333,7 +333,7 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts != oldStatus.GameStats.Blackouts)
+			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts > oldStatus.GameStats.Blackouts)
 			{
 				string[] options = {"**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** "};
 				string message = options[Random.Next(options.Length)];

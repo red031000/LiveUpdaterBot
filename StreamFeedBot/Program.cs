@@ -283,27 +283,33 @@ namespace StreamFeedBot
 		{
 			while (!cancel)
 			{
-				await Api!.UpdateStatus().ConfigureAwait(false);
-				try
+				bool result = await Api!.UpdateStatus().ConfigureAwait(false);
+				if (result)
 				{
-					string? message = Ruleset!.CalculateDeltas(Api.Status, Api.OldStatus, out string? announcement);
-					if (message != null)
+					try
 					{
-						TimeSpan time = DateTime.UtcNow - RunStart;
-						await Utils.SendMessage($"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim()).ConfigureAwait(true);
-					}
+						string? message = Ruleset!.CalculateDeltas(Api.Status, Api.OldStatus, out string? announcement);
+						if (message != null)
+						{
+							TimeSpan time = DateTime.UtcNow - RunStart;
+							await Utils.SendMessage($"{time.Days}d {time.Hours}h {time.Minutes}m " + message.Trim())
+								.ConfigureAwait(true);
+						}
 
-					if (announcement != null) await Utils.AnnounceMessage(announcement, Client).ConfigureAwait(false);
-				}
-				catch (Exception e)
-				{
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine($"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
-					PrivateWriter!.WriteLine(
-						$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
-					PrivateWriter.Flush();
-					await Utils.ReportError(e, Client).ConfigureAwait(true);
-					Console.ResetColor();
+						if (announcement != null)
+							await Utils.AnnounceMessage(announcement, Client).ConfigureAwait(false);
+					}
+					catch (Exception e)
+					{
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine(
+							$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
+						PrivateWriter!.WriteLine(
+							$"ERROR: Failed to resolve deltas: {e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}");
+						PrivateWriter.Flush();
+						await Utils.ReportError(e, Client).ConfigureAwait(true);
+						Console.ResetColor();
+					}
 				}
 
 				if (logdate != DateTime.UtcNow.Date)

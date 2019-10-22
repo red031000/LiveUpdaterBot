@@ -42,7 +42,7 @@ namespace StreamFeedBot
             File.WriteAllText($"Snapshots/{Program.Settings?.RunName ?? "UntitledRun"}/ApiSnapshot{date}.txt", message);
 		}
 
-		public async Task UpdateStatus()
+		public async Task<bool> UpdateStatus()
 		{
 			HttpResponseMessage? result = null;
 			bool replaced = false;
@@ -57,7 +57,7 @@ namespace StreamFeedBot
 					Console.WriteLine($"ERROR: Failed to update run_status: {result.StatusCode}: {content}");
 					Console.ResetColor();
 					result.Dispose();
-					return;
+					return false;
 				}
 
 				if (Status != null)
@@ -70,11 +70,13 @@ namespace StreamFeedBot
 			}
 			catch (Exception e)
 			{
-				await Utils.ReportError(e, Program.Client).ConfigureAwait(false);
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine($"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}");
+				Console.ResetColor();
 				if (replaced)
 					Status = OldStatus;
 				result?.Dispose();
-				return;
+				return false;
 			}
 
 			if (Status.BattleKind == BattleKind.Wild && Status.EnemyParty != null && Status.EnemyParty.Count >= 1 && Status.EnemyParty[0].Species?.Name == "???")
@@ -108,6 +110,8 @@ namespace StreamFeedBot
 			}
 
 			result.Dispose();
+
+			return true;
 		}
 
 		public void Dispose()
