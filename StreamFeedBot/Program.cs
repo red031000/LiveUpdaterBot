@@ -160,9 +160,20 @@ namespace StreamFeedBot
 				.WithWebApi("/api", m => m
 					.RegisterController(() => new ApiController(Ruleset.Memory, Ruleset.ReleasedDictionary, Api)))
 				.HandleHttpException(GenericHttpExceptionHandler.Handler);
-			if (Settings.WebSettings?.LogsDir != null && Settings.WebSettings?.ResDir != null)
+			if (Settings.WebSettings?.LogsDir != null)
 			{
-				Server.WithStaticFolder("/logs", Settings.WebSettings.LogsDir, true, m => m.WithDirectoryLister(new LogsDirectoryLister()).WithContentCaching(false));
+				Server.WithStaticFolder("/logs", Settings.WebSettings.LogsDir, true,
+					m => m.WithDirectoryLister(new LogsDirectoryLister()).WithContentCaching(false));
+			}
+
+			if (Settings.WebSettings?.SnapshotsDir != null)
+			{
+				Server.WithStaticFolder("/snapshots", Settings.WebSettings.SnapshotsDir, true,
+					m => m.WithDirectoryLister(new LogsDirectoryLister()).WithContentCaching(false));
+			}
+
+			if (Settings.WebSettings?.ResDir != null)
+			{
 				Server.WithStaticFolder("/", Settings.WebSettings.ResDir, true, m => m.WithContentCaching(true));
 			}
 

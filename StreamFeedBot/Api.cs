@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace StreamFeedBot
 {
@@ -56,7 +57,7 @@ namespace StreamFeedBot
 			{
 				result = await Client.GetAsync(new Uri("https://twitchplayspokemon.tv/api/run_status")).ConfigureAwait(true);
 				string content = await result.Content.ReadAsStringAsync().ConfigureAwait(true);
-				message = content;
+				message = JToken.Parse(content).ToString(Formatting.Indented);
 				if (!result.IsSuccessStatusCode)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;

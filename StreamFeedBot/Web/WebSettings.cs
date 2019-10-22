@@ -7,5 +7,6 @@ namespace StreamFeedBot.Web
 		public uint Port;
 		public string? LogsDir;
 		public string? ResDir;
+		public string? SnapshotsDir;
 	}
 }
