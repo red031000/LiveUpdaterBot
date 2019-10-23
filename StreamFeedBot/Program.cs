@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -32,6 +33,7 @@ namespace StreamFeedBot
 		public static StreamWriter? PrivateWriter;
 
 		private static bool cancel;
+		private static ManualResetEvent? mre;
 
 		private static Ruleset? Ruleset;
 		private static WebServer? Server;
@@ -63,7 +65,7 @@ namespace StreamFeedBot
 		private static void Disconnect(object? sender, ConsoleCancelEventArgs? e)
 		{
 			Client?.DisconnectAsync().Wait();
-
+			mre?.Set();
 			cancel = true;
 			if (e != null)
 				e.Cancel = true;
@@ -117,37 +119,41 @@ namespace StreamFeedBot
 				memory = JsonConvert.DeserializeObject<Memory>(json);
 			}
 
-			Client = new DiscordClient(new DiscordConfiguration
-			{
-				Token = Settings.Token,
-				TokenType = TokenType.Bot
-			});
-
 			Api = new Api();
 
-			Client.DebugLogger.LogMessageReceived += DebugLoggerOnLogMessageReceived;
-
-			await Client.ConnectAsync(new DiscordActivity("TwitchPlaysPokemon", ActivityType.Streaming)
+			if (!Settings.WebOnly)
 			{
-				StreamUrl = "https://www.twitch.tv/twitchplayspokemon"
-			}).ConfigureAwait(false);
+				Client = new DiscordClient(new DiscordConfiguration
+				{
+					Token = Settings.Token,
+					TokenType = TokenType.Bot
+				});
 
-			Client.MessageCreated += DmHandler;
+				Client.DebugLogger.LogMessageReceived += DebugLoggerOnLogMessageReceived;
 
-			foreach (ulong id in Settings.Channels!)
-			{
-				DiscordChannel channel = await Client.GetChannelAsync(id).ConfigureAwait(false);
-				Console.WriteLine($"Connecting to channel {id}.");
-				Channels.Add(channel);
-			}
+				await Client.ConnectAsync(new DiscordActivity("TwitchPlaysPokemon", ActivityType.Streaming)
+				{
+					StreamUrl = "https://www.twitch.tv/twitchplayspokemon"
+				}).ConfigureAwait(false);
 
-			Ruleset = new RandomizedUltraMoonRuleset(memory, Settings);
+				Client.MessageCreated += DmHandler;
 
-			if (DateTime.UtcNow < RunStart)
-			{
-				TimeSpan span = RunStart - DateTime.UtcNow;
-				await Utils.SendMessage(
-					$"Connected, {span.Days}d {span.Hours}h {span.Minutes}m {span.Seconds}s until {Settings.RunName}!").ConfigureAwait(false);
+				foreach (ulong id in Settings.Channels!)
+				{
+					DiscordChannel channel = await Client.GetChannelAsync(id).ConfigureAwait(false);
+					Console.WriteLine($"Connecting to channel {id}.");
+					Channels.Add(channel);
+				}
+
+				Ruleset = new RandomizedUltraMoonRuleset(memory, Settings);
+
+				if (DateTime.UtcNow < RunStart)
+				{
+					TimeSpan span = RunStart - DateTime.UtcNow;
+					await Utils.SendMessage(
+							$"Connected, {span.Days}d {span.Hours}h {span.Minutes}m {span.Seconds}s until {Settings.RunName}!")
+						.ConfigureAwait(false);
+				}
 			}
 
 			Logger.RegisterLogger<WebLogger>();
@@ -156,9 +162,14 @@ namespace StreamFeedBot
 					.WithUrlPrefix($"http://*:{Settings.WebSettings!.Port}/")
 					.WithMode(HttpListenerMode.EmbedIO))
 				.WithLocalSessionManager()
-				.WithWebApi("/api", m => m
-					.RegisterController(() => new ApiController(Ruleset.Memory, Ruleset.ReleasedDictionary, Api)))
 				.HandleHttpException(GenericHttpExceptionHandler.Handler);
+
+			if (!Settings.WebOnly)
+			{
+				Server.WithWebApi("/api", m => m
+					.RegisterController(() => new ApiController(Ruleset!.Memory, Ruleset!.ReleasedDictionary, Api)));
+			}
+
 			if (Settings.WebSettings?.LogsDir != null)
 			{
 				Server.WithStaticFolder("/logs", Settings.WebSettings.LogsDir, true,
@@ -178,9 +189,17 @@ namespace StreamFeedBot
 
 			_ = Server.RunAsync();
 
-			await MainLoop().ConfigureAwait(false);
+			if (!Settings.WebOnly)
+			{
+				await MainLoop().ConfigureAwait(false);
 
-			await Task.Delay(-1).ConfigureAwait(false);
+				await Task.Delay(-1).ConfigureAwait(false);
+			}
+			else
+			{
+				mre = new ManualResetEvent(false);
+				mre.WaitOne();
+			}
 		}
 
 		private static void DebugLoggerOnLogMessageReceived(object? sender, DebugLogMessageEventArgs? e)

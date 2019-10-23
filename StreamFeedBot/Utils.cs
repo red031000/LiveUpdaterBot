@@ -14,20 +14,78 @@ namespace StreamFeedBot
 		public static async Task<List<DiscordMessage>> SendMessage(string content, DiscordEmbed? embed = null)
 		{
 			List<DiscordMessage> messages = new List<DiscordMessage>();
-			foreach (DiscordChannel channel in Program.Channels)
-			{
-				DiscordMessage message = await channel.SendMessageAsync(content, embed: embed).ConfigureAwait(true);
-				messages.Add(message);
-			}
+			if (content == null)
+				throw new ArgumentException("Content is null", nameof(content));
 
-			Console.WriteLine($"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}");
-			if (Program.LogWriter != null)
+			if (content.Length <= 2000)
 			{
-				await Program.LogWriter
-					.WriteLineAsync(
-						$"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}")
-					.ConfigureAwait(true);
-				await Program.LogWriter.FlushAsync().ConfigureAwait(false);
+				foreach (DiscordChannel channel in Program.Channels)
+				{
+					DiscordMessage message = await channel.SendMessageAsync(content, embed: embed).ConfigureAwait(true);
+					messages.Add(message);
+				}
+
+				Console.WriteLine(
+					$"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}");
+				if (Program.LogWriter != null)
+				{
+					await Program.LogWriter
+						.WriteLineAsync(
+							$"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}")
+						.ConfigureAwait(true);
+					await Program.LogWriter.FlushAsync().ConfigureAwait(false);
+				}
+			}
+			else
+			{
+				string[] parts = content.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+				string message = "";
+				foreach (string part in parts)
+				{
+					if (part.Length + message.Length <= 2000)
+						message += part + " ";
+					else
+					{
+						foreach (DiscordChannel channel in Program.Channels)
+						{
+							DiscordMessage msg = await channel.SendMessageAsync(message.Trim(), embed: embed).ConfigureAwait(true);
+							messages.Add(msg);
+						}
+
+						Console.WriteLine(
+							$"Sent message: {message.Trim()}{(embed != null ? $", With embed: {embed.Description}" : "")}");
+						if (Program.LogWriter != null)
+						{
+							await Program.LogWriter
+								.WriteLineAsync(
+									$"Sent message: {message.Trim()}{(embed != null ? $", With embed: {embed.Description}" : "")}")
+								.ConfigureAwait(true);
+							await Program.LogWriter.FlushAsync().ConfigureAwait(false);
+						}
+
+						message = part + " ";
+					}
+				}
+
+				if (!string.IsNullOrEmpty(message))
+				{
+					foreach (DiscordChannel channel in Program.Channels)
+					{
+						DiscordMessage msg = await channel.SendMessageAsync(message.Trim(), embed: embed).ConfigureAwait(true);
+						messages.Add(msg);
+					}
+
+					Console.WriteLine(
+						$"Sent message: {message.Trim()}{(embed != null ? $", With embed: {embed.Description}" : "")}");
+					if (Program.LogWriter != null)
+					{
+						await Program.LogWriter
+							.WriteLineAsync(
+								$"Sent message: {message.Trim()}{(embed != null ? $", With embed: {embed.Description}" : "")}")
+							.ConfigureAwait(true);
+						await Program.LogWriter.FlushAsync().ConfigureAwait(false);
+					}
+				}
 			}
 
 			return messages;

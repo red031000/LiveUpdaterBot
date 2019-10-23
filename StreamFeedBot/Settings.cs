@@ -14,6 +14,7 @@ namespace StreamFeedBot
 		public ulong ReportId;
 		public ulong ReportServer;
 		public ulong[]? SuperUsers;
+		public bool WebOnly;
 		public AnnounceSettings[]? AnnounceSettings;
 		public WebSettings? WebSettings;
 	}
