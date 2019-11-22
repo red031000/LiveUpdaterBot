@@ -7,119 +7,9 @@ using System.Text;
 
 namespace StreamFeedBot.Rulesets
 {
-	public class RandomizedUltraMoonRuleset : Ruleset
+	public class RedRuleset : Ruleset
 	{
-		private static readonly uint[] BallIds =
-		{
-			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 492, 493, 494, 495, 496, 497, 498, 499, 500, 576, 851
-		};
-
-		private static readonly uint[] ImportantCrystalIds =
-		{
-			791, 822, 790, 821, 779, 810, 793, 824, 782, 813, 777, 808, 789, 820, 780, 811, 784, 815, 776, 807, 786, 817, 788, 819, 788, 809, 
-		};
-
-		private static readonly int[] SpecialClasses_USUM =
-		{
-            000, // Pokémon Trainer
-            001, // Pokémon Trainer
-            030, // Pokémon Trainer
-            031, // Island Kahuna
-            038, // Captain
-            040, // Pokémon Trainer
-            041, // Pokémon Trainer
-            043, // Captain
-            044, // Captain
-            045, // Captain
-            046, // Captain
-            047, // Captain
-            048, // Captain
-            049, // Island Kahuna
-            050, // Island Kahuna
-            051, // Island Kahuna
-            070, // Team Skull
-            071, // Aether President
-            072, // Aether Branch Chief
-            076, // Team Skull Boss
-            077, // Pokémon Trainer
-            078, // Team Skull Admin
-            079, // Pokémon Trainer
-            080, // Elite Four
-            081, // Pokémon Trainer
-            082, // Aether President
-            083, // Pokémon Trainer
-            084, // Pokémon Trainer
-            085, // Pokémon Trainer
-            086, // Pokémon Trainer
-            087, // Pokémon Trainer
-            088, // Pokémon Trainer
-            089, // Pokémon Trainer
-            090, // Pokémon Trainer
-            091, // Pokémon Trainer
-            092, // Pro Wrestler
-            093, // Pokémon Trainer
-            097, // Pokémon Trainer
-            098, // Pokémon Trainer
-            099, // Pokémon Trainer
-            100, // Pokémon Trainer
-            101, // Pokémon Trainer
-            102, // Pokémon Trainer
-            103, // Pokémon Trainer
-            104, // Pokémon Trainer
-            105, // Pokémon Trainer
-            106, // Pokémon Trainer
-            107, // Elite Four
-            108, // Pokémon Trainer
-            109, // Elite Four
-            110, // Elite Four
-            111, // Pokémon Professor
-            128, // Pokémon Trainer
-            139, // GAME FREAK
-            140, // Pokémon Trainer
-            141, // Island Kahuna
-            142, // Captain
-            143, // Pokémon Trainer
-            150, // Pokémon Trainer
-            151, // Captain
-            152, // Captain
-            153, // Captain
-            154, // Pokémon Professor
-			162, // Aether Foundation
-            164, // Island Kahuna
-            166, // Pokémon Trainer
-            167, // Pokémon Trainer
-            168, // Pokémon Trainer
-            169, // Pokémon Trainer
-            170, // Pokémon Trainer
-            171, // Pokémon Trainer
-            165, // Pokémon Professor
-            183, // Battle Legend
-            184, // Battle Legend
-            185, // Aether Foundation
-            186, // Pokémon Trainer
-            187, // Pokémon Trainer
-            188, // Pokémon Trainer
-            189, // Pokémon Trainer
-            190, // Pokémon Trainer
-            191, // Elite Four
-            192, // Ultra Recon Squad
-            193, // Ultra Recon Squad
-            194, // Pokémon Trainer
-            198, // Team Aqua
-            199, // Team Galactic
-            200, // Team Magma
-            201, // Team Plasma
-            202, // Team Flare
-            205, // GAME FREAK
-            206, // Team Rainbow Rocket
-            207, // Pokémon Trainer
-            219, // Pokémon Trainer
-            220, // Aether President
-            221, // Pokémon Trainer
-            222, // Pokémon Trainer
-        };
-
-		public RandomizedUltraMoonRuleset(Memory memory, Settings settings)
+		public RedRuleset(Memory memory, Settings settings)
 			: base(memory, settings)
 		{ }
 
@@ -141,7 +31,7 @@ namespace StreamFeedBot.Rulesets
 			}
 
 			if (status.BattleKind != null && status.GameStats != null && oldStatus.GameStats != null &&
-			    status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
+				status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
 			{
 				switch (status.BattleKind)
 				{
@@ -178,7 +68,7 @@ namespace StreamFeedBot.Rulesets
 							if (status.EnemyTrainers[0] != null)
 							{
 								Trainer trainer = status.EnemyTrainers[0];
-								if (SpecialClasses_USUM.Contains(trainer.ClassId))
+								/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
 								{
 									builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
 									if (Attempts.TryGetValue(trainer.Id, out int val))
@@ -193,7 +83,7 @@ namespace StreamFeedBot.Rulesets
 									}
 
 									break;
-								}
+								}*/ //TODO fix for red
 
 								if (trainer.ClassId == -1)
 								{
@@ -221,9 +111,9 @@ namespace StreamFeedBot.Rulesets
 									break;
 								}
 
-								string[] c1 = {"fight", "battle", "face off against"};
-								string[] c2 = {"cheeky", "rogue", "roving", "wandering"};
-								string[] c3 = {" wandering", "n eager"};
+								string[] c1 = { "fight", "battle", "face off against" };
+								string[] c2 = { "cheeky", "rogue", "roving", "wandering" };
+								string[] c3 = { " wandering", "n eager" };
 								string[] choices =
 								{
 									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Any(x => x.Active == true) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
@@ -233,9 +123,9 @@ namespace StreamFeedBot.Rulesets
 								builder.Append(choices[Random.Next(choices.Length)]);
 							}
 						}
-						else if (status.EnemyTrainers?.Count == 2)
+						else if (status.EnemyTrainers?.Count == 2) //TODO remove - no doubles in red
 						{
-							if (status.EnemyTrainers[0] != null && status.EnemyTrainers[1] != null)
+							/*if (status.EnemyTrainers[0] != null && status.EnemyTrainers[1] != null)
 							{
 								Trainer trainer0 = status.EnemyTrainers[0];
 								Trainer trainer1 = status.EnemyTrainers[1];
@@ -324,7 +214,7 @@ namespace StreamFeedBot.Rulesets
 									};
 									builder.Append(choices[Random.Next(choices.Length)]);
 								}
-							}
+							}*/
 						}
 
 						break;
@@ -333,18 +223,18 @@ namespace StreamFeedBot.Rulesets
 
 			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts > oldStatus.GameStats.Blackouts)
 			{
-				string[] options = {"**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** "};
+				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
 				string message = options[Random.Next(options.Length)];
 				builder.Append(message);
 			}
 
 			if (status.BattleKind == null && oldStatus!.BattleKind == BattleKind.Trainer &&
-			    status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts)
+				status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts)
 			{
 				if (oldStatus.EnemyTrainers != null && oldStatus.EnemyTrainers.Count == 1)
 				{
 					Trainer trainer = oldStatus.EnemyTrainers[0];
-					if (SpecialClasses_USUM.Contains(trainer.ClassId))
+					/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
 					{
 						builder.Append($"**Defeated {trainer.ClassName} {trainer.Name}!** ");
 						EnemyName = trainer.ClassName + " " + trainer.Name;
@@ -357,30 +247,30 @@ namespace StreamFeedBot.Rulesets
 						{
 							aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
 							Memory.Urned = true;
-						}	
-					}
+						}
+					}*/ //TODO fix for red
 				}
 				else if (oldStatus.EnemyTrainers != null && oldStatus.EnemyTrainers.Count == 2)
 				{
 					if (oldStatus.EnemyTrainers[1].Id == 0)
 					{
 						Trainer trainer = oldStatus.EnemyTrainers[0];
-						if (SpecialClasses_USUM.Contains(trainer.ClassId))
+						/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
 						{
 							builder.Append($"**Defeated {trainer.ClassName}s {trainer.Name}!** ");
 							EnemyName = trainer.ClassName + "s " + trainer.Name;
-						}
+						}*/ //TODO fix for red
 					}
 					else
 					{
-						Trainer trainer0 = oldStatus.EnemyTrainers[0];
+						/*Trainer trainer0 = oldStatus.EnemyTrainers[0];
 						Trainer trainer1 = oldStatus.EnemyTrainers[0];
 						if (SpecialClasses_USUM.Contains(trainer0.ClassId) ||
-						    SpecialClasses_USUM.Contains(trainer1.ClassId))
+							SpecialClasses_USUM.Contains(trainer1.ClassId))
 						{
 							builder.Append($"**Defeated {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name}!** ");
 							EnemyName = $"{trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name}";
-						}
+						}*/ //TODO remove - no doubles in red
 					}
 				}
 			}
@@ -396,7 +286,7 @@ namespace StreamFeedBot.Rulesets
 				distinctMedicine.AddRange(oldStatus.Items.Medicine);
 			distinctMedicine = distinctMedicine.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctMedicine)
+			foreach (Item item in distinctMedicine) //TODO remove free space - not in gen 1
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Medicine?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
@@ -442,10 +332,10 @@ namespace StreamFeedBot.Rulesets
 							monsGivePc.AddRange(box.BoxContents
 								.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
 								.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								            (oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-									             .HeldItem == null ||
-								             oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-									             .HeldItem?.Id != x.HeldItem?.Id)).ToList());
+											(oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+												 .HeldItem == null ||
+											 oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+												 .HeldItem?.Id != x.HeldItem?.Id)).ToList());
 						}
 					}
 
@@ -457,9 +347,9 @@ namespace StreamFeedBot.Rulesets
 						{
 							monsTakePc.AddRange(box.BoxContents
 								.Where(x => x.HeldItem == null ||
-								            oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-								            oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-									            .HeldItem?.Id != x.HeldItem?.Id).Where(x =>
+											oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+											oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+												.HeldItem?.Id != x.HeldItem?.Id).Where(x =>
 									oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
 									oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
 									null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
@@ -534,7 +424,7 @@ namespace StreamFeedBot.Rulesets
 				distinctBerries.AddRange(oldStatus.Items.Berries);
 			distinctBerries = distinctBerries.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctBerries)
+			foreach (Item item in distinctBerries) //TODO remove free space - not in gen 1
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Berries?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
@@ -671,7 +561,7 @@ namespace StreamFeedBot.Rulesets
 				distinctItems.AddRange(oldStatus.Items.Items);
 			distinctItems = distinctItems.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctItems)
+			foreach (Item item in distinctItems) //TODO remove free space - not in gen 1
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Items?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
@@ -777,10 +667,10 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (status.BattleKind == BattleKind.Wild && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
+					if (status.BattleKind == BattleKind.Wild && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 /*&& BallIds.Contains(item.Id)*/) //todo fix for red
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the wild {status.EnemyParty[0].Species!.Name}. ");
-					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
+					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 /*&& BallIds.Contains(item.Id)*/) //todo fix for red
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the opponent's {status.EnemyParty[0].Species!.Name}. ");
 					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
@@ -811,7 +701,7 @@ namespace StreamFeedBot.Rulesets
 				distinctKey.AddRange(oldStatus.Items.Key);
 			distinctKey = distinctKey.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctKey)
+			foreach (Item item in distinctKey) //TODO remove free space - not in gen 1
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Key?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
@@ -935,7 +825,7 @@ namespace StreamFeedBot.Rulesets
 				distinctTMs.AddRange(oldStatus.Items.TMs);
 			distinctTMs = distinctTMs.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctTMs)
+			foreach (Item item in distinctTMs) //TODO remove free space - not in gen 1
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.TMs?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
@@ -1069,8 +959,9 @@ namespace StreamFeedBot.Rulesets
 				distinctZCrystals.AddRange(oldStatus.Items.ZCrystals);
 			distinctZCrystals = distinctZCrystals.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctZCrystals)
+			foreach (Item item in distinctZCrystals) //TODO change to badges
 			{
+				/*
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.ZCrystals?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
@@ -1208,9 +1099,10 @@ namespace StreamFeedBot.Rulesets
 				}
 
 				ids.Add(item.Id);
+				*/
 			}
 
-			List<Item> distinctFreeSpace = new List<Item>();
+			List<Item> distinctFreeSpace = new List<Item>(); //TODO FOR THE LOVE OF GOD REMOVE FREE SPACE
 			if (status?.Items?.FreeSpace != null)
 				distinctFreeSpace.AddRange(status.Items.FreeSpace);
 			if (oldStatus?.Items?.FreeSpace != null)
@@ -1281,7 +1173,7 @@ namespace StreamFeedBot.Rulesets
 										.HeldItem?.Id == item.Id).ToList());
 						}
 					}
-					
+
 
 					if (monsGive.Length != 0)
 					{
@@ -1350,9 +1242,9 @@ namespace StreamFeedBot.Rulesets
 				distinctRotomPowers.AddRange(oldStatus.Items.RotomPowers);
 			distinctRotomPowers = distinctRotomPowers.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctRotomPowers)
+			foreach (Item item in distinctRotomPowers) //TODO no such thing in red
 			{
-				if (ids.Contains(item.Id)) continue;
+				/*if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.RotomPowers?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.RotomPowers?.FirstOrDefault(x => x.Id == item.Id) != null;
@@ -1464,7 +1356,7 @@ namespace StreamFeedBot.Rulesets
 							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 				}
 
-				ids.Add(item.Id);
+				ids.Add(item.Id);*/
 			}
 
 			if ((status!.Money < oldStatus!.Money || status.Money > oldStatus.Money) && oldStatus.BattleKind == null)
@@ -1572,14 +1464,14 @@ namespace StreamFeedBot.Rulesets
 					{
 						if (move == null) continue;
 						if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id) &&
-						    (oldBattleMon == null || !oldBattleMon.Moves.Where(x => x != null).Select(x => x.Id)
-							     .Contains(move.Id)))
+							(oldBattleMon == null || !oldBattleMon.Moves.Where(x => x != null).Select(x => x.Id)
+								 .Contains(move.Id)))
 						{
 							if (oldMon.Moves!.Count == 4 || (oldBattleMon != null && oldBattleMon.Moves!.Count == 4))
 							{
 								Move? oldMove;
 								if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id) &&
-								    oldMon.Moves.Count == 4)
+									oldMon.Moves.Count == 4)
 								{
 									oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
 								}
@@ -1604,7 +1496,7 @@ namespace StreamFeedBot.Rulesets
 						{
 							$"**{oldMon.Name} ({oldMon.Species!.Name}) has fainted!** ",
 							$"**{oldMon.Name} ({oldMon.Species.Name}) has fallen!** ",
-                        };
+						};
 						builder.Append(choice[Random.Next(choice.Length)]);
 						flag = true;
 					}
@@ -1840,8 +1732,8 @@ namespace StreamFeedBot.Rulesets
 				foreach (Pokemon mon in newBoxedMons)
 				{
 					if (oldStatus?.Party?.Any(x => x.PersonalityValue == mon.PersonalityValue) == true ||
-					    ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue) &&
-					    oldBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue))
+						ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue) &&
+						oldBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue))
 					{
 						string[] choices =
 						{
@@ -1862,8 +1754,8 @@ namespace StreamFeedBot.Rulesets
 				foreach (Pokemon oldMon in oldBoxedMons)
 				{
 					if ((status?.Party?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true) &&
-					    newBoxedMons.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
-					    (status?.Daycare?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true))
+						newBoxedMons.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
+						(status?.Daycare?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true))
 					{
 						if (ReleasedDictionary.All(x => x.Key.PersonalityValue != oldMon.PersonalityValue))
 							ReleasedDictionary.Add(oldMon, 1);
@@ -1883,8 +1775,8 @@ namespace StreamFeedBot.Rulesets
 					}
 
 					if ((status?.Party?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true) &&
-					    newBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue) &&
-					    (status?.Daycare?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true))
+						newBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue) &&
+						(status?.Daycare?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true))
 					{
 						if (ReleasedDictionary.All(x => x.Key.PersonalityValue != mon.PersonalityValue))
 							ReleasedDictionary.Add(mon, 1);
@@ -1932,7 +1824,7 @@ namespace StreamFeedBot.Rulesets
 
 			if (status?.MapName != oldStatus?.MapName)
 			{
-				if (status?.MapName == "Pokémon League")
+				if (status?.MapName == "Pokémon League") //TODO check map name
 				{
 					List<string> options = new List<string>
 					{

@@ -17,6 +17,8 @@ namespace StreamFeedBot.Rulesets
 
 		protected Settings Settings;
 
+		protected string? EnemyName;
+
 		protected Ruleset(Memory memory, Settings settings)
 		{
 			Random = new Random();

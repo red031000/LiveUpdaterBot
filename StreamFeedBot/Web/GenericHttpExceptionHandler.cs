@@ -12,7 +12,12 @@ namespace StreamFeedBot.Web
 		{
 			if (httpexception == null)
 				httpexception = new HttpException(HttpStatusCode.InternalServerError);
-			return context.SendStandardHtmlAsync(httpexception.StatusCode);
+			return context.SendStandardHtmlAsync(httpexception.StatusCode,
+				async writer =>
+				{
+					await writer.WriteAsync($"<img src=\"https://http.cat/{httpexception.StatusCode}\">")
+						.ConfigureAwait(false);
+				});
 		}
 	}
 }

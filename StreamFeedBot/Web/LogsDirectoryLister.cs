@@ -40,7 +40,7 @@ namespace StreamFeedBot.Web
 			foreach (MappedResourceInfo mappedResourceInfo in entries.Where(m => m.IsDirectory).OrderBy(e => e.Name))
 			{
 				text.Write(
-					$"<a href=\"{(!string.IsNullOrEmpty(str)? str + $"{Path.DirectorySeparatorChar}" : "")}{Uri.EscapeDataString(mappedResourceInfo.Name)}{Path.DirectorySeparatorChar}\">{WebUtility.HtmlEncode(mappedResourceInfo.Name)}</a>");
+					$"<a href=\"{(!string.IsNullOrEmpty(str)? str + (str.EndsWith(Path.DirectorySeparatorChar) ? "" : Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture)) : "")}{Uri.EscapeDataString(mappedResourceInfo.Name)}{Path.DirectorySeparatorChar}\">{WebUtility.HtmlEncode(mappedResourceInfo.Name)}</a>");
 				text.Write(new string(' ', Math.Max(1, 50 - mappedResourceInfo.Name.Length + 1)));
 				text.Write(HttpDate.Format(mappedResourceInfo.LastModifiedUtc));
 				text.Write('\n');
@@ -49,7 +49,7 @@ namespace StreamFeedBot.Web
 			foreach (MappedResourceInfo mappedResourceInfo in entries.Where(m => m.IsFile).OrderBy(e => e.Name))
 			{
 				text.Write(
-					$"<a href=\"{(!string.IsNullOrEmpty(str) ? str + $"{Path.DirectorySeparatorChar}" : "")}{Uri.EscapeDataString(mappedResourceInfo.Name)}{Path.DirectorySeparatorChar}\">{WebUtility.HtmlEncode(mappedResourceInfo.Name)}</a>");
+					$"<a href=\"{(!string.IsNullOrEmpty(str) ? str + (str.EndsWith(Path.DirectorySeparatorChar) ? "" : Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture)) : "")}{Uri.EscapeDataString(mappedResourceInfo.Name)}\">{WebUtility.HtmlEncode(mappedResourceInfo.Name)}</a>");
 				text.Write(new string(' ', Math.Max(1, 50 - mappedResourceInfo.Name.Length + 1)));
 				text.Write(HttpDate.Format(mappedResourceInfo.LastModifiedUtc));
 				text.Write(" {0,-20}\n", mappedResourceInfo.Length.ToString("#,###", CultureInfo.InvariantCulture));

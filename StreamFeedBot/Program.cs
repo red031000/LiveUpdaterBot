@@ -40,7 +40,7 @@ namespace StreamFeedBot
 
 		private static Api? Api;
 
-		public static readonly DateTime RunStart = new DateTime(2019, 10, 12, 21, 00, 00, DateTimeKind.Utc);
+		public static readonly DateTime RunStart = new DateTime(2020, 02, 13, 01, 22, 00, DateTimeKind.Utc);
 
 		public const int RefreshInterval = 15;
 
@@ -96,10 +96,19 @@ namespace StreamFeedBot
 			if (!Directory.Exists("logs"))
 				Directory.CreateDirectory("logs");
 
-			LogStream =
-				new FileStream(Path.Combine("logs", Settings.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
+			if (!Directory.Exists(Path.Combine("logs", Settings.RunName!)))
+				Directory.CreateDirectory(Path.Combine("logs", Settings.RunName!));
 
-			LogWriter = new StreamWriter(LogStream);
+			if (!Settings.WebOnly)
+			{
+				LogStream =
+					new FileStream(
+						Path.Combine("logs", Settings.RunName!,
+							Settings.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"),
+						FileMode.Append);
+
+				LogWriter = new StreamWriter(LogStream);
+			}
 
 			if (!Directory.Exists("privatelogs"))
 				Directory.CreateDirectory("privatelogs");
@@ -333,11 +342,18 @@ namespace StreamFeedBot
 
 				if (logdate != DateTime.UtcNow.Date)
 				{
-					LogWriter?.Dispose();
-					LogStream?.Dispose();
-					logdate = DateTime.UtcNow.Date;
-					LogStream = new FileStream(Path.Combine("logs", Settings!.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ".txt"), FileMode.Append);
-					LogWriter = new StreamWriter(LogStream);
+					if (!Settings!.WebOnly)
+					{
+						LogWriter?.Dispose();
+						LogStream?.Dispose();
+						logdate = DateTime.UtcNow.Date;
+						LogStream = new FileStream(
+							Path.Combine("logs", Settings.RunName!,
+								Settings!.RunName + logdate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) +
+								".txt"), FileMode.Append);
+						LogWriter = new StreamWriter(LogStream);
+					}
+
 					PrivateWriter?.Dispose();
 					PrivateStream?.Dispose();
 					PrivateStream =

@@ -8,7 +8,7 @@ namespace StreamFeedBot.Rulesets
 	{
 		public Dictionary<int, int> Attempts = new Dictionary<int, int>();
 
-		public List<uint> AnnouncedCrystals = new List<uint>(); //TODO find a more permanent solution
+		public List<uint> AnnouncedBadges = new List<uint>(); //TODO find a more permanent solution
 
 		public uint E4AttemptNum = 1;
 
