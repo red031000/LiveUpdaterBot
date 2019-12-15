@@ -23,7 +23,7 @@ namespace StreamFeedBot.Rulesets
 				return null; //calculate deltas between two statuses, not just one
 			}
 
-			if ((oldStatus.Name == null || oldStatus.Gender == null) && status.Name != null && status.Gender != null)
+			if ((oldStatus.Name == null || oldStatus.Gender == null) && status.Name != null && status.Gender != null) //TODO: no gender in red
 			{
 				string choice = status.Gender == Gender.Female ? "girl" : "boy";
 
@@ -63,158 +63,62 @@ namespace StreamFeedBot.Rulesets
 						EnemyName = null;
 						break;
 					case BattleKind.Trainer:
-						if (status.EnemyTrainers?.Count == 1)
+						if (status.EnemyTrainers?[0] != null)
 						{
-							if (status.EnemyTrainers[0] != null)
+							Trainer trainer = status.EnemyTrainers[0];
+							/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
 							{
-								Trainer trainer = status.EnemyTrainers[0];
-								/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
+								builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
+								if (Attempts.TryGetValue(trainer.Id, out int val))
 								{
-									builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
-									if (Attempts.TryGetValue(trainer.Id, out int val))
-									{
-										builder.Append($"Attempt #{val + 1}! ");
-										Attempts.Remove(trainer.Id);
-										Attempts.Add(trainer.Id, val + 1);
-									}
-									else
-									{
-										Attempts.Add(trainer.Id, 1);
-									}
-
-									break;
-								}*/ //TODO fix for red
-
-								if (trainer.ClassId == -1)
+									builder.Append($"Attempt #{val + 1}! ");
+									Attempts.Remove(trainer.Id);
+									Attempts.Add(trainer.Id, val + 1);
+								}
+								else
 								{
-									string[] rand1 =
-									{
+									Attempts.Add(trainer.Id, 1);
+								}
+
+								break;
+							}*/ //TODO fix for red
+
+							if (trainer.ClassId == -1)
+							{
+								string[] rand1 =
+								{
 										"come across", "run into", "step on", "stumble upon", "encounter", "bump into",
 										"run across"
 									};
-									string[] rand2 =
-										{"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"};
-									string[] rand3 =
-									{
+								string[] rand2 =
+									{"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"};
+								string[] rand3 =
+								{
 										"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
 										"collides with", "jumps", "ambushes", "attacks", "assaults"
 									};
-									string[] choice =
-									{
+								string[] choice =
+								{
 										$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty![0].Species!.Name}. ",
 										$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species!.Name}. ",
 										$"A wild {status.EnemyParty[0].Species!.Name} {rand3[Random.Next(rand3.Length)]} us. "
 									};
-									string message = choice[Random.Next(choice.Length)];
-									builder.Append(message);
-									EnemyName = null;
-									break;
-								}
+								string message = choice[Random.Next(choice.Length)];
+								builder.Append(message);
+								EnemyName = null;
+								break;
+							}
 
-								string[] c1 = { "fight", "battle", "face off against" };
-								string[] c2 = { "cheeky", "rogue", "roving", "wandering" };
-								string[] c3 = { " wandering", "n eager" };
-								string[] choices =
-								{
+							string[] c1 = { "fight", "battle", "face off against" };
+							string[] c2 = { "cheeky", "rogue", "roving", "wandering" };
+							string[] c3 = { " wandering", "n eager" };
+							string[] choices =
+							{
 									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Any(x => x.Active == true) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
 									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Any(x => x.Active == true) ? $" against their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
 									$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Any(x => x.Active == true) ? $", using their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. "
 								};
-								builder.Append(choices[Random.Next(choices.Length)]);
-							}
-						}
-						else if (status.EnemyTrainers?.Count == 2) //TODO remove - no doubles in red
-						{
-							/*if (status.EnemyTrainers[0] != null && status.EnemyTrainers[1] != null)
-							{
-								Trainer trainer0 = status.EnemyTrainers[0];
-								Trainer trainer1 = status.EnemyTrainers[1];
-
-								if ((SpecialClasses_USUM.Contains(trainer0.ClassId) || SpecialClasses_USUM.Contains(trainer1.ClassId)) && trainer1.ClassId != 0)
-								{
-									builder.Append($"**VS {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name}!** ");
-									if (SpecialClasses_USUM.Contains(trainer0.ClassId))
-									{
-										if (Attempts.TryGetValue(trainer0.Id, out int val))
-										{
-											builder.Append($"Attempt #{val + 1}! ");
-											Attempts.Remove(trainer0.Id);
-											Attempts.Add(trainer0.Id, val + 1);
-										}
-										else
-										{
-											Attempts.Add(trainer0.Id, 1);
-										}
-									}
-									else
-									{
-										if (Attempts.TryGetValue(trainer1.Id, out int val))
-										{
-											builder.Append($"Attempt #{val + 1}! ");
-											Attempts.Remove(trainer1.Id);
-											Attempts.Add(trainer1.Id, val + 1);
-										}
-										else
-										{
-											Attempts.Add(trainer1.Id, 1);
-										}
-									}
-								}
-								else if (SpecialClasses_USUM.Contains(trainer0.ClassId))
-								{
-									builder.Append($"**VS {trainer0.ClassName}s {trainer0.Name}!** ");
-									if (Attempts.TryGetValue(trainer0.Id, out int val))
-									{
-										builder.Append($"Attempt #{val + 1}! ");
-										Attempts.Remove(trainer0.Id);
-										Attempts.Add(trainer0.Id, val + 1);
-									}
-									else
-									{
-										Attempts.Add(trainer0.Id, 1);
-									}
-								}
-								else if (trainer0.ClassId == -1 || trainer1.ClassId == -1)
-								{
-									string[] rand1 =
-									{
-										"come across", "run into", "step on", "stumble upon", "encounter", "bump into",
-										"run across"
-									};
-									string[] rand2 =
-										{"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"};
-									string[] rand3 =
-									{
-										"picks a fight with", "engages", "thinks it can take", "crashes into", "smacks into",
-										"collides with", "jumps", "ambushes", "attacks", "assaults"
-									};
-									string[] choice =
-									{
-										$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty![0].Species!.Name}. ",
-										$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species!.Name}. ",
-										$"A wild {status.EnemyParty[0].Species!.Name} {rand3[Random.Next(rand3.Length)]} us. "
-									};
-									string message = choice[Random.Next(choice.Length)];
-									builder.Append(message);
-									EnemyName = null;
-								}
-								else if (trainer1.ClassId != 0)
-								{
-									string[] choices =
-									{
-										$"Both {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name} challenge us to a battle at the same time!",
-									};
-									builder.Append(choices[Random.Next(choices.Length)]);
-								}
-								else
-								{
-									string[] choices =
-									{
-										$"{trainer0.ClassName} {trainer0.Name} challenge us to a battle at the same time!",
-									};
-									builder.Append(choices[Random.Next(choices.Length)]);
-								}
-							}*/
+							builder.Append(choices[Random.Next(choices.Length)]);
 						}
 
 						break;
@@ -231,7 +135,7 @@ namespace StreamFeedBot.Rulesets
 			if (status.BattleKind == null && oldStatus!.BattleKind == BattleKind.Trainer &&
 				status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts)
 			{
-				if (oldStatus.EnemyTrainers != null && oldStatus.EnemyTrainers.Count == 1)
+				if (oldStatus.EnemyTrainers != null)
 				{
 					Trainer trainer = oldStatus.EnemyTrainers[0];
 					/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
@@ -250,29 +154,6 @@ namespace StreamFeedBot.Rulesets
 						}
 					}*/ //TODO fix for red
 				}
-				else if (oldStatus.EnemyTrainers != null && oldStatus.EnemyTrainers.Count == 2)
-				{
-					if (oldStatus.EnemyTrainers[1].Id == 0)
-					{
-						Trainer trainer = oldStatus.EnemyTrainers[0];
-						/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
-						{
-							builder.Append($"**Defeated {trainer.ClassName}s {trainer.Name}!** ");
-							EnemyName = trainer.ClassName + "s " + trainer.Name;
-						}*/ //TODO fix for red
-					}
-					else
-					{
-						/*Trainer trainer0 = oldStatus.EnemyTrainers[0];
-						Trainer trainer1 = oldStatus.EnemyTrainers[0];
-						if (SpecialClasses_USUM.Contains(trainer0.ClassId) ||
-							SpecialClasses_USUM.Contains(trainer1.ClassId))
-						{
-							builder.Append($"**Defeated {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name}!** ");
-							EnemyName = $"{trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name}";
-						}*/ //TODO remove - no doubles in red
-					}
-				}
 			}
 
 			List<uint> ids = new List<uint>();
@@ -286,20 +167,14 @@ namespace StreamFeedBot.Rulesets
 				distinctMedicine.AddRange(oldStatus.Items.Medicine);
 			distinctMedicine = distinctMedicine.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctMedicine) //TODO remove free space - not in gen 1
+			foreach (Item item in distinctMedicine)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Medicine?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.Medicine?.FirstOrDefault(x => x.Id == item.Id) != null;
-				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.Medicine?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					if (oldCount != null)
-						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					else
-						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 0;
 				}
 
@@ -424,20 +299,14 @@ namespace StreamFeedBot.Rulesets
 				distinctBerries.AddRange(oldStatus.Items.Berries);
 			distinctBerries = distinctBerries.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctBerries) //TODO remove free space - not in gen 1
+			foreach (Item item in distinctBerries)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Berries?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.Berries?.FirstOrDefault(x => x.Id == item.Id) != null;
-				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.Berries?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					if (oldCount != null)
-						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					else
-						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 0;
 				}
 
@@ -561,20 +430,14 @@ namespace StreamFeedBot.Rulesets
 				distinctItems.AddRange(oldStatus.Items.Items);
 			distinctItems = distinctItems.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctItems) //TODO remove free space - not in gen 1
+			foreach (Item item in distinctItems)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Items?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.Items?.FirstOrDefault(x => x.Id == item.Id) != null;
-				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.Items?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					if (oldCount != null)
-						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					else
-						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 0;
 				}
 
@@ -701,20 +564,14 @@ namespace StreamFeedBot.Rulesets
 				distinctKey.AddRange(oldStatus.Items.Key);
 			distinctKey = distinctKey.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctKey) //TODO remove free space - not in gen 1
+			foreach (Item item in distinctKey)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Key?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.Key?.FirstOrDefault(x => x.Id == item.Id) != null;
-				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.Key?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					if (oldCount != null)
-						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					else
-						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 0;
 				}
 
@@ -825,20 +682,14 @@ namespace StreamFeedBot.Rulesets
 				distinctTMs.AddRange(oldStatus.Items.TMs);
 			distinctTMs = distinctTMs.Distinct(comparer).ToList();
 
-			foreach (Item item in distinctTMs) //TODO remove free space - not in gen 1
+			foreach (Item item in distinctTMs)
 			{
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.TMs?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.TMs?.FirstOrDefault(x => x.Id == item.Id) != null;
-				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.TMs?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					if (oldCount != null)
-						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					else
-						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 0;
 				}
 
@@ -1100,263 +951,6 @@ namespace StreamFeedBot.Rulesets
 
 				ids.Add(item.Id);
 				*/
-			}
-
-			List<Item> distinctFreeSpace = new List<Item>(); //TODO FOR THE LOVE OF GOD REMOVE FREE SPACE
-			if (status?.Items?.FreeSpace != null)
-				distinctFreeSpace.AddRange(status.Items.FreeSpace);
-			if (oldStatus?.Items?.FreeSpace != null)
-				distinctFreeSpace.AddRange(oldStatus.Items.FreeSpace);
-			distinctFreeSpace = distinctFreeSpace.Distinct(comparer).ToList();
-
-			foreach (Item item in distinctFreeSpace)
-			{
-				if (ids.Contains(item.Id)) continue;
-				long count = status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				bool res = oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
-				if (res)
-				{
-					long? oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 0;
-				}
-
-				if (count != 0)
-				{
-					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
-							 x.HeldItem?.Id))
-						.ToArray();
-					Pokemon[] monsTake = status.Party.Where(x =>
-							x.HeldItem == null ||
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
-							x.HeldItem.Id)
-						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
-							item.Id)
-						.ToArray();
-					List<Pokemon> monsGivePc = new List<Pokemon>();
-					foreach (Box box in status.PC?.Boxes ?? new List<Box>())
-					{
-						Box? oldBox = oldStatus!.PC?.Boxes?.FirstOrDefault(x => x.BoxNumber == box.BoxNumber);
-						if (oldBox != null)
-						{
-							monsGivePc.AddRange(box.BoxContents
-								.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-								.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-											(oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-												 .HeldItem == null ||
-											 oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-												 .HeldItem?.Id != x.HeldItem?.Id)).ToList());
-						}
-					}
-
-					List<Pokemon> monsTakePc = new List<Pokemon>();
-					foreach (Box box in status.PC?.Boxes ?? new List<Box>())
-					{
-						Box? oldBox = oldStatus!.PC?.Boxes?.FirstOrDefault(x => x.BoxNumber == box.BoxNumber);
-						if (oldBox != null)
-						{
-							monsTakePc.AddRange(box.BoxContents
-								.Where(x => x.HeldItem == null ||
-											oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-											oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-												.HeldItem?.Id != x.HeldItem?.Id).Where(x =>
-									oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-									oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
-									null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-										.HeldItem?.Id == item.Id).ToList());
-						}
-					}
-
-
-					if (monsGive.Length != 0)
-					{
-						foreach (Pokemon mon in monsGive)
-						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
-							count++;
-						}
-					}
-
-					if (monsGivePc != null && monsGivePc.Count != 0)
-					{
-						foreach (Pokemon mon in monsGivePc)
-						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
-							count++;
-						}
-					}
-
-					if (monsTake.Length != 0)
-					{
-						foreach (Pokemon mon in monsTake)
-						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
-							count--;
-						}
-					}
-
-					if (monsTakePc != null && monsTakePc.Count != 0)
-					{
-						foreach (Pokemon mon in monsTakePc)
-						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
-							count--;
-						}
-					}
-
-					if (status.BattleKind != null && count < 0)
-						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
-					{
-						builder.Append(
-							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-					}
-					else if (count < 0)
-						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-					else if (count > 0 && status.Money < oldStatus!.Money)
-					{
-						builder.Append(
-							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-					}
-					else if (count > 0)
-						builder.Append(
-							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-				}
-
-				ids.Add(item.Id);
-			}
-
-			List<Item> distinctRotomPowers = new List<Item>();
-			if (status?.Items?.RotomPowers != null)
-				distinctRotomPowers.AddRange(status.Items.RotomPowers);
-			if (oldStatus?.Items?.RotomPowers != null)
-				distinctRotomPowers.AddRange(oldStatus.Items.RotomPowers);
-			distinctRotomPowers = distinctRotomPowers.Distinct(comparer).ToList();
-
-			foreach (Item item in distinctRotomPowers) //TODO no such thing in red
-			{
-				/*if (ids.Contains(item.Id)) continue;
-				long count = status?.Items?.RotomPowers?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				bool res = oldStatus?.Items?.RotomPowers?.FirstOrDefault(x => x.Id == item.Id) != null;
-				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
-				if (res)
-				{
-					long? oldCount = oldStatus?.Items?.RotomPowers?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					if (oldCount != null)
-						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					else
-						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 0;
-				}
-
-				if (count != 0)
-				{
-					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
-							 x.HeldItem?.Id))
-						.ToArray();
-					Pokemon[] monsTake = status.Party.Where(x =>
-							x.HeldItem == null ||
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
-							x.HeldItem.Id)
-						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
-							item.Id)
-						.ToArray();
-					List<Pokemon> monsGivePc = new List<Pokemon>();
-					foreach (Box box in status.PC?.Boxes ?? new List<Box>())
-					{
-						Box? oldBox = oldStatus!.PC?.Boxes?.FirstOrDefault(x => x.BoxNumber == box.BoxNumber);
-						if (oldBox != null)
-						{
-							monsGivePc.AddRange(box.BoxContents
-								.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-								.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-											(oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-												 .HeldItem == null ||
-											 oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-												 .HeldItem?.Id != x.HeldItem?.Id)).ToList());
-						}
-					}
-
-					List<Pokemon> monsTakePc = new List<Pokemon>();
-					foreach (Box box in status.PC?.Boxes ?? new List<Box>())
-					{
-						Box? oldBox = oldStatus!.PC?.Boxes?.FirstOrDefault(x => x.BoxNumber == box.BoxNumber);
-						if (oldBox != null)
-						{
-							monsTakePc.AddRange(box.BoxContents
-								.Where(x => x.HeldItem == null ||
-											oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-											oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-												.HeldItem?.Id != x.HeldItem?.Id).Where(x =>
-									oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-									oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
-									null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-										.HeldItem?.Id == item.Id).ToList());
-						}
-					}
-					if (monsGive.Length != 0)
-					{
-						foreach (Pokemon mon in monsGive)
-						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
-							count++;
-						}
-					}
-
-					if (monsGivePc != null && monsGivePc.Count != 0)
-					{
-						foreach (Pokemon mon in monsGivePc)
-						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
-							count++;
-						}
-					}
-
-					if (monsTake.Length != 0)
-					{
-						foreach (Pokemon mon in monsTake)
-						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
-							count--;
-						}
-					}
-
-					if (monsTakePc != null && monsTakePc.Count != 0)
-					{
-						foreach (Pokemon mon in monsTakePc)
-						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
-							count--;
-						}
-					}
-
-					if (count < 0)
-						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-					else if (count > 0)
-						builder.Append(
-							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-				}
-
-				ids.Add(item.Id);*/
 			}
 
 			if ((status!.Money < oldStatus!.Money || status.Money > oldStatus.Money) && oldStatus.BattleKind == null)

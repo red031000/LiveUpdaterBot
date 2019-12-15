@@ -12,8 +12,8 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "area_name")]
 		public string? AreaName;
 
-		//[JsonProperty(PropertyName = "badges")]
-		[JsonIgnore] //Gen 7 doesn't have badges
+		[JsonProperty(PropertyName = "badges")]
+		//[JsonIgnore] //Gen 7 doesn't have badges
 		public uint Badges;
 
 		[JsonIgnore]
@@ -104,13 +104,16 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "tms")]
 		public List<Item>? TMs;
 		
-		[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
+		//[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
+		[JsonIgnore]
 		public List<Item>? ZCrystals;
 
-		[JsonProperty(PropertyName = "free_space")] //Gen 7 specific
+		//[JsonProperty(PropertyName = "free_space")] //Gen 7 specific
+		[JsonIgnore]
 		public List<Item>? FreeSpace;
 
-		[JsonProperty(PropertyName = "rotom_powers")] //USUM specific
+		//[JsonProperty(PropertyName = "rotom_powers")] //USUM specific
+		[JsonIgnore]
 		public List<Item>? RotomPowers;
 	}
 

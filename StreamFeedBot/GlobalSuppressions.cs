@@ -8,3 +8,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "reason #1", Scope = "namespaceanddescendants", Target = "StreamFeedBot")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "reason #2", Scope = "namespaceanddescendants", Target = "StreamFeedBot")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "reason #3", Scope = "namespaceanddescendants", Target = "StreamFeedBot")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "reason #4", Scope = "member", Target = "~M:StreamFeedBot.Program.MainAsync~System.Threading.Tasks.Task")]
