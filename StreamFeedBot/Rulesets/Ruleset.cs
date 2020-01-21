@@ -19,6 +19,8 @@ namespace StreamFeedBot.Rulesets
 
 		protected string? EnemyName;
 
+		public abstract List<string>? Badges { get; }
+
 		protected Ruleset(Memory memory, Settings settings)
 		{
 			Random = new Random();

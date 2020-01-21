@@ -11,6 +11,11 @@ namespace StreamFeedBot.Rulesets
 		private bool Reset;
 		private readonly List<Pokemon> Lost = new List<Pokemon>();
 		private uint Expected;
+		
+		private readonly List<string> _badges = new List<string> { "Stone", "Knuckle", "Dynamo", "Heat", "Balance", "Feather", "Mind", "Rain" };
+
+		public override List<string> Badges => _badges;
+
 		public TriHardEmeraldRuleset(Memory memory, Settings settings)
 			: base (memory, settings)
 		{ }
@@ -213,7 +218,7 @@ namespace StreamFeedBot.Rulesets
 				{
 					if (losses[i])
 					{
-						string[] choices = { $"**Lost the {Settings.BadgeNames[i]} Badge!** " };
+						string[] choices = { $"**Lost the {_badges[i]} Badge!** " };
 						builder.Append(choices[Random.Next(choices.Length)]);
 					}
 				}
@@ -224,8 +229,8 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choices =
 						{
-							$"**Got the {Settings.BadgeNames[i]} Badge!** ",
-							$"**Received the {Settings.BadgeNames[i]} Badge!** "
+							$"**Got the {_badges[i]} Badge!** ",
+							$"**Received the {_badges[i]} Badge!** "
 						};
 						builder.Append(choices[Random.Next(choices.Length)]);
 					}

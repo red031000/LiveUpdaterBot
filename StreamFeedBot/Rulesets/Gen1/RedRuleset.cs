@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using static StreamFeedBot.Utils;
 
 namespace StreamFeedBot.Rulesets
 {
@@ -38,6 +39,10 @@ namespace StreamFeedBot.Rulesets
 			046, //Agatha
 			047, //Lance
 		};
+
+		private readonly List<string> _badges = new List<string> { "Boulder", "Cascade", "Thunder", "Rainbow", "Soul", "Marsh", "Volcano", "Earth" };
+
+		public override List<string>? Badges => _badges;
 
 		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement)
 		{
@@ -185,7 +190,7 @@ namespace StreamFeedBot.Rulesets
 			{
 				List<bool> gains = new List<bool>();
 				int j = 0;
-				foreach (bool badgeFlag in status?.BadgesFlags)
+				foreach (bool badgeFlag in status!.BadgesFlags)
 				{
 					if (badgeFlag != oldStatus?.BadgesFlags[j] && badgeFlag)
 					{
@@ -208,8 +213,8 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choices =
 						{
-							$"**Got the {Settings?.BadgeNames?[i]} Badge!** ",
-							$"**Received the {Settings?.BadgeNames?[i]} Badge!** "
+							$"**Got the {_badges[i]} Badge!** ",
+							$"**Received the {_badges[i]} Badge!** "
 						};
 						string choice = choices[Random.Next(choices.Length)];
 						builder.Append(choice);
@@ -218,20 +223,20 @@ namespace StreamFeedBot.Rulesets
 							if (oldStatus!.BattleKind == BattleKind.Trainer)
 							{
 								aBuilder.Append(
-									$"**We defeated {oldStatus.EnemyTrainers![0].ClassName} {oldStatus.EnemyTrainers[0].Name} and received the {Settings?.BadgeNames?[i]} badge!** ");
+									$"**We defeated {oldStatus.EnemyTrainers![0].ClassName} {oldStatus.EnemyTrainers[0].Name} and received the {_badges[i]} badge!** ");
 								Memory.AnnouncedBadges.Add((uint)i);
 							}
 							else if (EnemyName != null)
 							{
 								aBuilder.Append(
-									$"**We defeated {EnemyName} and received the {Settings?.BadgeNames?[i]} badge!** ");
+									$"**We defeated {EnemyName} and received the {_badges[i]} badge!** ");
 								EnemyName = null;
 								Memory.AnnouncedBadges.Add((uint)i);
 							}
 							else
 							{
 								aBuilder.Append(
-									$"**We received the {Settings?.BadgeNames?[i]} badge!** ");
+									$"**We received the {_badges[i]} badge!** ");
 								Memory.AnnouncedBadges.Add((uint)i);
 							}
 						}
@@ -244,7 +249,7 @@ namespace StreamFeedBot.Rulesets
 			ItemEqualityComparer comparer = new ItemEqualityComparer();
 
 			List<Item> distinctMedicine = new List<Item>();
-			if (status.Items?.Medicine != null)
+			if (status?.Items?.Medicine != null)
 				distinctMedicine.AddRange(status.Items.Medicine);
 			if (oldStatus!.Items?.Medicine != null)
 				distinctMedicine.AddRange(oldStatus.Items.Medicine);
@@ -319,7 +324,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGive)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -328,7 +333,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -337,7 +342,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTake)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
@@ -346,30 +351,30 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
 
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
-							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					}
 					else if (count < 0)
 						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					else if (count > 0 && status.Money < oldStatus!.Money)
 					{
 						builder.Append(
-							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We buy {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					}
 					else if (count > 0)
 						builder.Append(
-							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We pick up {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 				}
 
 				ids.Add(item.Id);
@@ -450,7 +455,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGive)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -459,7 +464,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -468,7 +473,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTake)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
@@ -477,30 +482,30 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
 
 					if (status.BattleKind != null && count < 0)
 						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
-							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					}
 					else if (count < 0)
 						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					else if (count > 0 && status.Money < oldStatus!.Money)
 					{
 						builder.Append(
-							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We buy {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					}
 					else if (count > 0)
 						builder.Append(
-							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We pick up {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 				}
 
 				ids.Add(item.Id);
@@ -581,7 +586,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGive)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -590,7 +595,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -599,7 +604,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTake)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
@@ -608,33 +613,33 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
 
 					if (status.BattleKind == BattleKind.Wild && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
-							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the wild {status.EnemyParty[0].Species!.Name}. ");
+							$"We throw {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the wild {status.EnemyParty[0].Species!.Name}. ");
 					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
-							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the opponent's {status.EnemyParty[0].Species!.Name}. ");
+							$"We throw {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the opponent's {status.EnemyParty[0].Species!.Name}. ");
 					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
-							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					}
 					else if (count < 0)
 						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					else if (count > 0 && status.Money < oldStatus!.Money)
 					{
 						builder.Append(
-							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We buy {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					}
 					else if (count > 0)
 						builder.Append(
-							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We pick up {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 				}
 
 				ids.Add(item.Id);
@@ -715,7 +720,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGive)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -724,7 +729,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -733,7 +738,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTake)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
@@ -742,17 +747,17 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
 
 					if (count < 0)
 						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					else if (count > 0)
 						builder.Append(
-							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We pick up {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 				}
 
 				ids.Add(item.Id);
@@ -833,7 +838,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGive)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -842,7 +847,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsGivePc)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
@@ -851,7 +856,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTake)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
@@ -860,7 +865,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						foreach (Pokemon mon in monsTakePc)
 						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
@@ -868,19 +873,19 @@ namespace StreamFeedBot.Rulesets
 					if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
 					{
 						builder.Append(
-							$"We sell {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					}
 					else if (count < 0)
 						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					else if (count > 0 && status.Money < oldStatus!.Money)
 					{
 						builder.Append(
-							$"We buy {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We buy {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 					}
 					else if (count > 0)
 						builder.Append(
-							$"We pick up {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+							$"We pick up {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
 				}
 
 				ids.Add(item.Id);
@@ -924,8 +929,8 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choices =
 						{
-							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}! **",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}! **"
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into {IndefiniteArticle(mon.Species.Name)} {mon.Species.Name}! **",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into {IndefiniteArticle(mon.Species.Name)} {mon.Species.Name}! **"
 						};
 						string message = choices[Random.Next(choices.Length)];
 						builder.Append(message);
@@ -963,8 +968,8 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choices =
 						{
-							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}! **",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}! **"
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into {IndefiniteArticle(mon.Species.Name)} {mon.Species.Name}! **",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into {IndefiniteArticle(mon.Species.Name)} {mon.Species.Name}! **"
 						};
 						string message = choices[Random.Next(choices.Length)];
 						builder.Append(message);

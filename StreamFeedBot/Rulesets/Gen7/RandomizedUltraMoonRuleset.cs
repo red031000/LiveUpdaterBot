@@ -119,6 +119,8 @@ namespace StreamFeedBot.Rulesets
             222, // Pokémon Trainer
         };
 
+		public override List<string>? Badges => null; //no badges in this gen
+
 		public RandomizedUltraMoonRuleset(Memory memory, Settings settings)
 			: base(memory, settings)
 		{ }

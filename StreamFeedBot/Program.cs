@@ -26,6 +26,8 @@ namespace StreamFeedBot
 		public static List<DiscordChannel> Channels = new List<DiscordChannel>();
 		public static DateTime logdate = DateTime.UtcNow.Date;
 
+		public static List<string>? Badges => Ruleset?.Badges;
+
 		public static FileStream? LogStream;
 		public static StreamWriter? LogWriter;
 

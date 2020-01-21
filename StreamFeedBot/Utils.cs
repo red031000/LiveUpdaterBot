@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -144,6 +145,12 @@ namespace StreamFeedBot
 			}
 
 			return null;
+		}
+
+		public static string IndefiniteArticle(string? item)
+		{
+			if (item == null) return "a";
+			return new char?[] {'a', 'e', 'i', 'o', 'u'}.Contains(item.FirstOrDefault()) ? "an" : "a";
 		}
 	}
 }

@@ -87,9 +87,12 @@ namespace StreamFeedBot
 				await UpdateStatus().ConfigureAwait(true);
 			}
 
-			for (int j = 0; j < Program.Settings!.BadgeNames!.Length; j++)
+			if (Program.Badges != null)
 			{
-				Status!.BadgesFlags.Add((Status.Badges & (int)Math.Pow(2, j)) != 0);
+				for (int j = 0; j < Program.Badges.Count; j++)
+				{
+					Status!.BadgesFlags.Add((Status.Badges & (int) Math.Pow(2, j)) != 0);
+				}
 			}
 
 			if (Status!.EnemyTrainers != null)
