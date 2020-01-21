@@ -49,7 +49,8 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "items")]
 		public ItemGroup? Items;
 
-		[JsonProperty(PropertyName = "gender")]
+		[JsonIgnore] //no gender in red
+		//[JsonProperty(PropertyName = "gender")]
 		public Gender? Gender;
 
 		[JsonProperty(PropertyName = "name")]

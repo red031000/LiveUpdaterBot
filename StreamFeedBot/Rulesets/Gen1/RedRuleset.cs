@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -13,6 +14,31 @@ namespace StreamFeedBot.Rulesets
 			: base(memory, settings)
 		{ }
 
+		private static readonly uint[] BallIds =
+		{
+			1, 2, 3, 4, 8
+		};
+
+		private static readonly int[] SpecialClasses_Red =
+		{
+			025, //Rival1
+			026, //Prof.Oak
+			029, //Giovanni
+			033, //Bruno
+			034, //Brock
+			035, //Misty
+			036, //Lt.Surge
+			037, //Erika
+			038, //Koga
+			039, //Blaine
+			040, //Sabrina
+			042, //Rival2
+			043, //Rival3
+			044, //Lorelei
+			046, //Agatha
+			047, //Lance
+		};
+
 		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement)
 		{
 			StringBuilder builder = new StringBuilder();
@@ -23,11 +49,9 @@ namespace StreamFeedBot.Rulesets
 				return null; //calculate deltas between two statuses, not just one
 			}
 
-			if ((oldStatus.Name == null || oldStatus.Gender == null) && status.Name != null && status.Gender != null) //TODO: no gender in red
+			if (oldStatus.Name == null && status.Name != null)
 			{
-				string choice = status.Gender == Gender.Female ? "girl" : "boy";
-
-				builder.Append($"**We are a {choice} named {status.Name}!** ");
+				builder.Append($"**We are named {status.Name}!** ");
 			}
 
 			if (status.BattleKind != null && status.GameStats != null && oldStatus.GameStats != null &&
@@ -66,22 +90,23 @@ namespace StreamFeedBot.Rulesets
 						if (status.EnemyTrainers?[0] != null)
 						{
 							Trainer trainer = status.EnemyTrainers[0];
-							/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
+							if (SpecialClasses_Red.Contains(trainer.ClassId))
 							{
-								builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
-								if (Attempts.TryGetValue(trainer.Id, out int val))
+								builder.Append($"**VS {trainer.ClassName}!** ");
+								int id = int.Parse(trainer.ClassId.ToString("D3", CultureInfo.InvariantCulture) + trainer.Id.ToString("D3", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+								if (Attempts.TryGetValue(id, out int val))
 								{
 									builder.Append($"Attempt #{val + 1}! ");
-									Attempts.Remove(trainer.Id);
-									Attempts.Add(trainer.Id, val + 1);
+									Attempts.Remove(id);
+									Attempts.Add(id, val + 1);
 								}
 								else
 								{
-									Attempts.Add(trainer.Id, 1);
+									Attempts.Add(id, 1);
 								}
 
 								break;
-							}*/ //TODO fix for red
+							}
 
 							if (trainer.ClassId == -1)
 							{
@@ -112,7 +137,7 @@ namespace StreamFeedBot.Rulesets
 							string[] c1 = { "fight", "battle", "face off against" };
 							string[] c2 = { "cheeky", "rogue", "roving", "wandering" };
 							string[] c3 = { " wandering", "n eager" };
-							string[] choices =
+							string[] choices = //TODO fix for reds
 							{
 									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Any(x => x.Active == true) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
 									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Any(x => x.Active == true) ? $" against their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
@@ -138,13 +163,13 @@ namespace StreamFeedBot.Rulesets
 				if (oldStatus.EnemyTrainers != null)
 				{
 					Trainer trainer = oldStatus.EnemyTrainers[0];
-					/*if (SpecialClasses_USUM.Contains(trainer.ClassId))
+					if (SpecialClasses_Red.Contains(trainer.ClassId))
 					{
 						builder.Append($"**Defeated {trainer.ClassName} {trainer.Name}!** ");
 						EnemyName = trainer.ClassName + " " + trainer.Name;
 					}
 
-					if (Enumerable.Range(494, 3).Contains(trainer.Id))
+					/*if (Enumerable.Range(494, 3).Contains(trainer.Id))
 					{
 						builder.Append("**TEH URN!** ");
 						if (!Memory.Urned)
@@ -153,6 +178,64 @@ namespace StreamFeedBot.Rulesets
 							Memory.Urned = true;
 						}
 					}*/ //TODO fix for red
+				}
+			}
+
+			if (status?.Badges != oldStatus?.Badges)
+			{
+				List<bool> gains = new List<bool>();
+				int j = 0;
+				foreach (bool badgeFlag in status?.BadgesFlags)
+				{
+					if (badgeFlag != oldStatus?.BadgesFlags[j] && badgeFlag)
+					{
+						gains.Add(true);
+					}
+					else if (badgeFlag != oldStatus?.BadgesFlags[j] && !badgeFlag)
+					{
+						gains.Add(false);
+					}
+					else
+					{
+						gains.Add(false);
+					}
+					j++;
+				}
+
+				for (int i = 0; i < gains.Count; i++)
+				{
+					if (gains[i])
+					{
+						string[] choices =
+						{
+							$"**Got the {Settings?.BadgeNames?[i]} Badge!** ",
+							$"**Received the {Settings?.BadgeNames?[i]} Badge!** "
+						};
+						string choice = choices[Random.Next(choices.Length)];
+						builder.Append(choice);
+						if (!Memory.AnnouncedBadges.Contains((uint)i))
+						{
+							if (oldStatus!.BattleKind == BattleKind.Trainer)
+							{
+								aBuilder.Append(
+									$"**We defeated {oldStatus.EnemyTrainers![0].ClassName} {oldStatus.EnemyTrainers[0].Name} and received the {Settings?.BadgeNames?[i]} badge!** ");
+								Memory.AnnouncedBadges.Add((uint)i);
+							}
+							else if (EnemyName != null)
+							{
+								aBuilder.Append(
+									$"**We defeated {EnemyName} and received the {Settings?.BadgeNames?[i]} badge!** ");
+								EnemyName = null;
+								Memory.AnnouncedBadges.Add((uint)i);
+							}
+							else
+							{
+								aBuilder.Append(
+									$"**We received the {Settings?.BadgeNames?[i]} badge!** ");
+								Memory.AnnouncedBadges.Add((uint)i);
+							}
+						}
+					}
 				}
 			}
 
@@ -530,10 +613,10 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (status.BattleKind == BattleKind.Wild && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 /*&& BallIds.Contains(item.Id)*/) //todo fix for red
+					if (status.BattleKind == BattleKind.Wild && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the wild {status.EnemyParty[0].Species!.Name}. ");
-					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 /*&& BallIds.Contains(item.Id)*/) //todo fix for red
+					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
 							$"We throw {(count == -1 ? $"a {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the opponent's {status.EnemyParty[0].Species!.Name}. ");
 					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
@@ -801,156 +884,6 @@ namespace StreamFeedBot.Rulesets
 				}
 
 				ids.Add(item.Id);
-			}
-
-			List<Item> distinctZCrystals = new List<Item>();
-			if (status?.Items?.ZCrystals != null)
-				distinctZCrystals.AddRange(status.Items.ZCrystals);
-			if (oldStatus?.Items?.ZCrystals != null)
-				distinctZCrystals.AddRange(oldStatus.Items.ZCrystals);
-			distinctZCrystals = distinctZCrystals.Distinct(comparer).ToList();
-
-			foreach (Item item in distinctZCrystals) //TODO change to badges
-			{
-				/*
-				if (ids.Contains(item.Id)) continue;
-				long count = status?.Items?.ZCrystals?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				count += status?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
-				bool res = oldStatus?.Items?.ZCrystals?.FirstOrDefault(x => x.Id == item.Id) != null;
-				res |= oldStatus?.Items?.FreeSpace?.FirstOrDefault(x => x.Id == item.Id) != null;
-				if (res)
-				{
-					long? oldCount = oldStatus?.Items?.ZCrystals?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					if (oldCount != null)
-						oldCount += oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					else
-						oldCount = oldStatus?.Items?.FreeSpace?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
-					count -= oldCount ?? 0;
-				}
-
-				if (count != 0)
-				{
-					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
-							 x.HeldItem?.Id))
-						.ToArray();
-					Pokemon[] monsTake = status.Party.Where(x =>
-							x.HeldItem == null ||
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
-							x.HeldItem.Id)
-						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
-							item.Id)
-						.ToArray();
-					List<Pokemon> monsGivePc = new List<Pokemon>();
-					foreach (Box box in status.PC?.Boxes ?? new List<Box>())
-					{
-						Box? oldBox = oldStatus!.PC?.Boxes?.FirstOrDefault(x => x.BoxNumber == box.BoxNumber);
-						if (oldBox != null)
-						{
-							monsGivePc.AddRange(box.BoxContents
-								.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
-								.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-											(oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-												 .HeldItem == null ||
-											 oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-												 .HeldItem?.Id != x.HeldItem?.Id)).ToList());
-						}
-					}
-
-					List<Pokemon> monsTakePc = new List<Pokemon>();
-					foreach (Box box in status.PC?.Boxes ?? new List<Box>())
-					{
-						Box? oldBox = oldStatus!.PC?.Boxes?.FirstOrDefault(x => x.BoxNumber == box.BoxNumber);
-						if (oldBox != null)
-						{
-							monsTakePc.AddRange(box.BoxContents
-								.Where(x => x.HeldItem == null ||
-											oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-											oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
-												.HeldItem?.Id != x.HeldItem?.Id).Where(x =>
-									oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-									oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
-									null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
-										.HeldItem?.Id == item.Id).ToList());
-						}
-					}
-					if (monsGive.Length != 0)
-					{
-						foreach (Pokemon mon in monsGive)
-						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
-							count++;
-						}
-					}
-
-					if (monsGivePc != null && monsGivePc.Count != 0)
-					{
-						foreach (Pokemon mon in monsGivePc)
-						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) a {item.Name} to hold. ");
-							count++;
-						}
-					}
-
-					if (monsTake.Length != 0)
-					{
-						foreach (Pokemon mon in monsTake)
-						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
-							count--;
-						}
-					}
-
-					if (monsTakePc != null && monsTakePc.Count != 0)
-					{
-						foreach (Pokemon mon in monsTakePc)
-						{
-							builder.Append($"We take a {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
-							count--;
-						}
-					}
-
-					if (count < 0)
-						builder.Append(
-							$"We use {(count == -1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-					else if (count > 0)
-					{
-						builder.Append(
-							$"**We receive {(count == 1 ? $"a {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}!** ");
-						if (!Memory.AnnouncedBadges.Contains(item.Id))
-						{
-							if (oldStatus!.BattleKind == BattleKind.Trainer && ImportantCrystalIds.Contains(item.Id))
-							{
-								aBuilder.Append(
-									$"**We defeated {oldStatus.EnemyTrainers![0].ClassName} {oldStatus.EnemyTrainers[0].Name} and received the {item.Name} crystal!** ");
-								Memory.AnnouncedBadges.Add(item.Id);
-							}
-							else if (ImportantCrystalIds.Contains(item.Id) && EnemyName != null)
-							{
-								aBuilder.Append(
-									$"**We defeated {EnemyName} and received the {item.Name} crystal!** ");
-								EnemyName = null;
-								Memory.AnnouncedBadges.Add(item.Id);
-							}
-							else if (ImportantCrystalIds.Contains(item.Id))
-							{
-								aBuilder.Append(
-									$"**We received the {item.Name} crystal!** ");
-								Memory.AnnouncedBadges.Add(item.Id);
-							}
-						}
-					}
-				}
-
-				ids.Add(item.Id);
-				*/
 			}
 
 			if ((status!.Money < oldStatus!.Money || status.Money > oldStatus.Money) && oldStatus.BattleKind == null)
@@ -1418,7 +1351,7 @@ namespace StreamFeedBot.Rulesets
 
 			if (status?.MapName != oldStatus?.MapName)
 			{
-				if (status?.MapName == "Pokémon League") //TODO check map name
+				if (status?.MapName == "Pokémon League" && oldStatus?.MapName != "Champion's Hall" && oldStatus?.MapName != "Lance's Hall" && oldStatus?.MapName != "Hall of Fame")
 				{
 					List<string> options = new List<string>
 					{
