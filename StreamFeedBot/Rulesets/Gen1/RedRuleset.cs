@@ -142,11 +142,11 @@ namespace StreamFeedBot.Rulesets
 							string[] c1 = { "fight", "battle", "face off against" };
 							string[] c2 = { "cheeky", "rogue", "roving", "wandering" };
 							string[] c3 = { " wandering", "n eager" };
-							string[] choices = //TODO fix for reds
+							string[] choices =
 							{
-									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Any(x => x.Active == true) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
-									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName} named {trainer.Name}, and begin a battle{(status.EnemyParty.Any(x => x.Active == true) ? $" against their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
-									$"{trainer.ClassName} {trainer.Name} picks a fight with us{(status.EnemyParty.Any(x => x.Active == true) ? $", using their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. "
+									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}{(status.EnemyParty.Any(x => x.Active == true) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
+									$"We get spotted by a{c3[Random.Next(c3.Length)]} {trainer.ClassName}, and begin a battle{(status.EnemyParty.Any(x => x.Active == true) ? $" against their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
+									$"{trainer.ClassName} picks a fight with us{(status.EnemyParty.Any(x => x.Active == true) ? $", using their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. "
 								};
 							builder.Append(choices[Random.Next(choices.Length)]);
 						}
@@ -170,19 +170,19 @@ namespace StreamFeedBot.Rulesets
 					Trainer trainer = oldStatus.EnemyTrainers[0];
 					if (SpecialClasses_Red.Contains(trainer.ClassId))
 					{
-						builder.Append($"**Defeated {trainer.ClassName} {trainer.Name}!** ");
-						EnemyName = trainer.ClassName + " " + trainer.Name;
+						builder.Append($"**Defeated {trainer.ClassName}** ");
+						EnemyName = trainer.ClassName;
 					}
 
-					/*if (Enumerable.Range(494, 3).Contains(trainer.Id))
+					if (trainer.ClassId == 43) //Rival champion
 					{
 						builder.Append("**TEH URN!** ");
 						if (!Memory.Urned)
 						{
-							aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
+							aBuilder.Append($"**We defeated {trainer.ClassName}! TEH URN!** ");
 							Memory.Urned = true;
 						}
-					}*/ //TODO fix for red
+					}
 				}
 			}
 
@@ -223,7 +223,7 @@ namespace StreamFeedBot.Rulesets
 							if (oldStatus!.BattleKind == BattleKind.Trainer)
 							{
 								aBuilder.Append(
-									$"**We defeated {oldStatus.EnemyTrainers![0].ClassName} {oldStatus.EnemyTrainers[0].Name} and received the {_badges[i]} badge!** ");
+									$"**We defeated {oldStatus.EnemyTrainers![0].ClassName} and received the {_badges[i]} badge!** ");
 								Memory.AnnouncedBadges.Add((uint)i);
 							}
 							else if (EnemyName != null)
