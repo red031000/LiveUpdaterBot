@@ -156,7 +156,7 @@ namespace StreamFeedBot
 					Channels.Add(channel);
 				}
 
-				Ruleset = new RandomizedUltraMoonRuleset(memory, Settings);
+				Ruleset = new RedRuleset(memory, Settings);
 
 				if (DateTime.UtcNow < RunStart)
 				{

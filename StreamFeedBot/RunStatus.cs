@@ -87,29 +87,36 @@ namespace StreamFeedBot
 	public class ItemGroup
 	{
 		//[JsonProperty(PropertyName = "balls")]
-		[JsonIgnore] //not in Gen 7
+		[JsonIgnore] //not in Gen 1
 		public List<Item>? Balls;
 
-		[JsonProperty(PropertyName = "berries")]
+		//[JsonProperty(PropertyName = "berries")]
+		[JsonIgnore] //not in Gen 1
 		public List<Item>? Berries;
 
-		[JsonProperty(PropertyName = "medicine")] //Gen 7 specific
+		//[JsonProperty(PropertyName = "medicine")] //Gen 7 specific
+		[JsonIgnore]
 		public List<Item>? Medicine;
 
 		[JsonProperty(PropertyName = "items")]
 		public List<Item>? Items;
 
-		[JsonProperty(PropertyName = "key")]
+		[JsonProperty(PropertyName = "pc")]
+		public List<Item>? PC;
+
+		//[JsonProperty(PropertyName = "key")]
+		[JsonIgnore] //not in Gen 1
 		public List<Item>? Key;
 
-		[JsonProperty(PropertyName = "tms")]
+		//[JsonProperty(PropertyName = "tms")]
+		[JsonIgnore] //not in Gen 1
 		public List<Item>? TMs;
 		
 		//[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
 		[JsonIgnore]
 		public List<Item>? ZCrystals;
 
-		//[JsonProperty(PropertyName = "free_space")] //Gen 7 specific
+		//[JsonProperty(PropertyName = "free_space")] //Gen 5+ specific
 		[JsonIgnore]
 		public List<Item>? FreeSpace;
 
