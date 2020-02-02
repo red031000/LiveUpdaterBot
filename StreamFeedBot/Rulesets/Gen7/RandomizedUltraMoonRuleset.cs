@@ -1503,7 +1503,7 @@ namespace StreamFeedBot.Rulesets
 						builder.Append(message);
 					}
 
-					if (mon.Species!.Id != oldMon.Species!.Id && mon.Species.Id != oldBattleMon?.Species?.Id)
+					if (mon.Species!.NationalDex != oldMon.Species!.NationalDex && mon.Species.NationalDex != oldBattleMon?.Species?.NationalDex)
 					{
 						string[] choices =
 						{
@@ -1542,7 +1542,7 @@ namespace StreamFeedBot.Rulesets
 						builder.Append(message);
 					}
 
-					if (mon.Species!.Id != oldMon.Species!.Id && mon.Species.Id != partyMon?.Species?.Id)
+					if (mon.Species!.NationalDex != oldMon.Species!.NationalDex && mon.Species.NationalDex != partyMon?.Species?.NationalDex)
 					{
 						string[] choices =
 						{

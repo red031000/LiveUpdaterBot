@@ -59,6 +59,11 @@ namespace StreamFeedBot.Rulesets
 				builder.Append($"**We are named {status.Name}!** ");
 			}
 
+			if (oldStatus.RivalName == null && status.RivalName != null)
+			{
+				builder.Append($"**We name our rival {status.RivalName}!** ");
+			}
+
 			if (status.BattleKind != null && status.GameStats != null && oldStatus.GameStats != null &&
 				status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
 			{
@@ -535,7 +540,7 @@ namespace StreamFeedBot.Rulesets
 						builder.Append(message);
 					}
 
-					if (mon.Species!.Id != oldMon.Species!.Id)
+					if (mon.Species!.NationalDex != oldMon.Species!.NationalDex)
 					{
 						string[] choices =
 						{

@@ -9,9 +9,6 @@ namespace StreamFeedBot
 {
 	public class RunStatus
 	{
-		[JsonProperty(PropertyName = "area_name")]
-		public string? AreaName;
-
 		[JsonProperty(PropertyName = "badges")]
 		//[JsonIgnore] //Gen 7 doesn't have badges
 		public uint Badges;
@@ -43,18 +40,22 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "party")]
 		public List<Pokemon>? Party;
 
-		[JsonProperty(PropertyName = "battle_party")]
+		//[JsonProperty(PropertyName = "battle_party")]
+		[JsonIgnore] //no battle party in red
 		public List<Pokemon>? BattleParty;
 
 		[JsonProperty(PropertyName = "items")]
 		public ItemGroup? Items;
 
-		[JsonIgnore] //no gender in red
 		//[JsonProperty(PropertyName = "gender")]
+		[JsonIgnore] //no gender in red
 		public Gender? Gender;
 
 		[JsonProperty(PropertyName = "name")]
 		public string? Name;
+
+		[JsonProperty(PropertyName = "rival_name")]
+		public string? RivalName;
 
 		[JsonProperty(PropertyName = "pc")]
 		public PC? PC;
@@ -172,8 +173,8 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "name")]
 		public string? Name;
 
-		[JsonProperty(PropertyName = "id")]
-		public int Id;
+		[JsonProperty(PropertyName = "national_dex")]
+		public int NationalDex;
 	}
 
 	public class Move

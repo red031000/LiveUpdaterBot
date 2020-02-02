@@ -95,6 +95,11 @@ namespace StreamFeedBot.Rulesets
 				builder.Append($"**We are a {choice} named {status.Name}!** ");
 			}
 
+			if (oldStatus.RivalName == null && status.RivalName != null)
+			{
+				builder.Append($"**We name our rival {status.RivalName}!** ");
+			}
+
 			if (status.BattleKind != null && status.GameStats != null && oldStatus.GameStats != null &&
 				status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
 			{
@@ -1075,7 +1080,7 @@ namespace StreamFeedBot.Rulesets
 						builder.Append(message);
 					}
 
-					if (mon.Species!.Id != oldMon.Species!.Id && mon.Species.Id != oldBattleMon?.Species?.Id)
+					if (mon.Species!.NationalDex != oldMon.Species!.NationalDex && mon.Species.NationalDex != oldBattleMon?.Species?.NationalDex)
 					{
 						string[] choices =
 						{
@@ -1114,7 +1119,7 @@ namespace StreamFeedBot.Rulesets
 						builder.Append(message);
 					}
 
-					if (mon.Species!.Id != oldMon.Species!.Id && mon.Species.Id != partyMon?.Species?.Id)
+					if (mon.Species!.NationalDex != oldMon.Species!.NationalDex && mon.Species.NationalDex != partyMon?.Species?.NationalDex)
 					{
 						string[] choices =
 						{
