@@ -67,7 +67,7 @@ namespace StreamFeedBot.Rulesets
 			027
 		};
 
-		private readonly List<string> _badges = new List<string> { "Boulder", "Cascade", "Thunder", "Rainbow", "Soul", "Marsh", "Volcano", "Earth" };
+		private readonly List<string> _badges = new List<string> { "Zephyr", "Hive", "Plain", "Fog", "Storm", "Mineral", "Glacier", "Rising", "Boulder", "Cascade", "Thunder", "Rainbow", "Soul", "Marsh", "Volcano", "Earth" };
 
 		public override List<string>? Badges => _badges;
 
