@@ -25,7 +25,7 @@ namespace StreamFeedBot.Web
 			Api = api;
 		}
 
-		[Route(HttpVerb.Get, "/status")]
+		[Route(HttpVerbs.Get, "/status")]
 		public async Task GetStatus()
 		{
 			BotStatus status = new BotStatus
