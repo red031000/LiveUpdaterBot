@@ -1266,10 +1266,10 @@ namespace StreamFeedBot.Rulesets
 			}
 
 
-			if (status?.MapName != oldStatus?.MapName)
+			if (status?.MapBank != oldStatus?.MapBank && status?.MapId != oldStatus?.MapId)
 			{
-				if (status?.MapName == "Pokémon League" && oldStatus?.MapName != "Champion's Hall" && oldStatus?.MapName != "Lance's Hall" && oldStatus?.MapName != "Hall of Fame" &&
-					oldStatus?.MapName != "Lorelei's Hall" && oldStatus?.MapName != "Bruno's Hall" && oldStatus?.MapName != "Agatha's Hall") //TODO verify, might be in a different order
+				if (status.MapBank == 16 && status.MapId == 3 && oldStatus.MapId != 4 && oldStatus.MapId != 5 &&
+				    oldStatus.MapId != 6 && oldStatus.MapId != 7 && oldStatus.MapId != 8)
 				{
 					List<string> options = new List<string>
 					{

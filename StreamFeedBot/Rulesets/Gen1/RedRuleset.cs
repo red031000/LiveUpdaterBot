@@ -853,8 +853,8 @@ namespace StreamFeedBot.Rulesets
 
 			if (status?.MapName != oldStatus?.MapName)
 			{
-				if (status?.MapName == "Lorelei's Hall" && oldStatus?.MapName != "Champion's Hall" && oldStatus?.MapName != "Lance's Hall" && oldStatus?.MapName != "Hall of Fame" &&
-				    oldStatus?.MapName != "Lorelei's Hall" && oldStatus?.MapName != "Bruno's Hall" && oldStatus?.MapName != "Agatha's Hall") //TODO verify, might be in a different order
+				if (status?.MapName == "Lorelei's Hall" && oldStatus?.MapName != "Champion's Hall" && oldStatus?.MapName != "Lance's Hall" && oldStatus?.MapName != "Hall of Fame"
+				    && oldStatus?.MapName != "Bruno's Hall" && oldStatus?.MapName != "Agatha's Hall") //TODO verify, might be in a different order
 				{
 					List<string> options = new List<string>
 					{

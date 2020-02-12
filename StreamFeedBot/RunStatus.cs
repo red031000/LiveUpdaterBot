@@ -28,6 +28,9 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "map_id")]
 		public uint MapId;
 
+		[JsonProperty(PropertyName = "map_bank")]
+		public uint? MapBank;
+
 		[JsonProperty(PropertyName = "battle_kind", ItemConverterType = typeof(StringEnumConverter))]
 		public BattleKind? BattleKind;
 
