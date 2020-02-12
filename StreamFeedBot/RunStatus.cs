@@ -194,9 +194,6 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "class_name")]
 		public string? ClassName;
 
-		[JsonProperty(PropertyName = "gender")]
-		public Gender? Gender;
-
 		[JsonProperty(PropertyName = "name")]
 		public string? Name;
 

@@ -239,11 +239,11 @@ namespace StreamFeedBot
 
 				switch (e.Level)
 				{
-					case LogLevel.Warning:
+					case DSharpPlus.LogLevel.Warning:
 						Console.ForegroundColor = ConsoleColor.Yellow;
 						break;
-					case LogLevel.Critical:
-					case LogLevel.Error:
+					case DSharpPlus.LogLevel.Critical:
+					case DSharpPlus.LogLevel.Error:
 						Console.ForegroundColor = ConsoleColor.Red;
 						break;
 				}
