@@ -44,6 +44,8 @@ namespace StreamFeedBot.Rulesets
 
 		public override List<string>? Badges => _badges;
 
+		private bool flag;
+
 		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement)
 		{
 			StringBuilder builder = new StringBuilder();
@@ -160,15 +162,19 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
+			bool flag2 = false;
+
 			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts > oldStatus.GameStats.Blackouts)
 			{
 				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
 				string message = options[Random.Next(options.Length)];
 				builder.Append(message);
+				flag = true;
+				flag2 = true;
 			}
 
 			if (status.BattleKind == null && oldStatus!.BattleKind == BattleKind.Trainer &&
-				status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts)
+			    status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts && !flag)
 			{
 				if (oldStatus.EnemyTrainers != null)
 				{
@@ -544,8 +550,8 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choices =
 						{
-							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into {IndefiniteArticle(mon.Species.Name)} {mon.Species.Name}! **",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into {IndefiniteArticle(mon.Species.Name)} {mon.Species.Name}! **"
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into {IndefiniteArticle(mon.Species.Name)} {mon.Species.Name}!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into {IndefiniteArticle(mon.Species.Name)} {mon.Species.Name}!** "
 						};
 						string message = choices[Random.Next(choices.Length)];
 						builder.Append(message);
@@ -854,7 +860,7 @@ namespace StreamFeedBot.Rulesets
 			if (status?.MapName != oldStatus?.MapName)
 			{
 				if (status?.MapName == "Lorelei's Hall" && oldStatus?.MapName != "Champion's Hall" && oldStatus?.MapName != "Lance's Hall" && oldStatus?.MapName != "Hall of Fame"
-				    && oldStatus?.MapName != "Bruno's Hall" && oldStatus?.MapName != "Agatha's Hall") //TODO verify, might be in a different order
+				    && oldStatus?.MapName != "Bruno's Hall" && oldStatus?.MapName != "Agatha's Hall")
 				{
 					List<string> options = new List<string>
 					{
@@ -884,6 +890,9 @@ namespace StreamFeedBot.Rulesets
 					builder.Append(message);
 				}
 			}
+
+			if (!flag2 && flag)
+				flag = false;
 
 			announcement = aBuilder.ToString().Length == 0 ? null : aBuilder.ToString();
 			return builder.ToString().Length == 0 ? null : builder.ToString();

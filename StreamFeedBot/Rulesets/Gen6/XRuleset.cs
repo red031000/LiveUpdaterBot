@@ -1084,8 +1084,8 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choices =
 						{
-							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}! **",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}! **"
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}!** "
 						};
 						string message = choices[Random.Next(choices.Length)];
 						builder.Append(message);
@@ -1123,8 +1123,8 @@ namespace StreamFeedBot.Rulesets
 					{
 						string[] choices =
 						{
-							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}! **",
-							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}! **"
+							$"**{oldMon.Name} ({oldMon.Species.Name}) has evolved into a {mon.Species.Name}!** ",
+							$"**{oldMon.Name} ({oldMon.Species.Name}) evolves into a {mon.Species.Name}!** "
 						};
 						string message = choices[Random.Next(choices.Length)];
 						builder.Append(message);

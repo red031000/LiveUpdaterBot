@@ -19,9 +19,9 @@ namespace StreamFeedBot
 		public RunStatus? OldStatus;
 		private string? message;
 
-		public int Hour;
+		private int Hour;
 
-		public HttpClient Client = new HttpClient();
+		private HttpClient Client = new HttpClient();
 
 		public Api()
 		{
@@ -95,14 +95,7 @@ namespace StreamFeedBot
 				}
 			}
 
-			if (Status!.EnemyTrainers != null)
-			{
-				foreach (Trainer t in Status.EnemyTrainers)
-				{
-					if (t?.ClassName != null)
-						t.ClassName = t.ClassName.Replace("πµ", "PkMn", StringComparison.InvariantCultureIgnoreCase);
-				}
-			}
+			DoReplacements();
 
 			ProcessShedinja();
 
@@ -155,6 +148,60 @@ namespace StreamFeedBot
 						foreach (Pokemon mon in mons)
 						{
 							if (mon.Species!.NationalDex == 292) mon.PersonalityValue++;
+						}
+					}
+				}
+			}
+		}
+
+		private void DoReplacements()
+		{
+			if (Status!.EnemyTrainers != null)
+			{
+				foreach (Trainer t in Status.EnemyTrainers)
+				{
+					if (t?.ClassName != null)
+						t.ClassName = t.ClassName.Replace("πµ", "PkMn", StringComparison.InvariantCultureIgnoreCase);
+				}
+			}
+
+			if (Status!.Party != null)
+			{
+				foreach (Pokemon p in Status.Party)
+				{
+					if (p?.Name != null)
+						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
+				}
+			}
+
+			if (Status!.BattleParty != null)
+			{
+				foreach (Pokemon p in Status.BattleParty)
+				{
+					if (p?.Name != null)
+						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
+				}
+			}
+
+			if (Status!.Daycare != null)
+			{
+				foreach (Pokemon p in Status.Daycare)
+				{
+					if (p?.Name != null)
+						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
+				}
+			}
+
+			if (Status!.PC?.Boxes != null)
+			{
+				foreach (Box b in Status.PC.Boxes)
+				{
+					if (b.BoxContents != null)
+					{
+						foreach (Pokemon p in b.BoxContents)
+						{
+							if (p?.Name != null)
+								p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
 						}
 					}
 				}

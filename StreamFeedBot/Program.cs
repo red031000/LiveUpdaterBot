@@ -302,6 +302,12 @@ namespace StreamFeedBot
 					}
 					Console.WriteLine($"Reloading memory by request of {e.Author.Username}#{e.Author.Discriminator}");
 				}
+				else if (e.Author != Client.CurrentUser &&
+				         new[] {"UWU", "OWO"}.Contains(e.Message.Content.Trim().ToUpperInvariant()))
+				{
+					await e.Message.RespondAsync("<:RaccAttack:468748603632910336>w<:RaccAttack:468748603632910336>")
+						.ConfigureAwait(false);
+				}
 				else if (e.Author != Client.CurrentUser)
 				{
 					await e.Message.RespondAsync("<:RaccAttack:468748603632910336>").ConfigureAwait(false);
