@@ -150,7 +150,7 @@ namespace StreamFeedBot
 		public static string IndefiniteArticle(string? item)
 		{
 			if (item == null) return "a";
-			return new char?[] {'a', 'e', 'i', 'o', 'u'}.Contains(item.FirstOrDefault()) ? "an" : "a";
+			return new char?[] {'A', 'E', 'I', 'O', 'U'}.Contains(item.Trim().ToUpperInvariant().FirstOrDefault()) ? "an" : "a";
 		}
 	}
 }
