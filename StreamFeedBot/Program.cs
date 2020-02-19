@@ -42,7 +42,7 @@ namespace StreamFeedBot
 
 		private static Api? Api;
 
-		public static readonly DateTime RunStart = new DateTime(2020, 02, 13, 01, 22, 00, DateTimeKind.Utc);
+		public static readonly DateTime RunStart = new DateTime(2020, 02, 23, 12, 00, 00, DateTimeKind.Utc);
 
 		public const int RefreshInterval = 15;
 
@@ -169,7 +169,7 @@ namespace StreamFeedBot
 					Channels.Add(channel);
 				}
 
-				Ruleset = new RedRuleset(memory, Settings);
+				Ruleset = new CrystalRuleset(memory, Settings);
 
 				if (DateTime.UtcNow < RunStart)
 				{

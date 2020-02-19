@@ -49,9 +49,9 @@ namespace StreamFeedBot
 
 		[JsonProperty(PropertyName = "items")]
 		public ItemGroup? Items;
-
-		//[JsonProperty(PropertyName = "gender")]
-		[JsonIgnore] //no gender in red
+		
+		[JsonProperty(PropertyName = "gender")]
+		//[JsonIgnore] //no gender in red
 		public Gender? Gender;
 
 		[JsonProperty(PropertyName = "name")]
@@ -90,8 +90,8 @@ namespace StreamFeedBot
 
 	public class ItemGroup
 	{
-		//[JsonProperty(PropertyName = "balls")]
-		[JsonIgnore] //not in Gen 1
+		[JsonProperty(PropertyName = "balls")]
+		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Balls;
 
 		//[JsonProperty(PropertyName = "berries")]
@@ -108,12 +108,12 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "pc")]
 		public List<Item>? PC;
 
-		//[JsonProperty(PropertyName = "key")]
-		[JsonIgnore] //not in Gen 1
+		[JsonProperty(PropertyName = "key")]
+		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Key;
 
-		//[JsonProperty(PropertyName = "tms")]
-		[JsonIgnore] //not in Gen 1
+		[JsonProperty(PropertyName = "tms")]
+		//[JsonIgnore] //not in Gen 1
 		public List<Item>? TMs;
 		
 		//[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
