@@ -181,7 +181,7 @@ namespace StreamFeedBot.Rulesets
 					Trainer trainer = oldStatus.EnemyTrainers[0];
 					if (SpecialClasses_Red.Contains(trainer.ClassId))
 					{
-						builder.Append($"**Defeated {trainer.ClassName}** ");
+						builder.Append($"**Defeated {trainer.ClassName}!** ");
 						EnemyName = trainer.ClassName;
 					}
 

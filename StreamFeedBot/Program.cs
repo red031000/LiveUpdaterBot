@@ -58,15 +58,28 @@ namespace StreamFeedBot
 				File.WriteAllText("crash.log",
 					$"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}{e.InnerException?.Message}{Environment.NewLine}{e.InnerException?.StackTrace}{Environment.NewLine}");
 
-				if (Client != null)
-					Utils.ReportError(e, Client, true).Wait();
+				try
+				{
+					if (Client != null)
+						Utils.ReportError(e, Client, true).Wait();
+				}
+				// ReSharper disable once EmptyGeneralCatchClause
+				catch //literally fuck all we can do about it
+				{ }
+
 				Disconnect(null, null);
 			}
 		}
 
 		private static void Disconnect(object? sender, ConsoleCancelEventArgs? e)
 		{
-			Client?.DisconnectAsync().Wait();
+			try
+			{
+				Client?.DisconnectAsync().Wait();
+			}
+			// ReSharper disable once EmptyGeneralCatchClause
+			catch //again, fuck all we can do about it
+			{ }
 			mre?.Set();
 			cancel = true;
 			if (e != null)

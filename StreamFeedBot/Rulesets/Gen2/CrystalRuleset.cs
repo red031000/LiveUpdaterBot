@@ -212,7 +212,7 @@ namespace StreamFeedBot.Rulesets
 					if (SpecialClasses_Crystal.Contains(trainer.ClassId) || trainer.ClassId == 022 && TotallyNotAnArray.Contains(trainer.Id) //Totally normal procedure
                        || trainer.ClassId == 031 && RocketExecutives.Contains(trainer.Id)) //Rocket executives are lumped with grunts, separate them
 					{
-						builder.Append($"**Defeated {trainer.ClassName} {trainer.Name}** ");
+						builder.Append($"**Defeated {trainer.ClassName} {trainer.Name}!** ");
 						EnemyName = trainer.ClassName + " " + trainer.Name;
 					}
 

@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00657" />
-    <PackageReference Include="EmbedIO" Version="3.4.1" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00658" />
+    <PackageReference Include="EmbedIO" Version="3.4.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
