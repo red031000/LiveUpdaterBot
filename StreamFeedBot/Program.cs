@@ -211,6 +211,7 @@ namespace StreamFeedBot
 				Server.WithStaticFolder("/", Settings.WebSettings.ResDir, true, m => m.WithContentCaching(true));
 			}
 
+			//don't fucking touch, no matter how tempting
 			_ = Server.RunAsync();
 
 			if (!Settings.WebOnly)

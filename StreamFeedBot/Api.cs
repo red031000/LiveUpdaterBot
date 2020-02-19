@@ -127,7 +127,7 @@ namespace StreamFeedBot
 			{
 				foreach (Pokemon mon in Status.Party)
 				{
-					if (mon.Species!.NationalDex == 292) mon.PersonalityValue++;
+					if (mon?.Species?.NationalDex == 292) mon.PersonalityValue++;
 				}
 			}
 
@@ -135,7 +135,7 @@ namespace StreamFeedBot
 			{
 				foreach (Pokemon mon in Status.Daycare)
 				{
-					if (mon.Species!.NationalDex == 292) mon.PersonalityValue++;
+					if (mon?.Species?.NationalDex == 292) mon.PersonalityValue++;
 				}
 			}
 
@@ -147,7 +147,7 @@ namespace StreamFeedBot
 					{
 						foreach (Pokemon mon in mons)
 						{
-							if (mon.Species!.NationalDex == 292) mon.PersonalityValue++;
+							if (mon?.Species?.NationalDex == 292) mon.PersonalityValue++;
 						}
 					}
 				}
