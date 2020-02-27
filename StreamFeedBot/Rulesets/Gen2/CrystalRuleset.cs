@@ -1272,7 +1272,7 @@ namespace StreamFeedBot.Rulesets
 			}
 
 
-			if (status?.MapBank != oldStatus?.MapBank && status?.MapId != oldStatus?.MapId)
+			if (status?.MapBank != oldStatus?.MapBank || status?.MapId != oldStatus?.MapId)
 			{
 				if (status?.MapBank == 16 && status.MapId == 3 && oldStatus?.MapId != 4 && oldStatus?.MapId != 5 &&
 				    oldStatus?.MapId != 6 && oldStatus?.MapId != 7 && oldStatus?.MapId != 8)

@@ -352,7 +352,7 @@ namespace StreamFeedBot.Rulesets
 
 			ItemEqualityComparer comparer = new ItemEqualityComparer();
 
-			List<Item> distinctItems = new List<Item>(); //TODO items
+			List<Item> distinctItems = new List<Item>();
 			if (status?.Items?.Items != null)
 				distinctItems.AddRange(status.Items.Items);
 			if (oldStatus?.Items?.Items != null)
@@ -757,6 +757,134 @@ namespace StreamFeedBot.Rulesets
 				if (res)
 				{
 					long? oldCount = oldStatus?.Items?.TMs?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
+					count -= oldCount ?? 0;
+				}
+
+				if (count != 0)
+				{
+					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+						.Where(x =>
+							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
+							 x.HeldItem?.Id))
+						.ToArray();
+					Pokemon[] monsTake = status.Party.Where(x =>
+							x.HeldItem == null ||
+							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
+							x.HeldItem.Id)
+						.Where(x =>
+							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
+							item.Id)
+						.ToArray();
+					List<Pokemon> monsGivePc = new List<Pokemon>();
+					foreach (Box box in status.PC?.Boxes ?? new List<Box>())
+					{
+						Box? oldBox = oldStatus!.PC?.Boxes?.FirstOrDefault(x => x.BoxNumber == box.BoxNumber);
+						if (oldBox != null)
+						{
+							monsGivePc.AddRange(box.BoxContents
+								.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+								.Where(x => oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+											(oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+												 .HeldItem == null ||
+											 oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+												 .HeldItem?.Id != x.HeldItem?.Id)).ToList());
+						}
+					}
+
+					List<Pokemon> monsTakePc = new List<Pokemon>();
+					foreach (Box box in status.PC?.Boxes ?? new List<Box>())
+					{
+						Box? oldBox = oldStatus!.PC?.Boxes?.FirstOrDefault(x => x.BoxNumber == box.BoxNumber);
+						if (oldBox != null)
+						{
+							monsTakePc.AddRange(box.BoxContents
+								.Where(x => x.HeldItem == null ||
+											oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+											oldBox.BoxContents.First(y => x.PersonalityValue == y.PersonalityValue)
+												.HeldItem?.Id != x.HeldItem?.Id).Where(x =>
+									oldBox.BoxContents.Any(y => x.PersonalityValue == y.PersonalityValue) &&
+									oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem !=
+									null && oldBox.BoxContents.First(y => y.PersonalityValue == x.PersonalityValue)
+										.HeldItem?.Id == item.Id).ToList());
+						}
+					}
+					if (monsGive.Length != 0)
+					{
+						foreach (Pokemon mon in monsGive)
+						{
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
+							count++;
+						}
+					}
+
+					if (monsGivePc != null && monsGivePc.Count != 0)
+					{
+						foreach (Pokemon mon in monsGivePc)
+						{
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
+							count++;
+						}
+					}
+
+					if (monsTake.Length != 0)
+					{
+						foreach (Pokemon mon in monsTake)
+						{
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							count--;
+						}
+					}
+
+					if (monsTakePc != null && monsTakePc.Count != 0)
+					{
+						foreach (Pokemon mon in monsTakePc)
+						{
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							count--;
+						}
+					}
+
+					if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
+					{
+						builder.Append(
+							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+					}
+					else if (count < 0)
+						builder.Append(
+							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+					else if (count > 0 && status.Money < oldStatus!.Money)
+					{
+						builder.Append(
+							$"We buy {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+					}
+					else if (count > 0)
+						builder.Append(
+							$"We pick up {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
+				}
+
+				ids.Add(item.Id);
+			}
+
+			List<Item> distinctBerries = new List<Item>();
+			if (status?.Items?.Berries != null)
+				distinctBerries.AddRange(status.Items.Berries);
+			if (oldStatus?.Items?.Berries != null)
+				distinctBerries.AddRange(oldStatus.Items.Berries);
+			distinctBerries = distinctBerries.Distinct(comparer).ToList();
+
+			foreach (Item item in distinctBerries)
+			{
+				if (ids.Contains(item.Id)) continue;
+				long count = status?.Items?.Berries?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
+				bool res = oldStatus?.Items?.Berries?.FirstOrDefault(x => x.Id == item.Id) != null;
+				if (res)
+				{
+					long? oldCount = oldStatus?.Items?.Berries?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1);
 					count -= oldCount ?? 0;
 				}
 
@@ -1338,7 +1466,7 @@ namespace StreamFeedBot.Rulesets
 			}
 
 
-			if (status?.MapBank != oldStatus?.MapBank && status?.MapId != oldStatus?.MapId)
+			if (status?.MapBank != oldStatus?.MapBank || status?.MapId != oldStatus?.MapId)
 			{
 				if (status?.MapBank == 16 && status.MapId == 3 && oldStatus?.MapId != 4 && oldStatus?.MapId != 5 &&
 					oldStatus?.MapId != 6 && oldStatus?.MapId != 7 && oldStatus?.MapId != 8) //TODO check maps
