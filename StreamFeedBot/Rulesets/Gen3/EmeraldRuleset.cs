@@ -1468,7 +1468,7 @@ namespace StreamFeedBot.Rulesets
 
 			if (status?.MapBank != oldStatus?.MapBank || status?.MapId != oldStatus?.MapId)
 			{
-				if (status?.MapBank == 16 && status.MapId == 0)
+				if (status?.MapBank == 16 && status.MapId == 5)
 				{
 					List<string> options = new List<string>
 					{
@@ -1489,7 +1489,7 @@ namespace StreamFeedBot.Rulesets
 					string choice = move[Random.Next(move.Length)];
 					List<string> options = new List<string>
 					{
-						$"{status.MapName}. ", $"In {status.MapName}. ",
+						$"{status!.MapName}. ", $"In {status.MapName}. ",
 						$"Now in {status.MapName}. ",
 						$"We {choice} into {status.MapName}. ",
 						$"Arrived at {status.MapName}. "
