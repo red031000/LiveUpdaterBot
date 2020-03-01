@@ -5,10 +5,10 @@ namespace StreamFeedBot.Web
 {
 	public class BotStatus
 	{
-		public RunStatus RunStatus;
+		public RunStatus? RunStatus;
 
-		public Memory Memory;
+		public Memory? Memory;
 
-		public List<Pokemon> Released;
+		public List<Pokemon>? Released;
 	}
 }

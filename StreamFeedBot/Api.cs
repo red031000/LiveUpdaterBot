@@ -21,7 +21,7 @@ namespace StreamFeedBot
 
 		private int Hour;
 
-		private HttpClient Client = new HttpClient();
+		private readonly HttpClient Client = new HttpClient();
 
 		public Api()
 		{

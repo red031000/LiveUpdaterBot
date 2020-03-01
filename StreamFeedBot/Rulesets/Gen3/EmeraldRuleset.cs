@@ -98,7 +98,7 @@ namespace StreamFeedBot.Rulesets
 							if (status.EnemyTrainers?[0] != null)
 							{
 								Trainer trainer = status.EnemyTrainers[0];
-								if (SpecialClasses_Emerald.Contains(trainer.ClassId))
+								if (SpecialClasses_Emerald.Contains(trainer.ClassId) || trainer.Id == 322)
 								{
 									builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
 									int id = trainer.Id;
@@ -276,13 +276,13 @@ namespace StreamFeedBot.Rulesets
 				if (oldStatus.EnemyTrainers != null)
 				{
 					Trainer trainer = oldStatus.EnemyTrainers[0];
-					if (SpecialClasses_Emerald.Contains(trainer.ClassId))
+					if (SpecialClasses_Emerald.Contains(trainer.ClassId) || trainer.Id == 322)
 					{
 						builder.Append($"**Defeated {trainer.ClassName} {trainer.Name}!** ");
 						EnemyName = trainer.ClassName + " " + trainer.Name;
 					}
 
-					if (trainer.ClassId == 38) //Lance
+					if (trainer.ClassId == 38) //Wallace
 					{
 						builder.Append("**TEH URN!** ");
 						if (!Memory.Urned)
@@ -1468,8 +1468,7 @@ namespace StreamFeedBot.Rulesets
 
 			if (status?.MapBank != oldStatus?.MapBank || status?.MapId != oldStatus?.MapId)
 			{
-				if (status?.MapBank == 16 && status.MapId == 3 && oldStatus?.MapId != 4 && oldStatus?.MapId != 5 &&
-					oldStatus?.MapId != 6 && oldStatus?.MapId != 7 && oldStatus?.MapId != 8) //TODO check maps
+				if (status?.MapBank == 16 && status.MapId == 0)
 				{
 					List<string> options = new List<string>
 					{
@@ -1484,7 +1483,7 @@ namespace StreamFeedBot.Rulesets
 					if (Memory.Urned) Memory.E4RematchNum++;
 					else Memory.E4AttemptNum++;
 				}
-				else if (!string.IsNullOrWhiteSpace(status?.MapName))
+				else if (!string.IsNullOrWhiteSpace(status?.MapName) && status?.MapName != oldStatus?.MapName)
 				{
 					string[] move = { "head", "go", "step", "move", "travel", "walk", "stroll", "stride" };
 					string choice = move[Random.Next(move.Length)];
