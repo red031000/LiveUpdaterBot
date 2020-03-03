@@ -94,8 +94,8 @@ namespace StreamFeedBot
 		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Balls;
 
-		//[JsonProperty(PropertyName = "berries")]
-		[JsonIgnore] //not in Gen 1
+		[JsonProperty(PropertyName = "berries")]
+		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Berries;
 
 		//[JsonProperty(PropertyName = "medicine")] //Gen 7 specific
