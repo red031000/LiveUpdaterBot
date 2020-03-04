@@ -29,7 +29,6 @@ namespace StreamFeedBot.Rulesets
 			049, //Magma Admin
 			050, //PkMn Trainer
 			053, //Magma Leader
-			//TODO check
 		};
 
 		private readonly List<string> _badges = new List<string> { "Stone", "Knuckle", "Dynamo", "Heat", "Balance", "Feather", "Mind", "Rain" };
