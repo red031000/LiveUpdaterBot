@@ -423,22 +423,22 @@ namespace StreamFeedBot.Rulesets
 
 				if (count != 0)
 				{
-					Pokemon?[] monsGive = status!.Party.Where(x => x != null).Where(x => x!.HeldItem != null && x.HeldItem.Id == item.Id)
-						.Where(x =>
-							oldStatus!.Party.Where(y => y != null).Any(y => x!.PersonalityValue == y!.PersonalityValue) &&
-							(oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => y!.PersonalityValue == x!.PersonalityValue)?.HeldItem == null ||
-							 oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => y!.PersonalityValue == x!.PersonalityValue)?.HeldItem?.Id !=
-							 x!.HeldItem?.Id))
-						.ToArray();
-					Pokemon?[] monsTake = status.Party.Where(x => x != null).Where(x =>
-							x!.HeldItem == null ||
-							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y!.PersonalityValue) &&
-							oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => x!.PersonalityValue == y!.PersonalityValue)?.HeldItem?.Id !=
-							x!.HeldItem?.Id)
+					Pokemon[] monsGive = status!.Party.Where(x => x != null).Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
 						.Where(x =>
 							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => y!.PersonalityValue == x!.PersonalityValue)?.HeldItem != null
-							&& oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => y!.PersonalityValue == x!.PersonalityValue)?.HeldItem?.Id ==
+							(oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+							 oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
+							 x.HeldItem?.Id))
+						.ToArray();
+					Pokemon[] monsTake = status.Party.Where(x => x != null).Where(x =>
+							x.HeldItem == null ||
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
+							x.HeldItem.Id)
+						.Where(x =>
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+							&& oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
 							item.Id)
 						.ToArray();
 					List<Pokemon> monsGivePc = new List<Pokemon>();
@@ -477,27 +477,27 @@ namespace StreamFeedBot.Rulesets
 
 					if (monsGive.Length != 0)
 					{
-						foreach (Pokemon? mon in monsGive)
+						foreach (Pokemon mon in monsGive)
 						{
-							builder.Append($"We give {mon!.Name} ({mon!.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
 
 					if (monsGivePc != null && monsGivePc.Count != 0)
 					{
-						foreach (Pokemon? mon in monsGivePc)
+						foreach (Pokemon mon in monsGivePc)
 						{
-							builder.Append($"We give {mon!.Name} ({mon!.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
+							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
 
 					if (monsTake.Length != 0)
 					{
-						foreach (Pokemon? mon in monsTake)
+						foreach (Pokemon mon in monsTake)
 						{
-							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon!.Name} ({mon!.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
 							count--;
 						}
 					}
@@ -555,22 +555,22 @@ namespace StreamFeedBot.Rulesets
 
 				if (count != 0)
 				{
-					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+					Pokemon[] monsGive = status!.Party.Where(x => x != null).Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							(oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+							 oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
 							 x.HeldItem?.Id))
 						.ToArray();
-					Pokemon[] monsTake = status.Party.Where(x =>
+					Pokemon[] monsTake = status.Party.Where(x => x != null).Where(x =>
 							x.HeldItem == null ||
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
 							x.HeldItem.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+							&& oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
 							item.Id)
 						.ToArray();
 					List<Pokemon> monsGivePc = new List<Pokemon>();
@@ -686,22 +686,22 @@ namespace StreamFeedBot.Rulesets
 
 				if (count != 0)
 				{
-					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+					Pokemon[] monsGive = status!.Party.Where(x => x != null).Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							(oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+							 oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
 							 x.HeldItem?.Id))
 						.ToArray();
-					Pokemon[] monsTake = status.Party.Where(x =>
+					Pokemon[] monsTake = status.Party.Where(x => x != null).Where(x =>
 							x.HeldItem == null ||
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
 							x.HeldItem.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+							&& oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
 							item.Id)
 						.ToArray();
 					List<Pokemon> monsGivePc = new List<Pokemon>();
@@ -820,22 +820,22 @@ namespace StreamFeedBot.Rulesets
 
 				if (count != 0)
 				{
-					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+					Pokemon[] monsGive = status!.Party.Where(x => x != null).Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							(oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+							 oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
 							 x.HeldItem?.Id))
 						.ToArray();
-					Pokemon[] monsTake = status.Party.Where(x =>
+					Pokemon[] monsTake = status.Party.Where(x => x != null).Where(x =>
 							x.HeldItem == null ||
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
 							x.HeldItem.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+							&& oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
 							item.Id)
 						.ToArray();
 					List<Pokemon> monsGivePc = new List<Pokemon>();
@@ -938,22 +938,22 @@ namespace StreamFeedBot.Rulesets
 
 				if (count != 0)
 				{
-					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+					Pokemon[] monsGive = status!.Party.Where(x => x != null).Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							(oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
+							 oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
 							 x.HeldItem?.Id))
 						.ToArray();
-					Pokemon[] monsTake = status.Party.Where(x =>
+					Pokemon[] monsTake = status.Party.Where(x => x != null).Where(x =>
 							x.HeldItem == null ||
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
 							x.HeldItem.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
+							&& oldStatus.Party.Where(y => y != null).First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
 							item.Id)
 						.ToArray();
 					List<Pokemon> monsGivePc = new List<Pokemon>();
