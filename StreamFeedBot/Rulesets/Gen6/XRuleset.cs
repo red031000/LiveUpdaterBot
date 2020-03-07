@@ -423,22 +423,22 @@ namespace StreamFeedBot.Rulesets
 
 				if (count != 0)
 				{
-					Pokemon[] monsGive = status!.Party.Where(x => x.HeldItem != null && x.HeldItem.Id == item.Id)
+					Pokemon?[] monsGive = status!.Party.Where(x => x != null).Where(x => x!.HeldItem != null && x.HeldItem.Id == item.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							(oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem == null ||
-							 oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id !=
-							 x.HeldItem?.Id))
+							oldStatus!.Party.Where(y => y != null).Any(y => x!.PersonalityValue == y!.PersonalityValue) &&
+							(oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => y!.PersonalityValue == x!.PersonalityValue)?.HeldItem == null ||
+							 oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => y!.PersonalityValue == x!.PersonalityValue)?.HeldItem?.Id !=
+							 x!.HeldItem?.Id))
 						.ToArray();
-					Pokemon[] monsTake = status.Party.Where(x =>
-							x.HeldItem == null ||
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => x.PersonalityValue == y.PersonalityValue).HeldItem?.Id !=
-							x.HeldItem.Id)
+					Pokemon?[] monsTake = status.Party.Where(x => x != null).Where(x =>
+							x!.HeldItem == null ||
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y!.PersonalityValue) &&
+							oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => x!.PersonalityValue == y!.PersonalityValue)?.HeldItem?.Id !=
+							x!.HeldItem?.Id)
 						.Where(x =>
-							oldStatus!.Party.Any(y => x.PersonalityValue == y.PersonalityValue) &&
-							oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem != null
-							&& oldStatus.Party.First(y => y.PersonalityValue == x.PersonalityValue).HeldItem?.Id ==
+							oldStatus!.Party.Where(y => y != null).Any(y => x.PersonalityValue == y.PersonalityValue) &&
+							oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => y!.PersonalityValue == x!.PersonalityValue)?.HeldItem != null
+							&& oldStatus.Party?.Where(y => y != null).FirstOrDefault(y => y!.PersonalityValue == x!.PersonalityValue)?.HeldItem?.Id ==
 							item.Id)
 						.ToArray();
 					List<Pokemon> monsGivePc = new List<Pokemon>();
@@ -477,27 +477,27 @@ namespace StreamFeedBot.Rulesets
 
 					if (monsGive.Length != 0)
 					{
-						foreach (Pokemon mon in monsGive)
+						foreach (Pokemon? mon in monsGive)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
+							builder.Append($"We give {mon!.Name} ({mon!.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
 
 					if (monsGivePc != null && monsGivePc.Count != 0)
 					{
-						foreach (Pokemon mon in monsGivePc)
+						foreach (Pokemon? mon in monsGivePc)
 						{
-							builder.Append($"We give {mon.Name} ({mon.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
+							builder.Append($"We give {mon!.Name} ({mon!.Species!.Name}) {IndefiniteArticle(item.Name)} {item.Name} to hold. ");
 							count++;
 						}
 					}
 
 					if (monsTake.Length != 0)
 					{
-						foreach (Pokemon mon in monsTake)
+						foreach (Pokemon? mon in monsTake)
 						{
-							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon.Name} ({mon.Species!.Name}). ");
+							builder.Append($"We take {IndefiniteArticle(item.Name)} {item.Name} away from {mon!.Name} ({mon!.Species!.Name}). ");
 							count--;
 						}
 					}
@@ -1418,7 +1418,7 @@ namespace StreamFeedBot.Rulesets
 
 				foreach (Pokemon mon in newBoxedMons)
 				{
-					if (oldStatus?.Party?.Any(x => x.PersonalityValue == mon.PersonalityValue) == true ||
+					if (oldStatus?.Party?.Where(x => x != null)?.Any(x => x.PersonalityValue == mon.PersonalityValue) == true ||
 						ReleasedDictionary.Any(x => x.Key.PersonalityValue == mon.PersonalityValue) &&
 						oldBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue))
 					{
@@ -1440,9 +1440,9 @@ namespace StreamFeedBot.Rulesets
 
 				foreach (Pokemon oldMon in oldBoxedMons)
 				{
-					if ((status?.Party?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true) &&
+					if ((status?.Party?.Where(x => x != null)?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true) &&
 						newBoxedMons.All(x => x.PersonalityValue != oldMon.PersonalityValue) &&
-						(status?.Daycare?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true))
+						(status?.Daycare?.Where(x => x != null)?.All(x => x.PersonalityValue != oldMon.PersonalityValue) ?? true))
 					{
 						if (ReleasedDictionary.All(x => x.Key.PersonalityValue != oldMon.PersonalityValue))
 							ReleasedDictionary.Add(oldMon, 1);
@@ -1454,6 +1454,8 @@ namespace StreamFeedBot.Rulesets
 			{
 				foreach (Pokemon mon in oldStatus.Party)
 				{
+					if (mon == null) continue;
+
 					List<Pokemon> newBoxedMons = new List<Pokemon>();
 					foreach (List<Pokemon>? p in status?.PC?.Boxes?.Where(x => x?.BoxContents != null)?.Select(x => x.BoxContents) ?? new List<List<Pokemon>>())
 					{
@@ -1461,9 +1463,9 @@ namespace StreamFeedBot.Rulesets
 							newBoxedMons.AddRange(p);
 					}
 
-					if ((status?.Party?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true) &&
+					if ((status?.Party?.Where(x => x != null)?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true) &&
 						newBoxedMons.All(x => x.PersonalityValue != mon.PersonalityValue) &&
-						(status?.Daycare?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true))
+						(status?.Daycare?.Where(x => x != null)?.All(x => x.PersonalityValue != mon.PersonalityValue) ?? true))
 					{
 						if (ReleasedDictionary.All(x => x.Key.PersonalityValue != mon.PersonalityValue))
 							ReleasedDictionary.Add(mon, 1);
@@ -1473,7 +1475,7 @@ namespace StreamFeedBot.Rulesets
 			Dictionary<Pokemon, int> releasedCopy = new Dictionary<Pokemon, int>(ReleasedDictionary);
 			foreach ((Pokemon mon, int time) in releasedCopy)
 			{
-				List<uint> values = status?.Party
+				List<uint> values = status?.Party?.Where(x => x != null)
 					?.Select(x => x.PersonalityValue)
 					?.ToList() ?? new List<uint>();
 
