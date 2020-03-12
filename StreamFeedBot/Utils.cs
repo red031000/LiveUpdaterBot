@@ -122,6 +122,9 @@ namespace StreamFeedBot
 				List<DiscordMessage> messages = new List<DiscordMessage>();
 				foreach (AnnounceSettings setting in Program.Settings.AnnounceSettings!)
 				{
+					DiscordGuild guild = await client.GetGuildAsync(setting.AnnounceServer).ConfigureAwait(true);
+					DiscordRole role = guild.GetRole(setting.AnnounceRole);
+					role?.ModifyAsync(mentionable: true)?.Wait();
 					DiscordChannel channel = await client.GetChannelAsync(setting.AnnounceChannel).ConfigureAwait(true);
 					DiscordMessage sent = await channel.SendMessageAsync($"<@&{setting.AnnounceRole}> " + message)
 						.ConfigureAwait(true);
@@ -135,6 +138,7 @@ namespace StreamFeedBot
 					}
 
 					messages.Add(sent);
+					role?.ModifyAsync(mentionable: false)?.Wait();
 				}
 
 				return messages;

@@ -153,48 +153,21 @@ namespace StreamFeedBot.Rulesets
 								};
 								builder.Append(choices[Random.Next(choices.Length)]);
 							}
-							else if (status.EnemyTrainers?.Count == 2)
+						}
+						else if (status.EnemyTrainers?.Count == 2)
+						{
+							if (status.EnemyTrainers[0] != null && status.EnemyTrainers[1] != null)
 							{
-								if (status.EnemyTrainers[0] != null && status.EnemyTrainers[1] != null)
-								{
-									Trainer trainer0 = status.EnemyTrainers[0];
-									Trainer trainer1 = status.EnemyTrainers[1];
+								Trainer trainer0 = status.EnemyTrainers[0];
+								Trainer trainer1 = status.EnemyTrainers[1];
 
-									if ((SpecialClasses_Emerald.Contains(trainer0.ClassId) ||
-									     SpecialClasses_Emerald.Contains(trainer1.ClassId)) && trainer1.ClassId != 0)
+								if ((SpecialClasses_Emerald.Contains(trainer0.ClassId) ||
+									    SpecialClasses_Emerald.Contains(trainer1.ClassId)) && trainer1.ClassId != 0)
+								{
+									builder.Append(
+										$"**VS {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name}!** ");
+									if (SpecialClasses_Emerald.Contains(trainer0.ClassId))
 									{
-										builder.Append(
-											$"**VS {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name}!** ");
-										if (SpecialClasses_Emerald.Contains(trainer0.ClassId))
-										{
-											if (Attempts.TryGetValue(trainer0.Id, out int val))
-											{
-												builder.Append($"Attempt #{val + 1}! ");
-												Attempts.Remove(trainer0.Id);
-												Attempts.Add(trainer0.Id, val + 1);
-											}
-											else
-											{
-												Attempts.Add(trainer0.Id, 1);
-											}
-										}
-										else
-										{
-											if (Attempts.TryGetValue(trainer1.Id, out int val))
-											{
-												builder.Append($"Attempt #{val + 1}! ");
-												Attempts.Remove(trainer1.Id);
-												Attempts.Add(trainer1.Id, val + 1);
-											}
-											else
-											{
-												Attempts.Add(trainer1.Id, 1);
-											}
-										}
-									}
-									else if (SpecialClasses_Emerald.Contains(trainer0.ClassId))
-									{
-										builder.Append($"**VS {trainer0.ClassName}s {trainer0.Name}!** ");
 										if (Attempts.TryGetValue(trainer0.Id, out int val))
 										{
 											builder.Append($"Attempt #{val + 1}! ");
@@ -206,50 +179,77 @@ namespace StreamFeedBot.Rulesets
 											Attempts.Add(trainer0.Id, 1);
 										}
 									}
-									else if (trainer0.ClassId == -1 || trainer1.ClassId == -1)
+									else
 									{
-										string[] rand1 =
+										if (Attempts.TryGetValue(trainer1.Id, out int val))
 										{
-											"come across", "run into", "step on", "stumble upon", "encounter",
-											"bump into",
-											"run across"
-										};
-										string[] rand2 =
+											builder.Append($"Attempt #{val + 1}! ");
+											Attempts.Remove(trainer1.Id);
+											Attempts.Add(trainer1.Id, val + 1);
+										}
+										else
 										{
-											"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"
-										};
-										string[] rand3 =
-										{
-											"picks a fight with", "engages", "thinks it can take", "crashes into",
-											"smacks into",
-											"collides with", "jumps", "ambushes", "attacks", "assaults"
-										};
-										string[] choice =
-										{
-											$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty![0].Species!.Name}. ",
-											$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species!.Name}. ",
-											$"A wild {status.EnemyParty[0].Species!.Name} {rand3[Random.Next(rand3.Length)]} us. "
-										};
-										string message = choice[Random.Next(choice.Length)];
-										builder.Append(message);
-										EnemyName = null;
+											Attempts.Add(trainer1.Id, 1);
+										}
 									}
-									else if (trainer1.ClassId != 0)
+								}
+								else if (SpecialClasses_Emerald.Contains(trainer0.ClassId))
+								{
+									builder.Append($"**VS {trainer0.ClassName}s {trainer0.Name}!** ");
+									if (Attempts.TryGetValue(trainer0.Id, out int val))
 									{
-										string[] choices =
-										{
-											$"Both {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name} challenge us to a battle at the same time!",
-										};
-										builder.Append(choices[Random.Next(choices.Length)]);
+										builder.Append($"Attempt #{val + 1}! ");
+										Attempts.Remove(trainer0.Id);
+										Attempts.Add(trainer0.Id, val + 1);
 									}
 									else
 									{
-										string[] choices =
-										{
-											$"{trainer0.ClassName} {trainer0.Name} challenge us to a battle at the same time!",
-										};
-										builder.Append(choices[Random.Next(choices.Length)]);
+										Attempts.Add(trainer0.Id, 1);
 									}
+								}
+								else if (trainer0.ClassId == -1 || trainer1.ClassId == -1)
+								{
+									string[] rand1 =
+									{
+										"come across", "run into", "step on", "stumble upon", "encounter",
+										"bump into",
+										"run across"
+									};
+									string[] rand2 =
+									{
+										"Facing off against", "Battling", "Grappling", "Confronted by", "Wrestling"
+									};
+									string[] rand3 =
+									{
+										"picks a fight with", "engages", "thinks it can take", "crashes into",
+										"smacks into",
+										"collides with", "jumps", "ambushes", "attacks", "assaults"
+									};
+									string[] choice =
+									{
+										$"We {rand1[Random.Next(rand1.Length)]} a wild {status.EnemyParty![0].Species!.Name}. ",
+										$"{rand2[Random.Next(rand2.Length)]} a wild {status.EnemyParty[0].Species!.Name}. ",
+										$"A wild {status.EnemyParty[0].Species!.Name} {rand3[Random.Next(rand3.Length)]} us. "
+									};
+									string message = choice[Random.Next(choice.Length)];
+									builder.Append(message);
+									EnemyName = null;
+								}
+								else if (trainer1.ClassId != 0)
+								{
+									string[] choices =
+									{
+										$"Both {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name} challenge us to a battle at the same time!",
+									};
+									builder.Append(choices[Random.Next(choices.Length)]);
+								}
+								else
+								{
+									string[] choices =
+									{
+										$"{trainer0.ClassName} {trainer0.Name} challenge us to a battle at the same time!",
+									};
+									builder.Append(choices[Random.Next(choices.Length)]);
 								}
 							}
 						}
