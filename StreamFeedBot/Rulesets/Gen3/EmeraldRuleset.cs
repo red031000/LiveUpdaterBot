@@ -1469,7 +1469,7 @@ namespace StreamFeedBot.Rulesets
 
 			if (status?.MapBank != oldStatus?.MapBank || status?.MapId != oldStatus?.MapId)
 			{
-				if (status?.MapBank == 16 && status.MapId == 5)
+				if (status?.MapBank == 16 && status.MapId == 0)
 				{
 					List<string> options = new List<string>
 					{
