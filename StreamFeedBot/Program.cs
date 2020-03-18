@@ -42,7 +42,7 @@ namespace StreamFeedBot
 
 		private static Api? Api;
 
-		public static readonly DateTime RunStart = new DateTime(2020, 03, 07, 01, 00, 00, DateTimeKind.Utc);
+		public static readonly DateTime RunStart = new DateTime(2020, 03, 18, 21, 00, 00, DateTimeKind.Utc);
 
 		public const int RefreshInterval = 15;
 
@@ -169,7 +169,7 @@ namespace StreamFeedBot
 					Channels.Add(channel);
 				}
 
-				Ruleset = new EmeraldRuleset(memory, Settings);
+				Ruleset = new TouhoumonPuppetPlayRuleset(memory, Settings);
 
 				if (DateTime.UtcNow < RunStart)
 				{
@@ -302,9 +302,9 @@ namespace StreamFeedBot
 					Console.WriteLine($"Dumping memory by request of {e.Author.Username}#{e.Author.Discriminator}");
 				}
 				else if (Settings.SuperUsers.Contains(e.Author.Id) &&
-				         e.Message.Content.ToUpperInvariant().Trim() == "RELOADMEM"
+				         (e.Message.Content.ToUpperInvariant().Trim() == "RELOADMEM"
 				         || e.Message.Content.ToUpperInvariant().Trim() == "RELOADMEMORY"
-				         || e.Message.Content.ToUpperInvariant().Trim() == "RELOAD MEMORY")
+				         || e.Message.Content.ToUpperInvariant().Trim() == "RELOAD MEMORY"))
 				{
 					await e.Message.RespondAsync("reloading memory from ~/publish/memory.json <:RaccAttack:468748603632910336>").ConfigureAwait(true);
 					if (File.Exists("memory.json"))
@@ -315,6 +315,15 @@ namespace StreamFeedBot
 						Ruleset!.Memory = JsonConvert.DeserializeObject<Memory>(json);
 					}
 					Console.WriteLine($"Reloading memory by request of {e.Author.Username}#{e.Author.Discriminator}");
+				}
+				else if (Settings.SuperUsers.Contains(e.Author.Id) &&
+				         (e.Message.Content.ToUpperInvariant().Trim() == "SAVESNAPSHOT"
+				          || e.Message.Content.ToUpperInvariant().Trim() == "SAVE SNAPSHOT"
+				          || e.Message.Content.ToUpperInvariant().Trim() == "SNAPSHOT"))
+				{
+					string? link = Api?.PostSnapshot();
+					await e.Message.RespondAsync($"snapshot saved to {link ?? "ERROR: API is null!!"} <:RaccAttack:468748603632910336>").ConfigureAwait(true);
+					Console.WriteLine($"Saved snapshot by request of {e.Author.Username}#{e.Author.Discriminator}");
 				}
 				else if (e.Author != Client.CurrentUser &&
 				         new[] {"UWU", "OWO"}.Contains(e.Message.Content.Trim().ToUpperInvariant()))

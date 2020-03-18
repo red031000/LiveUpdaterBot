@@ -94,8 +94,8 @@ namespace StreamFeedBot
 		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Balls;
 
-		[JsonProperty(PropertyName = "berries")]
-		//[JsonIgnore] //not in Gen 1
+		//[JsonProperty(PropertyName = "berries")]
+		[JsonIgnore]
 		public List<Item>? Berries;
 
 		//[JsonProperty(PropertyName = "medicine")] //Gen 7 specific
@@ -112,8 +112,8 @@ namespace StreamFeedBot
 		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Key;
 
-		[JsonProperty(PropertyName = "tms")]
-		//[JsonIgnore] //not in Gen 1
+		//[JsonProperty(PropertyName = "tms")]
+		[JsonIgnore] //not in Gen 1
 		public List<Item>? TMs;
 		
 		//[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
@@ -210,11 +210,11 @@ namespace StreamFeedBot
 		public uint Blackouts;
 
 		//[JsonProperty(PropertyName = "Saves Made")]
-		[JsonIgnore] //Not in USUM
+		[JsonIgnore] //Emerald specific
 		public uint Saves;
 
 		//[JsonProperty(PropertyName = "Pok\u00e9mon Center Uses")]
-		[JsonIgnore] //Not in USUM
+		[JsonIgnore] //Emerald specific
 		public uint PokemonCentersUsed;
 
 		[JsonProperty(PropertyName = "Battles Fought (Total)")]

@@ -30,7 +30,7 @@ namespace StreamFeedBot
 			Hour = DateTime.UtcNow.Hour;
 		}
 
-		private void PostSnapshot()
+		public string PostSnapshot()
 		{
 			if (!Directory.Exists("Snapshots"))
 				Directory.CreateDirectory("Snapshots");
@@ -39,7 +39,9 @@ namespace StreamFeedBot
 			string date = DateTime.UtcNow.ToString("o", CultureInfo.CurrentCulture);
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) //windows is weird
 				date = date.Replace(":", "-", StringComparison.InvariantCultureIgnoreCase);
-            File.WriteAllText($"Snapshots/{Program.Settings?.RunName ?? "UntitledRun"}/ApiSnapshot{date}.txt", message);
+			string filename = $"ApiSnapshot{date}.txt";
+			File.WriteAllText($"Snapshots/{Program.Settings?.RunName ?? "UntitledRun"}/{filename}", message);
+			return $"https://red031000.com/snapshots/{Program.Settings?.RunName ?? "UntitledRun"}/{filename}";
 		}
 
 		public async Task<bool> UpdateStatus()
@@ -161,7 +163,7 @@ namespace StreamFeedBot
 				foreach (Trainer t in Status.EnemyTrainers)
 				{
 					if (t?.ClassName != null)
-						t.ClassName = t.ClassName.Replace("πµ", "PkMn", StringComparison.InvariantCultureIgnoreCase);
+						t.ClassName = t.ClassName.Replace("πµ", "BnKa", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
@@ -170,7 +172,7 @@ namespace StreamFeedBot
 				foreach (Pokemon p in Status.Party)
 				{
 					if (p?.Name != null)
-						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
+						p.Name = p.Name.Replace("π", "Bn", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Ka", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
@@ -179,7 +181,7 @@ namespace StreamFeedBot
 				foreach (Pokemon p in Status.BattleParty)
 				{
 					if (p?.Name != null)
-						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
+						p.Name = p.Name.Replace("π", "Bn", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Ka", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
@@ -188,7 +190,7 @@ namespace StreamFeedBot
 				foreach (Pokemon p in Status.Daycare)
 				{
 					if (p?.Name != null)
-						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
+						p.Name = p.Name.Replace("π", "Bn", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Ka", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
@@ -201,7 +203,7 @@ namespace StreamFeedBot
 						foreach (Pokemon p in b.BoxContents)
 						{
 							if (p?.Name != null)
-								p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
+								p.Name = p.Name.Replace("π", "Bn", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Ka", StringComparison.InvariantCultureIgnoreCase);
 						}
 					}
 				}
