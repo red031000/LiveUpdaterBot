@@ -136,7 +136,7 @@ namespace StreamFeedBot.Rulesets
 							if (status.EnemyTrainers?[0] != null)
 							{
 								Trainer trainer = status.EnemyTrainers[0];
-								if (SpecialIDs_Touhoumon.Contains(trainer.ClassId))
+								if (SpecialIDs_Touhoumon.Contains(trainer.Id))
 								{
 									builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
 									int id = trainer.Id;
