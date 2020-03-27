@@ -46,13 +46,14 @@ namespace StreamFeedBot.Rulesets
 
 		private bool flag;
 
-		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement)
+		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement, out bool ping)
 		{
 			StringBuilder builder = new StringBuilder();
 			StringBuilder aBuilder = new StringBuilder();
 			if (oldStatus == null || status == null)
 			{
 				announcement = null;
+				ping = false;
 				return null; //calculate deltas between two statuses, not just one
 			}
 
@@ -163,7 +164,7 @@ namespace StreamFeedBot.Rulesets
 			}
 
 			bool flag2 = false;
-
+			bool urn = false;
 			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts > oldStatus.GameStats.Blackouts)
 			{
 				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
@@ -192,6 +193,7 @@ namespace StreamFeedBot.Rulesets
 						{
 							aBuilder.Append($"**We defeated {trainer.ClassName}! TEH URN!** ");
 							Memory.Urned = true;
+							urn = true;
 						}
 					}
 				}
@@ -895,6 +897,7 @@ namespace StreamFeedBot.Rulesets
 				flag = false;
 
 			announcement = aBuilder.ToString().Length == 0 ? null : aBuilder.ToString();
+			ping = urn;
 			return builder.ToString().Length == 0 ? null : builder.ToString();
 		}
 	}

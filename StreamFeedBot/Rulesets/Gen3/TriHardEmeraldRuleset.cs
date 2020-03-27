@@ -21,11 +21,11 @@ namespace StreamFeedBot.Rulesets
 		public TriHardEmeraldRuleset(Memory memory, Settings settings)
 			: base (memory, settings)
 		{ }
-		public override string CalculateDeltas(RunStatus status, RunStatus oldStatus, out string announcement)
+		public override string CalculateDeltas(RunStatus status, RunStatus oldStatus, out string announcement, out bool ping)
 		{
 			announcement = null;
 			bool reset2 = Reset;
-
+			ping = false; //no pings
 			StringBuilder builder = new StringBuilder();
 			if (oldStatus == null || status == null)
 				return null; //calculate deltas between two statuses, not just one

@@ -347,7 +347,7 @@ namespace StreamFeedBot
 				{
 					try
 					{
-						string? message = Ruleset!.CalculateDeltas(Api.Status, Api.OldStatus, out string? announcement);
+						string? message = Ruleset!.CalculateDeltas(Api.Status, Api.OldStatus, out string? announcement, out bool ping);
 						if (message != null)
 						{
 							TimeSpan time = DateTime.UtcNow - RunStart;
@@ -356,7 +356,7 @@ namespace StreamFeedBot
 						}
 
 						if (announcement != null)
-							await Utils.AnnounceMessage(announcement, Client).ConfigureAwait(false);
+							await Utils.AnnounceMessage(announcement, Client, ping).ConfigureAwait(false);
 					}
 					catch (Exception e)
 					{

@@ -28,6 +28,6 @@ namespace StreamFeedBot.Rulesets
 			Settings = settings;
 		}
 
-		public abstract string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement);
+		public abstract string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement, out bool ping);
 	}
 }

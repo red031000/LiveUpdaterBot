@@ -115,30 +115,36 @@ namespace StreamFeedBot
 			}
 		}
 
-		public static async Task<List<DiscordMessage>?> AnnounceMessage(string? message, DiscordClient? client)
+		public static async Task<List<DiscordMessage>?> AnnounceMessage(string? message, DiscordClient? client, bool ping = false)
 		{
 			if (client != null && message != null && Program.Settings != null)
 			{
 				List<DiscordMessage> messages = new List<DiscordMessage>();
 				foreach (AnnounceSettings setting in Program.Settings.AnnounceSettings!)
 				{
-					DiscordGuild guild = await client.GetGuildAsync(setting.AnnounceServer).ConfigureAwait(true);
-					DiscordRole role = guild.GetRole(setting.AnnounceRole);
-					role?.ModifyAsync(mentionable: true)?.Wait();
+					DiscordRole? role = null;
+					if (ping)
+					{
+						DiscordGuild guild = await client.GetGuildAsync(setting.AnnounceServer).ConfigureAwait(true);
+						role = guild.GetRole(setting.AnnounceRole);
+						role?.ModifyAsync(mentionable: true)?.Wait();
+					}
+
 					DiscordChannel channel = await client.GetChannelAsync(setting.AnnounceChannel).ConfigureAwait(true);
-					DiscordMessage sent = await channel.SendMessageAsync($"<@&{setting.AnnounceRole}> " + message)
+					DiscordMessage sent = await channel.SendMessageAsync($"{(ping ? "<@&{setting.AnnounceRole}> " : "")}" + message)
 						.ConfigureAwait(true);
-					Console.WriteLine($"Announced message: <@&{setting.AnnounceRole}> {message}");
+					Console.WriteLine($"Announced message: {(ping ? "<@&{setting.AnnounceRole}> " : "")}{message}");
 					if (Program.LogWriter != null)
 					{
 						await Program.LogWriter
-							.WriteLineAsync($"Announced message: <@&{setting.AnnounceRole}> {message}")
+							.WriteLineAsync($"Announced message: {(ping ? "<@&{setting.AnnounceRole}> " : "")}{message}")
 							.ConfigureAwait(true);
 						await Program.LogWriter.FlushAsync().ConfigureAwait(true);
 					}
 
 					messages.Add(sent);
-					role?.ModifyAsync(mentionable: false)?.Wait();
+					if (role != null && ping)
+						role?.ModifyAsync(mentionable: false)?.Wait();
 				}
 
 				return messages;

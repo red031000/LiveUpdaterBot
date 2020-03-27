@@ -76,10 +76,11 @@ namespace StreamFeedBot.Rulesets
 
 		private bool flag;
 
-		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement)
+		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement, out bool ping)
 		{
 			StringBuilder builder = new StringBuilder();
 			StringBuilder aBuilder = new StringBuilder();
+			ping = false; //no pings
 			if (oldStatus == null || status == null)
 			{
 				announcement = null;
