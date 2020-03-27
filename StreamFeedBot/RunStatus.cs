@@ -28,7 +28,8 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "map_id")]
 		public uint MapId;
 
-		[JsonProperty(PropertyName = "map_bank")]
+		//[JsonProperty(PropertyName = "map_bank")]
+		[JsonIgnore]
 		public uint? MapBank;
 
 		[JsonProperty(PropertyName = "battle_kind", ItemConverterType = typeof(StringEnumConverter))]
@@ -94,28 +95,35 @@ namespace StreamFeedBot
 		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Balls;
 
-		//[JsonProperty(PropertyName = "berries")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "berries")]
+		//[JsonIgnore]
 		public List<Item>? Berries;
 
-		//[JsonProperty(PropertyName = "medicine")] //Gen 7 specific
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "medicine")]
+		//[JsonIgnore]
 		public List<Item>? Medicine;
 
 		[JsonProperty(PropertyName = "items")]
 		public List<Item>? Items;
 
-		[JsonProperty(PropertyName = "pc")]
+		[JsonProperty(PropertyName = "mail")]
+		public List<Item>? Mail;
+
+		//[JsonProperty(PropertyName = "pc")]
+		[JsonIgnore]
 		public List<Item>? PC;
 
 		[JsonProperty(PropertyName = "key")]
 		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Key;
 
-		//[JsonProperty(PropertyName = "tms")]
-		[JsonIgnore] //not in Gen 1
+		[JsonProperty(PropertyName = "tms")]
+		//[JsonIgnore]
 		public List<Item>? TMs;
-		
+
+		[JsonProperty(PropertyName = "battle")]
+		public List<Item>? BattleItems;
+
 		//[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
 		[JsonIgnore]
 		public List<Item>? ZCrystals;

@@ -163,7 +163,7 @@ namespace StreamFeedBot
 				foreach (Trainer t in Status.EnemyTrainers)
 				{
 					if (t?.ClassName != null)
-						t.ClassName = t.ClassName.Replace("πµ", "BnKa", StringComparison.InvariantCultureIgnoreCase);
+						t.ClassName = t.ClassName.Replace("πµ", "PkMn", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
@@ -172,7 +172,7 @@ namespace StreamFeedBot
 				foreach (Pokemon p in Status.Party)
 				{
 					if (p?.Name != null)
-						p.Name = p.Name.Replace("π", "Bn", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Ka", StringComparison.InvariantCultureIgnoreCase);
+						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
@@ -181,7 +181,7 @@ namespace StreamFeedBot
 				foreach (Pokemon p in Status.BattleParty)
 				{
 					if (p?.Name != null)
-						p.Name = p.Name.Replace("π", "Bn", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Ka", StringComparison.InvariantCultureIgnoreCase);
+						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
@@ -190,7 +190,7 @@ namespace StreamFeedBot
 				foreach (Pokemon p in Status.Daycare)
 				{
 					if (p?.Name != null)
-						p.Name = p.Name.Replace("π", "Bn", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Ka", StringComparison.InvariantCultureIgnoreCase);
+						p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
@@ -203,7 +203,7 @@ namespace StreamFeedBot
 						foreach (Pokemon p in b.BoxContents)
 						{
 							if (p?.Name != null)
-								p.Name = p.Name.Replace("π", "Bn", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Ka", StringComparison.InvariantCultureIgnoreCase);
+								p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
 						}
 					}
 				}
