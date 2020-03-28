@@ -1,3 +1,7 @@
 StreamFeedBot is a bot for discord that reports on events happening during a TwitchPlaysPokemon run.
 
 It is owned and operated by red031000
+
+To Setup, you need to add slimget to your package repository, since StreamFeed uses a nightly build of DSharpPlus
+
+Instructions on how to do this are located here: https://nuget.emzi0767.com/gallery/about

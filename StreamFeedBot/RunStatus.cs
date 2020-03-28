@@ -232,7 +232,8 @@ namespace StreamFeedBot
 	public enum BattleKind
 	{
 		Wild,
-		Trainer
+		Trainer,
+		None //m4 BabyRage
 	}
 
 	public enum Gender

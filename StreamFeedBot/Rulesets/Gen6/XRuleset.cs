@@ -103,7 +103,7 @@ namespace StreamFeedBot.Rulesets
 				builder.Append($"**We name our rival {status.RivalName}!** ");
 			}
 
-			if (status.BattleKind != null && status.GameStats != null && oldStatus.GameStats != null &&
+			if (status.BattleKind != null && status.BattleKind != BattleKind.None && status.GameStats != null && oldStatus.GameStats != null &&
 				status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
 			{
 				switch (status.BattleKind)
@@ -306,7 +306,7 @@ namespace StreamFeedBot.Rulesets
 				flag2 = true;
 			}
 
-			if (status.BattleKind == null && oldStatus!.BattleKind == BattleKind.Trainer &&
+			if ((status.BattleKind == null || status.BattleKind == BattleKind.None) && oldStatus!.BattleKind == BattleKind.Trainer &&
 				status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts && !flag)
 			{
 				if (oldStatus.EnemyTrainers != null && oldStatus.EnemyTrainers.Count == 1)
@@ -421,6 +421,7 @@ namespace StreamFeedBot.Rulesets
 
 			foreach (Item item in distinctMedicine)
 			{
+				if (item.Id == 0) continue;
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Medicine?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.Medicine?.FirstOrDefault(x => x.Id == item.Id) != null;
@@ -520,10 +521,10 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (status.BattleKind != null && count < 0)
+					if (status.BattleKind != null && status.BattleKind != BattleKind.None && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money > oldStatus!.Money && (oldStatus.BattleKind == null || oldStatus.BattleKind == BattleKind.None))
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
@@ -553,6 +554,7 @@ namespace StreamFeedBot.Rulesets
 
 			foreach (Item item in distinctBerries)
 			{
+				if (item.Id == 0) continue;
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Berries?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.Berries?.FirstOrDefault(x => x.Id == item.Id) != null;
@@ -651,10 +653,10 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (status.BattleKind != null && count < 0)
+					if ((status.BattleKind != null || status.BattleKind != BattleKind.None) && count < 0)
 						builder.Append(
 							$"We use {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
-					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money > oldStatus!.Money && (oldStatus.BattleKind == null || oldStatus.BattleKind == BattleKind.None))
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
@@ -684,6 +686,7 @@ namespace StreamFeedBot.Rulesets
 
 			foreach (Item item in distinctItems)
 			{
+				if (item.Id == 0) continue;
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Items?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.Items?.FirstOrDefault(x => x.Id == item.Id) != null;
@@ -788,7 +791,7 @@ namespace StreamFeedBot.Rulesets
 					else if (status.BattleKind == BattleKind.Trainer && status.EnemyParty != null && status.EnemyParty.Count > 0 && count < 0 && BallIds.Contains(item.Id))
 						builder.Append(
 							$"We throw {(count == -1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"some {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")} at the opponent's {status.EnemyParty[0].Species!.Name}. ");
-					else if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
+					else if (count < 0 && status.Money > oldStatus!.Money && (oldStatus.BattleKind == null || oldStatus.BattleKind == BattleKind.None))
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
@@ -818,6 +821,7 @@ namespace StreamFeedBot.Rulesets
 
 			foreach (Item item in distinctKey)
 			{
+				if (item.Id == 0) continue;
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.Key?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.Key?.FirstOrDefault(x => x.Id == item.Id) != null;
@@ -936,6 +940,7 @@ namespace StreamFeedBot.Rulesets
 
 			foreach (Item item in distinctTMs)
 			{
+				if (item.Id == 0) continue;
 				if (ids.Contains(item.Id)) continue;
 				long count = status?.Items?.TMs?.Where(x => x.Id == item.Id)?.Sum(x => x.Count ?? 1) ?? 0;
 				bool res = oldStatus?.Items?.TMs?.FirstOrDefault(x => x.Id == item.Id) != null;
@@ -1034,7 +1039,7 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 
-					if (count < 0 && status.Money > oldStatus!.Money && oldStatus.BattleKind == null)
+					if (count < 0 && status.Money > oldStatus!.Money && (oldStatus.BattleKind == null || oldStatus.BattleKind == BattleKind.None))
 					{
 						builder.Append(
 							$"We sell {(count == 1 ? $"{IndefiniteArticle(item.Name)} {item.Name}" : $"{Math.Abs(count)} {(item.Name?.EndsWith("s", StringComparison.InvariantCultureIgnoreCase) == true ? item.Name : item.Name + "s")}")}. ");
@@ -1055,7 +1060,7 @@ namespace StreamFeedBot.Rulesets
 				ids.Add(item.Id);
 			}
 
-			if ((status!.Money < oldStatus!.Money || status.Money > oldStatus.Money) && oldStatus.BattleKind == null)
+			if ((status!.Money < oldStatus!.Money || status.Money > oldStatus.Money) && (oldStatus.BattleKind == null || oldStatus.BattleKind == BattleKind.None))
 				builder.Append($"We have ₽{status.Money} left. ");
 
 			if (status.Party != null)
