@@ -55,7 +55,7 @@ namespace StreamFeedBot.Rulesets
 			102, //Castle Valet Darach
 		};
 
-		private readonly List<string> _badges = new List<string> { "Coal", "Forest", "Relic", "Cobble", "Fen", "Mine", "Icicle", "Beacon" };
+		private readonly List<string> _badges = new List<string> { "Coal", "Forest", "Cobble", "Fen", "Relic", "Mine", "Icicle", "Beacon" };
 
 		public override List<string>? Badges => _badges;
 
