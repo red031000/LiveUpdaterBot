@@ -97,9 +97,11 @@ namespace StreamFeedBot
 				}
 			}
 
-			DoReplacements();
+			DoPkMnReplacements();
 
 			ProcessShedinja();
+
+			FixNullBoxes();
 
 			if (DateTime.UtcNow.Hour != Hour)
 			{
@@ -156,7 +158,7 @@ namespace StreamFeedBot
 			}
 		}
 
-		private void DoReplacements()
+		private void DoPkMnReplacements()
 		{
 			if (Status!.EnemyTrainers != null)
 			{
@@ -196,14 +198,31 @@ namespace StreamFeedBot
 
 			if (Status!.PC?.Boxes != null)
 			{
-				foreach (Box b in Status.PC.Boxes)
+				foreach (Box? b in Status.PC.Boxes)
 				{
-					if (b.BoxContents != null)
+					if (b?.BoxContents != null)
 					{
 						foreach (Pokemon p in b.BoxContents)
 						{
 							if (p?.Name != null)
 								p.Name = p.Name.Replace("π", "Pk", StringComparison.InvariantCultureIgnoreCase).Replace("µ", "Mn", StringComparison.InvariantCultureIgnoreCase);
+						}
+					}
+				}
+			}
+		}
+
+		private void FixNullBoxes()
+		{
+			if (Status?.PC?.Boxes != null && OldStatus?.PC?.Boxes != null)
+			{
+				if (Status.PC.Boxes.Any(x => x == null))
+				{
+					for (int i = 0; i < OldStatus.PC.Boxes.Count; i++)
+					{
+						if (Status.PC.Boxes[i] == null && OldStatus.PC.Boxes[i] != null)
+						{
+							Status.PC.Boxes[i] = OldStatus.PC.Boxes[i];
 						}
 					}
 				}
