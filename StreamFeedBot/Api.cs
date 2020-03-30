@@ -74,6 +74,12 @@ namespace StreamFeedBot
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine($"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}");
+				if (Program.PrivateWriter != null)
+				{
+					Program.PrivateWriter.WriteLine(
+						$"Exception has occured: {e.Message}{Environment.NewLine}{e.StackTrace}");
+					Program.PrivateWriter.Flush();
+				}
 				Console.ResetColor();
 				if (replaced)
 					Status = OldStatus;
@@ -145,7 +151,7 @@ namespace StreamFeedBot
 
 			if (Status.PC?.Boxes != null)
 			{
-				foreach (List<Pokemon>? mons in Status.PC.Boxes.Select(x => x.BoxContents))
+				foreach (List<Pokemon>? mons in Status.PC.Boxes.Select(x => x?.BoxContents))
 				{
 					if (mons != null)
 					{
