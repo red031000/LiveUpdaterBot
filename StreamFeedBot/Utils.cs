@@ -131,13 +131,13 @@ namespace StreamFeedBot
 					}
 
 					DiscordChannel channel = await client.GetChannelAsync(setting.AnnounceChannel).ConfigureAwait(true);
-					DiscordMessage sent = await channel.SendMessageAsync($"{(ping ? "<@&{setting.AnnounceRole}> " : "")}" + message)
+					DiscordMessage sent = await channel.SendMessageAsync($"{(ping ? $"<@&{setting.AnnounceRole}> " : "")}" + message)
 						.ConfigureAwait(true);
-					Console.WriteLine($"Announced message: {(ping ? "<@&{setting.AnnounceRole}> " : "")}{message}");
+					Console.WriteLine($"Announced message: {(ping ? $"<@&{setting.AnnounceRole}> " : "")}{message}");
 					if (Program.LogWriter != null)
 					{
 						await Program.LogWriter
-							.WriteLineAsync($"Announced message: {(ping ? "<@&{setting.AnnounceRole}> " : "")}{message}")
+							.WriteLineAsync($"Announced message: {(ping ? $"<@&{setting.AnnounceRole}> " : "")}{message}")
 							.ConfigureAwait(true);
 						await Program.LogWriter.FlushAsync().ConfigureAwait(true);
 					}
