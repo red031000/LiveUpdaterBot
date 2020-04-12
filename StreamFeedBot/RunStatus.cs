@@ -91,8 +91,8 @@ namespace StreamFeedBot
 
 	public class ItemGroup
 	{
-		[JsonProperty(PropertyName = "balls")]
-		//[JsonIgnore] //not in Gen 1
+		//[JsonProperty(PropertyName = "balls")]
+		[JsonIgnore]
 		public List<Item>? Balls;
 
 		[JsonProperty(PropertyName = "berries")]
@@ -106,7 +106,8 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "items")]
 		public List<Item>? Items;
 
-		[JsonProperty(PropertyName = "mail")]
+		//[JsonProperty(PropertyName = "mail")]
+		[JsonIgnore]
 		public List<Item>? Mail;
 
 		//[JsonProperty(PropertyName = "pc")]
@@ -121,15 +122,16 @@ namespace StreamFeedBot
 		//[JsonIgnore]
 		public List<Item>? TMs;
 
-		[JsonProperty(PropertyName = "battle")]
+		//[JsonProperty(PropertyName = "battle")]
+		[JsonIgnore]
 		public List<Item>? BattleItems;
 
 		//[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
 		[JsonIgnore]
 		public List<Item>? ZCrystals;
 
-		//[JsonProperty(PropertyName = "free_space")] //Gen 5+ specific
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "free_space")] //Gen 5+ specific
+		//[JsonIgnore]
 		public List<Item>? FreeSpace;
 
 		//[JsonProperty(PropertyName = "rotom_powers")] //USUM specific

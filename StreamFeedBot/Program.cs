@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using StreamFeedBot.Rulesets;
 using StreamFeedBot.Web;
 using Swan.Logging;
+using LogLevel = DSharpPlus.LogLevel;
 
 namespace StreamFeedBot
 {
@@ -24,14 +25,14 @@ namespace StreamFeedBot
 		public static DiscordClient? Client;
 		public static Settings? Settings;
 		public static List<DiscordChannel> Channels = new List<DiscordChannel>();
-		public static DateTime logdate = DateTime.UtcNow.Date;
+		private static DateTime logdate = DateTime.UtcNow.Date;
 
 		public static List<string>? Badges => Ruleset?.Badges;
 
-		public static FileStream? LogStream;
+		private static FileStream? LogStream;
 		public static StreamWriter? LogWriter;
 
-		public static FileStream? PrivateStream;
+		private static FileStream? PrivateStream;
 		public static StreamWriter? PrivateWriter;
 
 		private static bool cancel;
@@ -42,9 +43,9 @@ namespace StreamFeedBot
 
 		private static Api? Api;
 
-		public static readonly DateTime RunStart = new DateTime(2020, 03, 28, 04, 00, 00, DateTimeKind.Utc);
+		private static readonly DateTime RunStart = new DateTime(2020, 04, 12, 21, 00, 00, DateTimeKind.Utc);
 
-		public const int RefreshInterval = 15;
+		private const int RefreshInterval = 15;
 
 		private static void Main()
 		{
@@ -150,7 +151,8 @@ namespace StreamFeedBot
 				Client = new DiscordClient(new DiscordConfiguration
 				{
 					Token = Settings.Token,
-					TokenType = TokenType.Bot
+					TokenType = TokenType.Bot,
+					LogLevel = LogLevel.Debug
 				});
 
 				Client.DebugLogger.LogMessageReceived += DebugLoggerOnLogMessageReceived;
@@ -169,7 +171,7 @@ namespace StreamFeedBot
 					Channels.Add(channel);
 				}
 
-				Ruleset = new PlatinumRuleset(memory, Settings);
+				Ruleset = new BlazeBlack2Ruleset(memory, Settings); //TODO change as needed
 
 				if (DateTime.UtcNow < RunStart)
 				{
@@ -212,6 +214,7 @@ namespace StreamFeedBot
 			}
 
 			//don't fucking touch, no matter how tempting
+			// ReSharper disable once AssignmentIsFullyDiscarded
 			_ = Server.RunAsync();
 
 			if (!Settings.WebOnly)
@@ -229,53 +232,50 @@ namespace StreamFeedBot
 
 		private static void DebugLoggerOnLogMessageReceived(object? sender, DebugLogMessageEventArgs? e)
 		{
-			if (e != null)
+			if (e == null || e.Level == LogLevel.Debug &&
+				e.Message.Contains("heartbeat", StringComparison.InvariantCultureIgnoreCase)) return;
+			if (PrivateWriter != null)
 			{
-				if (PrivateWriter != null)
-				{
-					PrivateWriter
-						.WriteLine(
-							$"{DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)} [{e.Application}] {Enum.GetName(typeof(DSharpPlus.LogLevel), e.Level)}: {e.Message}");
-					if (e.Exception != null)
-					{
-						PrivateWriter.WriteLine(
-							$"{e.Exception} {e.Exception.Message}{Environment.NewLine}{e.Exception.StackTrace}");
-						if (e.Exception.InnerException != null)
-						{
-							PrivateWriter.WriteLine("Inner Exception:");
-							PrivateWriter.WriteLine(
-								$"{e.Exception.InnerException} {e.Exception.InnerException.Message}{Environment.NewLine}{e.Exception.InnerException.StackTrace}");
-						}
-					}
-
-					PrivateWriter.Flush();
-				}
-
-				switch (e.Level)
-				{
-					case DSharpPlus.LogLevel.Warning:
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						break;
-					case DSharpPlus.LogLevel.Critical:
-					case DSharpPlus.LogLevel.Error:
-						Console.ForegroundColor = ConsoleColor.Red;
-						break;
-				}
-				Console.WriteLine($"[{e.Application}] {Enum.GetName(typeof(DSharpPlus.LogLevel), e.Level)}: {e.Message}");
+				PrivateWriter
+					.WriteLine(
+						$"{DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)} [{e.Application}] {Enum.GetName(typeof(LogLevel), e.Level)}: {e.Message}");
 				if (e.Exception != null)
 				{
-					Console.WriteLine(
+					PrivateWriter.WriteLine(
 						$"{e.Exception} {e.Exception.Message}{Environment.NewLine}{e.Exception.StackTrace}");
 					if (e.Exception.InnerException != null)
 					{
-						Console.WriteLine("Inner Exception:");
-						Console.WriteLine(
+						PrivateWriter.WriteLine("Inner Exception:");
+						PrivateWriter.WriteLine(
 							$"{e.Exception.InnerException} {e.Exception.InnerException.Message}{Environment.NewLine}{e.Exception.InnerException.StackTrace}");
 					}
 				}
-				Console.ResetColor();
 
+				PrivateWriter.Flush();
 			}
+
+			Console.ForegroundColor = e.Level switch
+			{
+				LogLevel.Warning => ConsoleColor.Yellow,
+				LogLevel.Critical => ConsoleColor.Red,
+				LogLevel.Error => ConsoleColor.Red,
+				_ => Console.ForegroundColor
+			};
+			Console.WriteLine(
+				$"[{e.Application}] {Enum.GetName(typeof(LogLevel), e.Level)}: {e.Message}");
+			if (e.Exception != null)
+			{
+				Console.WriteLine(
+					$"{e.Exception} {e.Exception.Message}{Environment.NewLine}{e.Exception.StackTrace}");
+				if (e.Exception.InnerException != null)
+				{
+					Console.WriteLine("Inner Exception:");
+					Console.WriteLine(
+						$"{e.Exception.InnerException} {e.Exception.InnerException.Message}{Environment.NewLine}{e.Exception.InnerException.StackTrace}");
+				}
+			}
+
+			Console.ResetColor();
 		}
 
 		private static async Task DmHandler(MessageCreateEventArgs e)
