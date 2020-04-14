@@ -1174,10 +1174,10 @@ namespace StreamFeedBot.Rulesets
 								if (!oldMon.Moves.Where(x => x != null).Select(x => x.Id).Contains(move.Id) &&
 									oldMon.Moves.Count == 4)
 								{
-									oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
+									oldMove = oldMon.Moves.First(x => !mon.Moves.Select(y => y.Id).Contains(x.Id));
 								}
 								else
-									oldMove = oldBattleMon?.Moves?.FirstOrDefault(x => !mon.Moves.Contains(x));
+									oldMove = oldBattleMon?.Moves?.FirstOrDefault(x => !mon.Moves.Select(y => y.Id).Contains(x.Id));
 
 								builder.Append(
 									oldMove != null

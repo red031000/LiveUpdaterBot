@@ -226,6 +226,7 @@ namespace StreamFeedBot
 				{
 					for (int i = 0; i < OldStatus.PC.Boxes.Count; i++)
 					{
+						if (i >= Status.PC.Boxes.Count) break;
 						if (Status.PC.Boxes[i] == null && OldStatus.PC.Boxes[i] != null)
 						{
 							Status.PC.Boxes[i] = OldStatus.PC.Boxes[i];

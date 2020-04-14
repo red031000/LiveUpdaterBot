@@ -601,7 +601,7 @@ namespace StreamFeedBot.Rulesets
 					{
 						if (oldMon.Moves.Count == 4)
 						{
-							Move oldMove = oldMon.Moves.First(x => !mon.Moves.Contains(x));
+							Move oldMove = oldMon.Moves.First(x => !mon.Moves.Select(y => y.Id).Contains(x.Id));
 							builder.Append(
 								$"**{mon.Name} ({mon.Species.Name}) learned {move.Name} over {oldMove.Name}!** ");
 						}
