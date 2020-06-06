@@ -553,10 +553,10 @@ namespace StreamFeedBot.Rulesets
 				Pokemon oldMon = oldStatus.Party[i];
 				if (oldMon == null) continue;
 				uint pv = oldMon.PersonalityValue;
-				if (oldMon.Species.NationalDex == 292)
+				if (oldMon.Species.NationalDex == "292")
 					pv++;
 				Pokemon mon = status.Party.Where(x => x != null).FirstOrDefault(x =>
-					x.Species.NationalDex == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					x.Species.NationalDex == "292" ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
 				if (mon == null)
 				{
 					continue;
@@ -589,10 +589,10 @@ namespace StreamFeedBot.Rulesets
 			{
 				if (mon == null) continue;
 				uint pv = mon.PersonalityValue;
-				if (mon.Species.NationalDex == 292)
+				if (mon.Species.NationalDex == "292")
 					pv++;
 				Pokemon oldMon = oldStatus.Party.Where(x => x != null).FirstOrDefault(x =>
-					x.Species.NationalDex == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
+					x.Species.NationalDex == "292" ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv);
 				if (oldMon == null) continue;
 				foreach (Move move in mon.Moves)
 				{
@@ -634,13 +634,13 @@ namespace StreamFeedBot.Rulesets
 			{
 				if (mon == null) continue;
 				uint pv = mon.PersonalityValue;
-				if (mon.Species.NationalDex == 292)
+				if (mon.Species.NationalDex == "292")
 					pv++;
 				List<uint> values =
-					oldStatus.Party.Where(x => x != null).Select(x => x.Species.NationalDex == 292 ? x.PersonalityValue + 1 : x.PersonalityValue)
+					oldStatus.Party.Where(x => x != null).Select(x => x.Species.NationalDex == "292" ? x.PersonalityValue + 1 : x.PersonalityValue)
 						.ToList();
 				List<Pokemon> mons = oldStatus.Party.Where(x => x != null).ToList();
-				if ((!values.Contains(pv) || mons.First(x => x.Species.NationalDex == 292 ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv).Health[0] == 0) && Reset)
+				if ((!values.Contains(pv) || mons.First(x => x.Species.NationalDex == "292" ? x.PersonalityValue + 1 == pv : x.PersonalityValue == pv).Health[0] == 0) && Reset)
 				{
 					string[] choice =
 					{

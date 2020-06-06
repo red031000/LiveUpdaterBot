@@ -318,7 +318,7 @@ namespace StreamFeedBot.Rulesets
 						EnemyName = trainer.ClassName + " " + trainer.Name;
 					}
 
-					if (Enumerable.Range(494, 3).Contains(trainer.Id)) //TODO check
+					if (trainer.Id == 276)
 					{
 						builder.Append("**TEH URN!** ");
 						if (!Memory.Urned)
@@ -1288,6 +1288,14 @@ namespace StreamFeedBot.Rulesets
 					List<uint> values =
 						oldStatus?.Party?.Where(x => x != null)?.Select(x => x.PersonalityValue)?
 							.ToList() ?? new List<uint>();
+					if (oldStatus?.BattleParty != null)
+					{
+						foreach (uint id in oldStatus.BattleParty.Where(x => x != null).Select(x => x.PersonalityValue))
+						{
+							if (!values.Contains(id))
+								values.Add(id);
+						}
+					}
 					List<uint> boxValues = new List<uint>();
 					List<Pokemon> pokemon = new List<Pokemon>();
 					foreach (List<Pokemon>? p in oldStatus?.PC?.Boxes?.Where(x => x?.BoxContents != null)?.Select(x => x.BoxContents) ?? new List<List<Pokemon>>())
@@ -1392,7 +1400,7 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-			if (status?.BattleParty != null && oldStatus?.BattleParty != null)
+			if (status?.BattleParty != null && oldStatus?.BattleParty != null && status.BattleParty.Count > 0 && oldStatus.BattleParty.Count > 0)
 			{
 				foreach (Pokemon mon in status.BattleParty)
 				{

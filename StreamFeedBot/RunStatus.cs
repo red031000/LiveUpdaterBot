@@ -45,7 +45,7 @@ namespace StreamFeedBot
 		public List<Pokemon>? Party;
 
 		//[JsonProperty(PropertyName = "battle_party")]
-		[JsonIgnore] //no battle party in red
+		[JsonIgnore]
 		public List<Pokemon>? BattleParty;
 
 		[JsonProperty(PropertyName = "items")]
@@ -130,8 +130,8 @@ namespace StreamFeedBot
 		[JsonIgnore]
 		public List<Item>? ZCrystals;
 
-		[JsonProperty(PropertyName = "free_space")] //Gen 5+ specific
-		//[JsonIgnore]
+		//[JsonProperty(PropertyName = "free_space")] //Gen 5+ specific
+		[JsonIgnore]
 		public List<Item>? FreeSpace;
 
 		//[JsonProperty(PropertyName = "rotom_powers")] //USUM specific
@@ -187,7 +187,7 @@ namespace StreamFeedBot
 		public string? Name;
 
 		[JsonProperty(PropertyName = "national_dex")]
-		public int NationalDex;
+		public string? NationalDex;
 	}
 
 	public class Move
@@ -235,7 +235,7 @@ namespace StreamFeedBot
 	{
 		Wild,
 		Trainer,
-		None //m4 BabyRage
+		None
 	}
 
 	public enum Gender
@@ -246,7 +246,7 @@ namespace StreamFeedBot
 
 	public class ItemEqualityComparer : IEqualityComparer<Item>
 	{
-		public bool Equals(Item item, Item other)
+		public bool Equals(Item? item, Item? other)
 		{
 			if (other is null) return false;
 
