@@ -28,8 +28,8 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "map_id")]
 		public uint MapId;
 
-		//[JsonProperty(PropertyName = "map_bank")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "map_bank")]
+		//[JsonIgnore]
 		public uint? MapBank;
 
 		[JsonProperty(PropertyName = "battle_kind", ItemConverterType = typeof(StringEnumConverter))]
@@ -91,16 +91,16 @@ namespace StreamFeedBot
 
 	public class ItemGroup
 	{
-		//[JsonProperty(PropertyName = "balls")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "balls")]
+		//[JsonIgnore]
 		public List<Item>? Balls;
 
 		[JsonProperty(PropertyName = "berries")]
 		//[JsonIgnore]
 		public List<Item>? Berries;
 
-		[JsonProperty(PropertyName = "medicine")]
-		//[JsonIgnore]
+		//[JsonProperty(PropertyName = "medicine")]
+		[JsonIgnore]
 		public List<Item>? Medicine;
 
 		[JsonProperty(PropertyName = "items")]
@@ -110,8 +110,8 @@ namespace StreamFeedBot
 		[JsonIgnore]
 		public List<Item>? Mail;
 
-		//[JsonProperty(PropertyName = "pc")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "pc")]
+		//[JsonIgnore]
 		public List<Item>? PC;
 
 		[JsonProperty(PropertyName = "key")]
