@@ -91,7 +91,7 @@ namespace StreamFeedBot.Rulesets
 			if (oldStatus == null || status == null)
 			{
 				announcement = null;
-				ping = false;
+				ping = true;
 				return null; //calculate deltas between two statuses, not just one
 			}
 
@@ -299,7 +299,6 @@ namespace StreamFeedBot.Rulesets
 			}
 
 			bool flag2 = false;
-			bool urn = false;
 
 			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts > oldStatus.GameStats.Blackouts)
 			{
@@ -329,7 +328,6 @@ namespace StreamFeedBot.Rulesets
 						{
 							aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
 							Memory.Urned = true;
-							urn = true;
 						}
 					}
 				}
@@ -1125,7 +1123,7 @@ namespace StreamFeedBot.Rulesets
 						continue;
 					}
 
-					if (mon.Level != oldMon.Level && mon.Level != partyMon.Level)
+					if (mon.Level != oldMon.Level && mon.Level != partyMon?.Level)
 					{
 						string[] choices =
 						{
@@ -1573,7 +1571,7 @@ namespace StreamFeedBot.Rulesets
 				flag = false;
 
 			announcement = aBuilder.ToString().Length == 0 ? null : aBuilder.ToString();
-			ping = urn;
+			ping = true;
 			return builder.ToString().Length == 0 ? null : builder.ToString();
 		}
 	}
