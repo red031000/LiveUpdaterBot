@@ -1534,7 +1534,7 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-			if (status?.MapName != oldStatus?.MapName)
+			if (status?.MapId != oldStatus?.MapId)
 			{
 				if (status?.MapId == 363)
 				{
@@ -1551,7 +1551,7 @@ namespace StreamFeedBot.Rulesets
 					if (Memory.Urned) Memory.E4RematchNum++;
 					else Memory.E4AttemptNum++;
 				}
-				else if (!string.IsNullOrWhiteSpace(status?.MapName))
+				else if (status?.MapName != oldStatus?.MapName && !string.IsNullOrWhiteSpace(status?.MapName))
 				{
 					string[] move = { "head", "go", "step", "move", "travel", "walk", "stroll", "stride" };
 					string choice = move[Random.Next(move.Length)];
