@@ -12,11 +12,10 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using EmbedIO;
 using EmbedIO.Files;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StreamFeedBot.Rulesets;
 using StreamFeedBot.Web;
-using Swan.Logging;
-using LogLevel = DSharpPlus.LogLevel;
 
 namespace StreamFeedBot
 {
@@ -152,11 +151,9 @@ namespace StreamFeedBot
 				{
 					Token = Settings.Token,
 					TokenType = TokenType.Bot,
-					LogLevel = LogLevel.Debug
+					MinimumLogLevel = LogLevel.Debug
 				});
-
-				Client.DebugLogger.LogMessageReceived += DebugLoggerOnLogMessageReceived;
-
+				
 				await Client.ConnectAsync(new DiscordActivity("TwitchPlaysPokemon", ActivityType.Streaming)
 				{
 					StreamUrl = "https://www.twitch.tv/twitchplayspokemon"
@@ -181,9 +178,7 @@ namespace StreamFeedBot
 						.ConfigureAwait(false);
 				}
 			}
-
-			Logger.RegisterLogger<WebLogger>();
-
+			
 			Server = new WebServer(opt => opt
 					.WithUrlPrefix($"http://*:{Settings.WebSettings!.Port}/")
 					.WithMode(HttpListenerMode.EmbedIO))
@@ -230,55 +225,7 @@ namespace StreamFeedBot
 			}
 		}
 
-		private static void DebugLoggerOnLogMessageReceived(object? sender, DebugLogMessageEventArgs? e)
-		{
-			if (e == null || e.Level == LogLevel.Debug &&
-				e.Message.Contains("heartbeat", StringComparison.InvariantCultureIgnoreCase)) return;
-			if (PrivateWriter != null)
-			{
-				PrivateWriter
-					.WriteLine(
-						$"{DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)} [{e.Application}] {Enum.GetName(typeof(LogLevel), e.Level)}: {e.Message}");
-				if (e.Exception != null)
-				{
-					PrivateWriter.WriteLine(
-						$"{e.Exception} {e.Exception.Message}{Environment.NewLine}{e.Exception.StackTrace}");
-					if (e.Exception.InnerException != null)
-					{
-						PrivateWriter.WriteLine("Inner Exception:");
-						PrivateWriter.WriteLine(
-							$"{e.Exception.InnerException} {e.Exception.InnerException.Message}{Environment.NewLine}{e.Exception.InnerException.StackTrace}");
-					}
-				}
-
-				PrivateWriter.Flush();
-			}
-
-			Console.ForegroundColor = e.Level switch
-			{
-				LogLevel.Warning => ConsoleColor.Yellow,
-				LogLevel.Critical => ConsoleColor.Red,
-				LogLevel.Error => ConsoleColor.Red,
-				_ => Console.ForegroundColor
-			};
-			Console.WriteLine(
-				$"[{e.Application}] {Enum.GetName(typeof(LogLevel), e.Level)}: {e.Message}");
-			if (e.Exception != null)
-			{
-				Console.WriteLine(
-					$"{e.Exception} {e.Exception.Message}{Environment.NewLine}{e.Exception.StackTrace}");
-				if (e.Exception.InnerException != null)
-				{
-					Console.WriteLine("Inner Exception:");
-					Console.WriteLine(
-						$"{e.Exception.InnerException} {e.Exception.InnerException.Message}{Environment.NewLine}{e.Exception.InnerException.StackTrace}");
-				}
-			}
-
-			Console.ResetColor();
-		}
-
-		private static async Task DmHandler(MessageCreateEventArgs e)
+		private static async Task DmHandler(DiscordClient client, MessageCreateEventArgs e)
 		{
 			if (e.Guild == null)
 			{

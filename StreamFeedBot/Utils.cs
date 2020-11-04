@@ -28,14 +28,12 @@ namespace StreamFeedBot
 
 				Console.WriteLine(
 					$"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}");
-				if (Program.LogWriter != null)
-				{
-					await Program.LogWriter
-						.WriteLineAsync(
-							$"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}")
-						.ConfigureAwait(true);
-					await Program.LogWriter.FlushAsync().ConfigureAwait(false);
-				}
+				if (Program.LogWriter == null) return messages;
+				await Program.LogWriter
+					.WriteLineAsync(
+						$"Sent message: {content}{(embed != null ? $", With embed: {embed.Description}" : "")}")
+					.ConfigureAwait(true);
+				await Program.LogWriter.FlushAsync().ConfigureAwait(false);
 			}
 			else
 			{
@@ -68,25 +66,22 @@ namespace StreamFeedBot
 					}
 				}
 
-				if (!string.IsNullOrEmpty(message))
+				if (string.IsNullOrEmpty(message)) return messages;
+				foreach (DiscordChannel channel in Program.Channels)
 				{
-					foreach (DiscordChannel channel in Program.Channels)
-					{
-						DiscordMessage msg = await channel.SendMessageAsync(message.Trim(), embed: embed).ConfigureAwait(true);
-						messages.Add(msg);
-					}
-
-					Console.WriteLine(
-						$"Sent message: {message.Trim()}{(embed != null ? $", With embed: {embed.Description}" : "")}");
-					if (Program.LogWriter != null)
-					{
-						await Program.LogWriter
-							.WriteLineAsync(
-								$"Sent message: {message.Trim()}{(embed != null ? $", With embed: {embed.Description}" : "")}")
-							.ConfigureAwait(true);
-						await Program.LogWriter.FlushAsync().ConfigureAwait(false);
-					}
+					DiscordMessage msg =
+						await channel.SendMessageAsync(message.Trim(), embed: embed).ConfigureAwait(true);
+					messages.Add(msg);
 				}
+
+				Console.WriteLine(
+					$"Sent message: {message.Trim()}{(embed != null ? $", With embed: {embed.Description}" : "")}");
+				if (Program.LogWriter == null) return messages;
+				await Program.LogWriter
+					.WriteLineAsync(
+						$"Sent message: {message.Trim()}{(embed != null ? $", With embed: {embed.Description}" : "")}")
+					.ConfigureAwait(true);
+				await Program.LogWriter.FlushAsync().ConfigureAwait(false);
 			}
 
 			return messages;
@@ -141,10 +136,27 @@ namespace StreamFeedBot
 							.ConfigureAwait(true);
 						await Program.LogWriter.FlushAsync().ConfigureAwait(true);
 					}
-
+					if (ping)
+					{
+						try
+						{
+							await channel.CrosspostMessageAsync(sent);
+						}
+						catch (ArgumentException e)
+						{
+							Console.WriteLine($"Error while publishing message: {e.Message}");
+							if (Program.LogWriter != null)
+							{
+								await Program.LogWriter
+									.WriteLineAsync($"Error while publishing message: {e.Message}")
+									.ConfigureAwait(true);
+								await Program.LogWriter.FlushAsync().ConfigureAwait(true);
+							}
+						}
+					}
 					messages.Add(sent);
 					if (role != null && ping)
-						role?.ModifyAsync(mentionable: false)?.Wait();
+						role.ModifyAsync(mentionable: false)?.Wait();
 				}
 
 				return messages;
