@@ -42,7 +42,7 @@ namespace StreamFeedBot
 
 		private static Api? Api;
 
-		private static readonly DateTime RunStart = new DateTime(2020, 08, 08, 21, 00, 00, DateTimeKind.Utc);
+		private static readonly DateTime RunStart = new DateTime(2020, 12, 12, 21, 00, 00, DateTimeKind.Utc);
 
 		private const int RefreshInterval = 15;
 
@@ -168,7 +168,7 @@ namespace StreamFeedBot
 					Channels.Add(channel);
 				}
 
-				Ruleset = new RisingRubyRuleset(memory, Settings); //TODO change as needed
+				Ruleset = new VegaRuleset(memory, Settings); //TODO change as needed
 
 				if (DateTime.UtcNow < RunStart)
 				{
