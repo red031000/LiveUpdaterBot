@@ -112,6 +112,7 @@ namespace StreamFeedBot
 			if (DateTime.UtcNow.Hour != Hour)
 			{
 				PostSnapshot();
+				Program.DumpMemory();
 				Hour = DateTime.UtcNow.Hour;
 			}
 

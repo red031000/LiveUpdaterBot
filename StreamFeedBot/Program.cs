@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
@@ -21,7 +22,7 @@ namespace StreamFeedBot
 {
 	internal class Program
 	{
-		public static DiscordClient? Client;
+		private static DiscordClient? Client;
 		public static Settings? Settings;
 		public static List<DiscordChannel> Channels = new List<DiscordChannel>();
 		private static DateTime logdate = DateTime.UtcNow.Date;
@@ -91,8 +92,7 @@ namespace StreamFeedBot
 			Environment.Exit(0);
 		}
 
-
-		private static void DumpMemory()
+		public static void DumpMemory()
 		{
 			if (Ruleset?.Memory == null) return;
 			string json = JsonConvert.SerializeObject(Ruleset.Memory, Formatting.Indented);
@@ -178,7 +178,7 @@ namespace StreamFeedBot
 						.ConfigureAwait(false);
 				}
 			}
-			
+
 			Server = new WebServer(opt => opt
 					.WithUrlPrefix($"http://*:{Settings.WebSettings!.Port}/")
 					.WithMode(HttpListenerMode.EmbedIO))
@@ -271,6 +271,47 @@ namespace StreamFeedBot
 					string? link = Api?.PostSnapshot();
 					await e.Message.RespondAsync($"snapshot saved to {link ?? "ERROR: API is null!!"} <:RaccAttack:468748603632910336>").ConfigureAwait(true);
 					Console.WriteLine($"Saved snapshot by request of {e.Author.Username}#{e.Author.Discriminator}");
+				}
+				else if (Settings.SuperUsers.Contains(e.Author.Id) &&
+				         e.Message.Content.ToUpperInvariant().Trim().StartsWith("EDIT "))
+				{
+					string[] parts = e.Message.Content.Trim().Substring(5).Split(" ", 2);
+					if (parts.Length != 2)
+					{
+						await e.Message.RespondAsync("Incorrect number of arguments");
+					}
+					else
+					{
+						if (!ulong.TryParse(parts[0], out ulong res))
+						{
+							await e.Message.RespondAsync($"Could not resolve {parts[0]} to a valid message ID");
+							return;
+						}
+
+						List<DiscordMessage> messages = new List<DiscordMessage>();
+						foreach (ulong chan in Settings.Channels!)
+						{
+							try
+							{
+								DiscordChannel channel = await Client.GetChannelAsync(chan);
+								DiscordMessage mes = await channel.GetMessageAsync(res);
+								messages.Add(mes);
+							}
+							catch
+							{
+							}
+						}
+
+						if (messages.Count == 0 || messages[0].Author != Client.CurrentUser)
+						{
+							await e.Message.RespondAsync($"Could not resolve {parts[0]} to a valid message ID");
+							return;
+						}
+
+						await messages[0].ModifyAsync(parts[1]);
+						await e.Message.RespondAsync("Message Modified!");
+						Console.WriteLine($"Modified message {parts[0]} to {parts[1]} by request of {e.Author.Username}#{e.Author.Discriminator}");
+					}
 				}
 				else if (e.Author != Client.CurrentUser &&
 				         new[] {"UWU", "OWO"}.Contains(e.Message.Content.Trim().ToUpperInvariant()))

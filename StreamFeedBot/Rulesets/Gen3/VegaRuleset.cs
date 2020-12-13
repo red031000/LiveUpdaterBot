@@ -32,6 +32,7 @@ namespace StreamFeedBot.Rulesets
 			086, //Dh Admin
 			087, //Elite Four
 			088, //Dh Leader
+			089, //Rival (PkMn Ranger)
 			090, //PkMn Trainer
 		};
 
