@@ -41,6 +41,7 @@ namespace StreamFeedBot.Rulesets
 		public override List<string>? Badges => _badges;
 
 		private bool flag;
+		private bool InBattle;
 
 		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement, out bool ping)
 		{
@@ -96,6 +97,7 @@ namespace StreamFeedBot.Rulesets
 						}
 
 						EnemyName = null;
+						InBattle = true;
 						break;
 					case BattleKind.Trainer:
 						if (status.EnemyTrainers?.Count == 1)
@@ -117,6 +119,7 @@ namespace StreamFeedBot.Rulesets
 									{
 										Attempts.Add(id, 1);
 									}
+									InBattle = true;
 
 									break;
 								}
@@ -144,6 +147,7 @@ namespace StreamFeedBot.Rulesets
 									};
 									string message = choice[Random.Next(choice.Length)];
 									builder.Append(message);
+									InBattle = true;
 									EnemyName = null;
 									break;
 								}
@@ -260,6 +264,7 @@ namespace StreamFeedBot.Rulesets
 							}
 						}
 
+						InBattle = true;
 						break;
 				}
 			}
@@ -273,10 +278,11 @@ namespace StreamFeedBot.Rulesets
 				builder.Append(message);
 				flag = true;
 				flag2 = true;
+				InBattle = false;
 			}
 
 			if (status.BattleKind == null && oldStatus!.BattleKind == BattleKind.Trainer &&
-				status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts && !flag)
+			    status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts && !flag && InBattle)
 			{
 				if (oldStatus.EnemyTrainers != null)
 				{
@@ -297,6 +303,11 @@ namespace StreamFeedBot.Rulesets
 						}
 					}
 				}
+			}
+			
+			if (status.BattleKind == null && oldStatus!.BattleKind != null && InBattle)
+			{
+				InBattle = false;
 			}
 
 			if (status?.Badges != oldStatus?.Badges)
