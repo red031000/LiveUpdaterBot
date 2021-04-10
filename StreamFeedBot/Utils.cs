@@ -105,7 +105,9 @@ namespace StreamFeedBot
 				if (crashLog)
 				{
 					await using FileStream stream = new FileStream("crash.log", FileMode.Open);
-					await red.SendFileAsync("crash.log", stream).ConfigureAwait(false);
+					DiscordMessageBuilder builder = new DiscordMessageBuilder()
+						.WithFiles(new Dictionary<string, Stream> { { "crash.log", stream } });
+					await red.SendMessageAsync(builder).ConfigureAwait(false);
 				}
 			}
 		}

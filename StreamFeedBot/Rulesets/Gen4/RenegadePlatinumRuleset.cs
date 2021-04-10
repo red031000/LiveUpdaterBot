@@ -1,28 +1,28 @@
-﻿#nullable enable
+#nullable enable
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using static StreamFeedBot.Utils;
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 
 namespace StreamFeedBot.Rulesets
 {
-	public class PlatinumRuleset : Ruleset
+	public class RenegadePlatinumRuleset : Ruleset
 	{
-		public PlatinumRuleset(Memory memory, Settings settings)
+		public RenegadePlatinumRuleset(Memory memory, Settings settings)
 			: base(memory, settings)
 		{ }
 
 		private static readonly uint[] BallIds =
 		{
-			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 492, 493, 494, 495, 496, 497, 498, 499, 500, 576, 851
 		};
 
-		private static readonly int[] SpecialClasses_Platinum =
+		private static readonly int[] SpecialClasses_Renegade =
 		{
-			000, //PkMn Trainer
+			000, //PkMn Trainer Lucas
+			001, //PkMn Trainer Dawn
 			062, //Leader Roark
 			063, //PkMn Trainer Barry (Cedric)
 			064, //Leader Byron
@@ -55,11 +55,25 @@ namespace StreamFeedBot.Rulesets
 			102, //Castle Valet Darach
 		};
 
+		private static readonly int[] SpecialIds_Renegade =
+		{
+			1029, //Bird Keeper Falkner
+			1030, //Bug Catcher Bugsy
+			1031, //Idol Whitney
+			1032, //Ace Trainer Morty
+			1033, //Black Belt Chuck
+			1034, //Lass Jasmine
+			1035, //Veteran Pryce
+			1036, //Ace Trainer Clair
+			1053, //Ace Trainer Dray
+		};
+
 		private readonly List<string> _badges = new List<string> { "Coal", "Forest", "Cobble", "Fen", "Relic", "Mine", "Icicle", "Beacon" };
 
 		public override List<string>? Badges => _badges;
 
 		private bool flag;
+		private bool InBattle;
 
 		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement, out bool ping)
 		{
@@ -68,7 +82,7 @@ namespace StreamFeedBot.Rulesets
 			if (oldStatus == null || status == null)
 			{
 				announcement = null;
-				ping = false;
+				ping = true;
 				return null; //calculate deltas between two statuses, not just one
 			}
 
@@ -84,8 +98,8 @@ namespace StreamFeedBot.Rulesets
 				builder.Append($"**We name our rival {status.RivalName}!** ");
 			}
 
-			if (status.BattleKind != null && status.BattleKind != BattleKind.None && status.GameStats != null && oldStatus.GameStats != null &&
-				status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
+			if (status.BattleKind != null && status.GameStats != null && oldStatus.GameStats != null &&
+			    status.GameStats.BattlesFought != oldStatus.GameStats.BattlesFought)
 			{
 				switch (status.BattleKind)
 				{
@@ -115,6 +129,7 @@ namespace StreamFeedBot.Rulesets
 						}
 
 						EnemyName = null;
+						InBattle = true;
 						break;
 					case BattleKind.Trainer:
 						if (status.EnemyTrainers?.Count == 1)
@@ -122,7 +137,7 @@ namespace StreamFeedBot.Rulesets
 							if (status.EnemyTrainers?[0] != null)
 							{
 								Trainer trainer = status.EnemyTrainers[0];
-								if (SpecialClasses_Platinum.Contains(trainer.ClassId))
+								if (SpecialClasses_Renegade.Contains(trainer.ClassId) || SpecialIds_Renegade.Contains(trainer.Id))
 								{
 									builder.Append($"**VS {trainer.ClassName} {trainer.Name}!** ");
 									int id = trainer.Id;
@@ -136,6 +151,7 @@ namespace StreamFeedBot.Rulesets
 									{
 										Attempts.Add(id, 1);
 									}
+									InBattle = true;
 
 									break;
 								}
@@ -163,13 +179,14 @@ namespace StreamFeedBot.Rulesets
 									};
 									string message = choice[Random.Next(choice.Length)];
 									builder.Append(message);
+									InBattle = true;
 									EnemyName = null;
 									break;
 								}
 
-								string[] c1 = { "fight", "battle", "face off against" };
-								string[] c2 = { "cheeky", "rogue", "roving", "wandering" };
-								string[] c3 = { " wandering", "n eager" };
+								string[] c1 = {"fight", "battle", "face off against"};
+								string[] c2 = {"cheeky", "rogue", "roving", "wandering"};
+								string[] c3 = {" wandering", "n eager"};
 								string[] choices =
 								{
 									$"We {c1[Random.Next(c1.Length)]} a {c2[Random.Next(c2.Length)]} {trainer.ClassName}, named {trainer.Name}{(status.EnemyParty.Any(x => x.Active == true) ? $", and their {string.Join(", ", status.EnemyParty.Where(x => x.Active == true).Select(x => x.Species?.Name ?? ""))}" : "")}. ",
@@ -186,12 +203,13 @@ namespace StreamFeedBot.Rulesets
 								Trainer trainer0 = status.EnemyTrainers[0];
 								Trainer trainer1 = status.EnemyTrainers[1];
 
-								if ((SpecialClasses_Platinum.Contains(trainer0.ClassId) ||
-										SpecialClasses_Platinum.Contains(trainer1.ClassId)) && trainer1.ClassId != 0)
+								if (((SpecialClasses_Renegade.Contains(trainer0.ClassId) || SpecialIds_Renegade.Contains(trainer0.Id)) ||
+								     (SpecialClasses_Renegade.Contains(trainer1.ClassId) || SpecialIds_Renegade.Contains(trainer1.Id))) &&
+								    trainer1.ClassId != 0)
 								{
 									builder.Append(
 										$"**VS {trainer0.ClassName} {trainer0.Name} and {trainer1.ClassName} {trainer1.Name}!** ");
-									if (SpecialClasses_Platinum.Contains(trainer0.ClassId))
+									if (SpecialClasses_Renegade.Contains(trainer0.ClassId) || SpecialIds_Renegade.Contains(trainer0.Id))
 									{
 										if (Attempts.TryGetValue(trainer0.Id, out int val))
 										{
@@ -218,7 +236,7 @@ namespace StreamFeedBot.Rulesets
 										}
 									}
 								}
-								else if (SpecialClasses_Platinum.Contains(trainer0.ClassId))
+								else if (SpecialClasses_Renegade.Contains(trainer0.ClassId) || SpecialIds_Renegade.Contains(trainer0.Id))
 								{
 									builder.Append($"**VS {trainer0.ClassName}s {trainer0.Name}!** ");
 									if (Attempts.TryGetValue(trainer0.Id, out int val))
@@ -279,12 +297,12 @@ namespace StreamFeedBot.Rulesets
 							}
 						}
 
+						InBattle = true;
 						break;
 				}
 			}
 
 			bool flag2 = false;
-			bool urn = false;
 
 			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts > oldStatus.GameStats.Blackouts)
 			{
@@ -293,31 +311,36 @@ namespace StreamFeedBot.Rulesets
 				builder.Append(message);
 				flag = true;
 				flag2 = true;
+				InBattle = false;
 			}
 
-			if ((status.BattleKind == null || status.BattleKind == BattleKind.None) && oldStatus!.BattleKind == BattleKind.Trainer &&
-				status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts && !flag)
+			if (status.BattleKind == null && oldStatus!.BattleKind == BattleKind.Trainer &&
+			    status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts && !flag && InBattle)
 			{
 				if (oldStatus.EnemyTrainers != null)
 				{
 					Trainer trainer = oldStatus.EnemyTrainers[0];
-					if (SpecialClasses_Platinum.Contains(trainer.ClassId))
+					if (SpecialClasses_Renegade.Contains(trainer.ClassId) || SpecialIds_Renegade.Contains(trainer.Id))
 					{
 						builder.Append($"**Defeated {trainer.ClassName} {trainer.Name}!** ");
 						EnemyName = trainer.ClassName + " " + trainer.Name;
 					}
 
-					if (trainer.ClassId == 69)
+					if (trainer.ClassId == 69) //Cynthia
 					{
 						builder.Append("**TEH URN!** ");
 						if (!Memory.Urned)
 						{
 							aBuilder.Append($"**We defeated {trainer.ClassName} {trainer.Name}! TEH URN!** ");
 							Memory.Urned = true;
-							urn = true;
 						}
 					}
 				}
+			}
+			
+			if (status.BattleKind == null && oldStatus!.BattleKind != null && InBattle)
+			{
+				InBattle = false;
 			}
 
 			if (status?.Badges != oldStatus?.Badges)
@@ -1757,7 +1780,6 @@ namespace StreamFeedBot.Rulesets
 				}
 			}
 
-
 			if (status?.MapId != oldStatus?.MapId)
 			{
 				if (status?.MapId == 176 || (status?.MapId == 177 && oldStatus?.MapId != 176))
@@ -1795,7 +1817,7 @@ namespace StreamFeedBot.Rulesets
 				flag = false;
 
 			announcement = aBuilder.ToString().Length == 0 ? null : aBuilder.ToString();
-			ping = urn;
+			ping = true;
 			return builder.ToString().Length == 0 ? null : builder.ToString();
 		}
 	}

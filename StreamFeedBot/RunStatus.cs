@@ -28,8 +28,8 @@ namespace StreamFeedBot
 		[JsonProperty(PropertyName = "map_id")]
 		public uint MapId;
 
-		[JsonProperty(PropertyName = "map_bank")]
-		//[JsonIgnore]
+		//[JsonProperty(PropertyName = "map_bank")]
+		[JsonIgnore]
 		public uint? MapBank;
 
 		[JsonProperty(PropertyName = "battle_kind", ItemConverterType = typeof(StringEnumConverter))]
@@ -95,35 +95,35 @@ namespace StreamFeedBot
 		//[JsonIgnore]
 		public List<Item>? Balls;
 
-		//[JsonProperty(PropertyName = "berries")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "berries")]
+		//[JsonIgnore]
 		public List<Item>? Berries;
 
-		//[JsonProperty(PropertyName = "medicine")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "medicine")]
+		//[JsonIgnore]
 		public List<Item>? Medicine;
 
 		[JsonProperty(PropertyName = "items")]
 		public List<Item>? Items;
 
-		//[JsonProperty(PropertyName = "mail")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "mail")]
+		//[JsonIgnore]
 		public List<Item>? Mail;
 
-		[JsonProperty(PropertyName = "pc")]
-		//[JsonIgnore]
+		//[JsonProperty(PropertyName = "pc")]
+		[JsonIgnore]
 		public List<Item>? PC;
 
 		[JsonProperty(PropertyName = "key")]
 		//[JsonIgnore] //not in Gen 1
 		public List<Item>? Key;
 
-		//[JsonProperty(PropertyName = "tms")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "tms")]
+		//[JsonIgnore]
 		public List<Item>? TMs;
 
-		//[JsonProperty(PropertyName = "battle")]
-		[JsonIgnore]
+		[JsonProperty(PropertyName = "battle")]
+		//[JsonIgnore]
 		public List<Item>? BattleItems;
 
 		//[JsonProperty(PropertyName = "z_crystals")] //Gen 7 specific
@@ -264,7 +264,7 @@ namespace StreamFeedBot
 #pragma warning restore CA1062 // Validate arguments of public methods
 			int idItemName = item.Id.GetHashCode();
 
-			return idItemName ^ hashItemName;
+			return HashCode.Combine(idItemName, hashItemName);
 		}
 	}
 }
