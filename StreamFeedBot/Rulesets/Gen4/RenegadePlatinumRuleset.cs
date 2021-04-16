@@ -71,8 +71,7 @@ namespace StreamFeedBot.Rulesets
 		private readonly List<string> _badges = new List<string> { "Coal", "Forest", "Cobble", "Fen", "Relic", "Mine", "Icicle", "Beacon" };
 
 		public override List<string>? Badges => _badges;
-
-		private bool flag;
+		
 		private bool InBattle;
 
 		public override string? CalculateDeltas(RunStatus? status, RunStatus? oldStatus, out string? announcement, out bool ping)
@@ -301,21 +300,17 @@ namespace StreamFeedBot.Rulesets
 						break;
 				}
 			}
-
-			bool flag2 = false;
-
+			
 			if (status.GameStats != null && oldStatus.GameStats != null && status.GameStats.Blackouts > oldStatus.GameStats.Blackouts)
 			{
 				string[] options = { "**BLACKED OUT!** ", "**We BLACK OUT!** ", "**BLACK OUT...** " };
 				string message = options[Random.Next(options.Length)];
 				builder.Append(message);
-				flag = true;
-				flag2 = true;
 				InBattle = false;
 			}
 
 			if (status.BattleKind == null && oldStatus!.BattleKind == BattleKind.Trainer &&
-			    status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts && !flag && InBattle)
+			    status.GameStats?.Blackouts == oldStatus.GameStats?.Blackouts && InBattle)
 			{
 				if (oldStatus.EnemyTrainers != null)
 				{
@@ -1812,9 +1807,6 @@ namespace StreamFeedBot.Rulesets
 					builder.Append(message);
 				}
 			}
-
-			if (!flag2 && flag)
-				flag = false;
 
 			announcement = aBuilder.ToString().Length == 0 ? null : aBuilder.ToString();
 			ping = true;
